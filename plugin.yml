@@ -1,0 +1,11 @@
+name: uhc_lg
+main: ch.kalunight.uhclg.UhcLg
+version: "1.0"
+api-version: "1.15"
+
+commands:
+ basic:
+  description: This is a demo command.
+  usage: /<command> [player]
+  permission: <plugin name>.basic
+  permission-message: You don't have <permission>
