@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ch.kalunight</groupId>
-	<artifactId>uhclg</artifactId>
+	<artifactId>uhclgzoe</artifactId>
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>uhclg</name>
+	<name>uhclgzoe</name>
 	<url>http://maven.apache.org</url>
 
 	<build>

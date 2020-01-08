@@ -1,5 +1,6 @@
-name: uhc_lg
+name: uhc_lg_zoe
 main: ch.kalunight.uhclg.UhcLg
+authors: [KaluNitht]
 version: "1.0"
 api-version: "1.15"
 
