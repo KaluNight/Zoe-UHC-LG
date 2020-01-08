@@ -4,8 +4,6 @@ version: "1.0"
 api-version: "1.15"
 
 commands:
- basic:
-  description: This is a demo command.
-  usage: /<command> [player]
-  permission: <plugin name>.basic
-  permission-message: You don't have <permission>
+ lgstart:
+  description: Start the game
+  usage: /lgstart
