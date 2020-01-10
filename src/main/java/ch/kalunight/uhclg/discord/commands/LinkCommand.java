@@ -25,12 +25,12 @@ public class LinkCommand extends Command {
 
     for(Player onlinePlayer : ZoePluginMaster.getMinecraftServer().getOnlinePlayers()) {
       if(onlinePlayer.getName().equalsIgnoreCase(event.getArgs())) {
-        onlinePlayer = player;
+        player = onlinePlayer;
       }
     }
 
     if(player != null) {
-      ZoePluginMaster.getPlayersRegistered().add(new LinkedDiscordAccount(event.getAuthor().getId(), player.getUniqueId()));
+      ZoePluginMaster.getPlayersRegistered().add(new LinkedDiscordAccount(event.getAuthor().getIdLong(), player.getUniqueId()));
       event.reply("Vous avez été enregistré avec le compte \"" + player.getName() + "\".");
     }else {
       event.reply("Aucun joueur n'a été trouvé, vous avez besoin d'être connecté sur le serveur pour faire cette commande");

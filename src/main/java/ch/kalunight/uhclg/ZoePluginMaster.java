@@ -43,15 +43,15 @@ public class ZoePluginMaster extends JavaPlugin {
     client.addCommand(new UnlinkCommand());
     
     try {
-      jda = new JDABuilder()
-          .setToken("")//
+      setJda(new JDABuilder()
+          .setToken("NjY1MjU5NzgyMzc4MzU2NzM4.XhjE0w.p0ULsxbxT0qvXvEcRRSbRpovs1g")//
           .setStatus(OnlineStatus.ONLINE)//
-          .addEventListeners(new DiscordEventListener()).build();
+          .addEventListeners(new DiscordEventListener()).build());
     } catch (LoginException e) {
       logger.error("Discord Error !");
     }//
     
-    ZoePluginMaster.server = getServer();
+    setMinecraftServer(getServer());
     
     this.getCommand("lgstart").setExecutor(new LgStart());
   }
@@ -65,11 +65,15 @@ public class ZoePluginMaster extends JavaPlugin {
     return server;
   }
   
+  private static void setMinecraftServer(Server server) {
+    ZoePluginMaster.server = server;
+  }
+  
   public static JDA getJda() {
     return jda;
   }
 
-  public static void setJda(JDA jda) {
+  private static void setJda(JDA jda) {
     ZoePluginMaster.jda = jda;
   }
 

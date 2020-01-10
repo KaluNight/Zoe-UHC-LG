@@ -21,7 +21,7 @@ public class UnlinkCommand extends Command {
     LinkedDiscordAccount accountToDelete = null;
     
     for(LinkedDiscordAccount account : ZoePluginMaster.getPlayersRegistered()) {
-      if(account.getDiscordId() == event.getAuthor().getLongId()) {
+      if(account.getDiscordId() == event.getAuthor().getIdLong()) {
         accountToDelete = account;
       }
     }
