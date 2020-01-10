@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
 import ch.kalunight.uhclg.discord.DiscordEventListener;
+import ch.kalunight.uhclg.discord.commands.LinkCommand;
+import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import net.dv8tion.jda.api.JDA;
@@ -36,6 +38,9 @@ public class ZoePluginMaster extends JavaPlugin {
     CommandClientBuilder client = new CommandClientBuilder();
     
     client.setPrefix("/");
+    
+    client.addCommand(new LinkCommand());
+    client.addCommand(new UnlinkCommand());
     
     try {
       jda = new JDABuilder()
