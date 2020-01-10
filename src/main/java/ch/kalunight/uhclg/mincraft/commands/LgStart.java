@@ -1,4 +1,4 @@
-package ch.kalunight.uhclg.commands;
+package ch.kalunight.uhclg.mincraft.commands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +33,7 @@ public class LgStart implements CommandExecutor {
     
     objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     
-    objective.getScore("Test").setScore(10);
+    objective.getScore("Test");
     
     List<Player> players = new ArrayList<>();
 
@@ -46,7 +46,7 @@ public class LgStart implements CommandExecutor {
     for(Player player : players) {
       player.setScoreboard(scoreBoard);
     }
-
+    
     return true;
   }
 
