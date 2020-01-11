@@ -1,5 +1,9 @@
 package ch.kalunight.uhclg;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +19,7 @@ import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
 import ch.kalunight.uhclg.discord.DiscordEventListener;
 import ch.kalunight.uhclg.discord.commands.LinkCommand;
+import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
@@ -28,10 +33,18 @@ public class ZoePluginMaster extends JavaPlugin {
   
   private static final List<LinkedDiscordAccount> playersRegistered = Collections.synchronizedList(new ArrayList<>());
   
+  private static final File SECRET_FILE = new File("plugins/secret.txt");
+  
+  private static final File OWNER_ID_FILE = new File("plugins/owner.txt");
+  
   private static Server server;
   
   private static JDA jda;
 
+  public static void main(String[] args) {
+    //Does not use
+  }
+  
   @Override
   public void onEnable() {
     
@@ -41,19 +54,40 @@ public class ZoePluginMaster extends JavaPlugin {
     
     client.addCommand(new LinkCommand());
     client.addCommand(new UnlinkCommand());
+    client.addCommand(new UnlinkAllCommand());
     
     try {
-      setJda(new JDABuilder()
-          .setToken("NjY1MjU5NzgyMzc4MzU2NzM4.XhjE0w.p0ULsxbxT0qvXvEcRRSbRpovs1g")//
+      client.setOwnerId(getParamWithFile(OWNER_ID_FILE));
+      setJda(new JDABuilder()//
+          .setToken(getParamWithFile(SECRET_FILE))//
           .setStatus(OnlineStatus.ONLINE)//
-          .addEventListeners(new DiscordEventListener()).build());
-    } catch (LoginException e) {
-      logger.error("Discord Error !");
-    }//
+          .addEventListeners(new DiscordEventListener())//
+          .addEventListeners(client.build()).build());
+    } catch (LoginException | IOException e) {
+      logger.error("Issue when loading Discord !", e);
+    }
     
     setMinecraftServer(getServer());
     
     this.getCommand("lgstart").setExecutor(new LgStart());
+    
+    generateLobby();
+  }
+  
+  private void generateLobby() {
+    Server server = getMinecraftServer();
+    
+    server.getWorld("world");
+    
+  }
+
+  private String getParamWithFile(File file) throws IOException {
+    String line;
+    try(BufferedReader br = new BufferedReader(new FileReader(file))){
+      line = br.readLine();
+    }
+
+    return line;
   }
   
   @Override
