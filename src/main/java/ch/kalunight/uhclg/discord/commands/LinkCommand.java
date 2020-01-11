@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import com.jagrosh.jdautilities.command.Command;
 import com.jagrosh.jdautilities.command.CommandEvent;
 
+import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 
@@ -30,7 +31,7 @@ public class LinkCommand extends Command {
     }
 
     if(player != null) {
-      ZoePluginMaster.getPlayersRegistered().add(new LinkedDiscordAccount(event.getAuthor().getIdLong(), player.getUniqueId()));
+      GameData.getPlayersRegistered().add(new LinkedDiscordAccount(event.getAuthor().getIdLong(), player.getUniqueId()));
       event.reply("Vous avez été enregistré avec le compte \"" + player.getName() + "\".");
     }else {
       event.reply("Aucun joueur n'a été trouvé, vous avez besoin d'être connecté sur le serveur pour faire cette commande");

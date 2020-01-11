@@ -4,10 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.security.auth.login.LoginException;
 
 import org.bukkit.Location;
@@ -21,13 +17,15 @@ import org.slf4j.LoggerFactory;
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
 
 import ch.kalunight.uhclg.discord.DiscordEventListener;
+import ch.kalunight.uhclg.discord.commands.DefineLobbyTextCommand;
+import ch.kalunight.uhclg.discord.commands.DefineLobbyVocalCommand;
 import ch.kalunight.uhclg.discord.commands.LinkCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
 import ch.kalunight.uhclg.model.GameStatus;
-import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import ch.kalunight.uhclg.worker.PositionWorker;
+import ch.kalunight.uhclg.worker.VocalSystemWorker;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -36,13 +34,9 @@ public class ZoePluginMaster extends JavaPlugin {
 
   private static final Logger logger = LoggerFactory.getLogger(ZoePluginMaster.class);
 
-  private static final List<LinkedDiscordAccount> playersRegistered = Collections.synchronizedList(new ArrayList<>());
-
   private static final File SECRET_FILE = new File("plugins/secret.txt");
 
   private static final File OWNER_ID_FILE = new File("plugins/owner.txt");
-  
-  private static GameStatus gameStatus = GameStatus.IN_LOBBY;
 
   private static Server server;
 
@@ -57,6 +51,8 @@ public class ZoePluginMaster extends JavaPlugin {
 
     setMinecraftServer(getServer());
     
+    GameData.setGameStatus(GameStatus.IN_LOBBY);
+    
     CommandClientBuilder client = new CommandClientBuilder();
 
     client.setPrefix("/");
@@ -64,6 +60,8 @@ public class ZoePluginMaster extends JavaPlugin {
     client.addCommand(new LinkCommand());
     client.addCommand(new UnlinkCommand());
     client.addCommand(new UnlinkAllCommand());
+    client.addCommand(new DefineLobbyVocalCommand());
+    client.addCommand(new DefineLobbyTextCommand());
 
     try {
       client.setOwnerId(getParamWithFile(OWNER_ID_FILE));
@@ -81,6 +79,7 @@ public class ZoePluginMaster extends JavaPlugin {
     generateLobby();
     
     getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 5, 5);
+    getServer().getScheduler().runTaskTimer(this, new VocalSystemWorker(), 5, 5);
     
     getServer().getPluginManager().registerEvents(new MinecraftEventListener(), this);
   }
@@ -129,18 +128,6 @@ public class ZoePluginMaster extends JavaPlugin {
 
   private static void setJda(JDA jda) {
     ZoePluginMaster.jda = jda;
-  }
-
-  public static List<LinkedDiscordAccount> getPlayersRegistered() {
-    return playersRegistered;
-  }
-
-  public static GameStatus getGameStatus() {
-    return gameStatus;
-  }
-
-  public static void setGameStatus(GameStatus gameStatus) {
-    ZoePluginMaster.gameStatus = gameStatus;
   }
 
 }
