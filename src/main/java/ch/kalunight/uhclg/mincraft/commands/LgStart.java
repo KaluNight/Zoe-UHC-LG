@@ -14,6 +14,9 @@ import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.RenderType;
 import org.bukkit.scoreboard.Scoreboard;
 
+import ch.kalunight.uhclg.ZoePluginMaster;
+import ch.kalunight.uhclg.model.GameStatus;
+
 public class LgStart implements CommandExecutor {
 
   private static Scoreboard scoreBoard;
@@ -46,6 +49,8 @@ public class LgStart implements CommandExecutor {
     for(Player player : players) {
       player.setScoreboard(scoreBoard);
     }
+    
+    ZoePluginMaster.setGameStatus(GameStatus.IN_GAME);
     
     return true;
   }

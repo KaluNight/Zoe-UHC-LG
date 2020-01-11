@@ -10,7 +10,10 @@ import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +25,9 @@ import ch.kalunight.uhclg.discord.commands.LinkCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
+import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
+import ch.kalunight.uhclg.worker.PositionWorker;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
@@ -30,32 +35,36 @@ import net.dv8tion.jda.api.OnlineStatus;
 public class ZoePluginMaster extends JavaPlugin {
 
   private static final Logger logger = LoggerFactory.getLogger(ZoePluginMaster.class);
-  
+
   private static final List<LinkedDiscordAccount> playersRegistered = Collections.synchronizedList(new ArrayList<>());
-  
+
   private static final File SECRET_FILE = new File("plugins/secret.txt");
-  
+
   private static final File OWNER_ID_FILE = new File("plugins/owner.txt");
   
+  private static GameStatus gameStatus = GameStatus.IN_LOBBY;
+
   private static Server server;
-  
+
   private static JDA jda;
 
   public static void main(String[] args) {
-    //Does not use
+    //Do not use
   }
-  
+
   @Override
   public void onEnable() {
+
+    setMinecraftServer(getServer());
     
     CommandClientBuilder client = new CommandClientBuilder();
-    
+
     client.setPrefix("/");
-    
+
     client.addCommand(new LinkCommand());
     client.addCommand(new UnlinkCommand());
     client.addCommand(new UnlinkAllCommand());
-    
+
     try {
       client.setOwnerId(getParamWithFile(OWNER_ID_FILE));
       setJda(new JDABuilder()//
@@ -66,19 +75,30 @@ public class ZoePluginMaster extends JavaPlugin {
     } catch (LoginException | IOException e) {
       logger.error("Issue when loading Discord !", e);
     }
-    
-    setMinecraftServer(getServer());
-    
+
     this.getCommand("lgstart").setExecutor(new LgStart());
     
     generateLobby();
+    
+    getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 5, 5);
+    
+    getServer().getPluginManager().registerEvents(new MinecraftEventListener(), this);
   }
-  
+
   private void generateLobby() {
-    Server server = getMinecraftServer();
+    World world = getMinecraftServer().getWorld("world");
+    Location spawn = world.getSpawnLocation();
+
+    int spawnSize = 25;
+    int spawnHigh = 200;
     
-    server.getWorld("world");
+    for(int j = 0; j < spawnSize; j++) {
+      for(int i = 0; i < spawnSize; i++) {
+        world.getBlockAt(spawn.getBlockX() + i, spawnHigh, spawn.getBlockY() + j).setType(Material.GLASS);
+      }
+    }
     
+    world.setSpawnLocation(spawn.getBlockX() + (spawnSize / 2), spawnHigh + 1, spawn.getBlockY() + (spawnSize / 2));
   }
 
   private String getParamWithFile(File file) throws IOException {
@@ -89,7 +109,7 @@ public class ZoePluginMaster extends JavaPlugin {
 
     return line;
   }
-  
+
   @Override
   public void onDisable() {
     jda.shutdownNow();
@@ -98,11 +118,11 @@ public class ZoePluginMaster extends JavaPlugin {
   public static Server getMinecraftServer() {
     return server;
   }
-  
+
   private static void setMinecraftServer(Server server) {
     ZoePluginMaster.server = server;
   }
-  
+
   public static JDA getJda() {
     return jda;
   }
@@ -114,5 +134,13 @@ public class ZoePluginMaster extends JavaPlugin {
   public static List<LinkedDiscordAccount> getPlayersRegistered() {
     return playersRegistered;
   }
-  
+
+  public static GameStatus getGameStatus() {
+    return gameStatus;
+  }
+
+  public static void setGameStatus(GameStatus gameStatus) {
+    ZoePluginMaster.gameStatus = gameStatus;
+  }
+
 }
