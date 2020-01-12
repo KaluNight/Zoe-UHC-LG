@@ -114,7 +114,7 @@ public class LgStart implements CommandExecutor {
       playerData.getAccount().getPlayer().setInvulnerable(false);
       
       playerData.getAccount().getPlayer().getPlayer()
-      .addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15, 50, false, true, false));
+      .addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 200, 500, false, true, false));
     }
 
     for(Location location : startLocations) {
