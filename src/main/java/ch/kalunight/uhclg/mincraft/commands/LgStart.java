@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -83,16 +84,18 @@ public class LgStart implements CommandExecutor {
       return true;
     }
 
-    GameData.setGameStatus(GameStatus.IN_GAME);
-
-    startTheGame(server);
+    GameData.setGameStatus(GameStatus.STARTING_GAME);
+    
+    startTheGame();
 
     defineWorldBorder();
-
     
+    VocalSystemWorker.setupVoiceChannels(GameData.getPlayersInGame());
     
     tpPlayers();
-
+    
+    GameData.setGameStatus(GameStatus.IN_GAME);
+    
     return true;
   }
 
@@ -106,6 +109,10 @@ public class LgStart implements CommandExecutor {
 
       startLocations.add(getRandomSpawnLocation(world, spawnLocation));
 
+      playerData.getAccount().getPlayer().setGameMode(GameMode.SURVIVAL);
+      
+      playerData.getAccount().getPlayer().setInvulnerable(false);
+      
       playerData.getAccount().getPlayer().getPlayer()
       .addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15, 50, false, true, false));
     }
@@ -157,7 +164,7 @@ public class LgStart implements CommandExecutor {
     world.getWorldBorder().setSize(GameData.getBaseWorldBorderSize());
   }
 
-  private void startTheGame(Server server) {
+  private void startTheGame() {
     GameData.getPlayersRegistered().forEach(e -> e.getPlayer().sendTitle("La partie va commencer !", "Vous allez être téleporté ...", 10, 40, 10));
 
     List<Role> rolesInTheGame = getRoleWithNumberOfPlayer(GameData.getPlayersRegistered().size());

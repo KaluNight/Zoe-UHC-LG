@@ -66,7 +66,7 @@ public enum Role {
     Role role;
     do {
       role = VALUES.get(RANDOM.nextInt(SIZE));
-    }while(!role.getClan().equals(RoleClan.VILLAGE) || !role.getClan().equals(RoleClan.SPECIAL) || role.equals(Role.VILLAGEOIS));
+    }while((!role.getClan().equals(RoleClan.VILLAGE) && !role.getClan().equals(RoleClan.SPECIAL)) || role.equals(Role.VILLAGEOIS));
 
     return role;
   }
@@ -75,7 +75,7 @@ public enum Role {
     Role role;
     do {
       role = VALUES.get(RANDOM.nextInt(SIZE));
-    }while(!role.getClan().equals(RoleClan.WOLFS) || !role.getClan().equals(RoleClan.SPECIAL) || role.equals(Role.LOUP_GAROU));
+    }while((!role.getClan().equals(RoleClan.WOLFS) && !role.getClan().equals(RoleClan.SPECIAL)) || role.equals(Role.LOUP_GAROU));
 
     return role;
   }

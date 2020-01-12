@@ -22,13 +22,13 @@ public class LinkCommand extends Command {
   @Override
   protected void execute(CommandEvent event) {
 
-    for(LinkedDiscordAccount linkedDiscord : GameData.getPlayersRegistered()) {
+    /*for(LinkedDiscordAccount linkedDiscord : GameData.getPlayersRegistered()) {
       if(ZoePluginMaster.getMinecraftServer().getOfflinePlayer(linkedDiscord.getPlayerUUID()).getName() != null) {
         event.reply("Ce compte est déjà lié avec le joueur " 
             + ZoePluginMaster.getJda().retrieveUserById(linkedDiscord.getDiscordId()).complete().getName() + ".");
         return;
       }
-    }
+    }*/
 
     Player player = null;
 

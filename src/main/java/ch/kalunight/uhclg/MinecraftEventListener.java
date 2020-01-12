@@ -13,7 +13,7 @@ public class MinecraftEventListener implements Listener {
       
       event.getPlayer().setGameMode(GameMode.ADVENTURE);
       
-      event.getPlayer().setInvulnerable(false);
+      event.getPlayer().setInvulnerable(true);
   }
   
 }

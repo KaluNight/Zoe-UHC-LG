@@ -79,7 +79,7 @@ public class ZoePluginMaster extends JavaPlugin {
     generateLobby();
     
     getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 5, 5);
-    getServer().getScheduler().runTaskTimer(this, new VocalSystemWorker(), 5, 5);
+    getServer().getScheduler().runTaskTimer(this, new VocalSystemWorker(), 10, 10);
     
     getServer().getPluginManager().registerEvents(new MinecraftEventListener(), this);
   }
@@ -98,6 +98,8 @@ public class ZoePluginMaster extends JavaPlugin {
     }
     
     world.setSpawnLocation(spawn.getBlockX() + (spawnSize / 2), spawnHigh + 1, spawn.getBlockY() + (spawnSize / 2));
+    
+    GameData.setLobbyLocation(spawn);
   }
 
   private String getParamWithFile(File file) throws IOException {
