@@ -27,6 +27,8 @@ public class GameData {
   private static Location lobbyLocation;
   
   private static int baseWorldBorderSize = 3000;
+  
+  private static double spawnMinBlockDistance = 100;
 
   private GameData() {
     //hide default public constructor
@@ -78,6 +80,14 @@ public class GameData {
 
   public static void setBaseWorldBorderSize(int baseWorldBorderSize) {
     GameData.baseWorldBorderSize = baseWorldBorderSize;
+  }
+
+  public static double getSpawnMinBlockDistance() {
+    return spawnMinBlockDistance;
+  }
+
+  public static void setSpawnMinBlockDistance(double spawnMinBlockDistance) {
+    GameData.spawnMinBlockDistance = spawnMinBlockDistance;
   }
   
 }

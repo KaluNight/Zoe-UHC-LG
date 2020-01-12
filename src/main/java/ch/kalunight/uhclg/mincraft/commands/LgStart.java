@@ -12,6 +12,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +29,9 @@ import ch.kalunight.uhclg.worker.VocalSystemWorker;
 import net.dv8tion.jda.api.entities.Member;
 
 public class LgStart implements CommandExecutor {
-  
+
   private static final Logger logger = LoggerFactory.getLogger(LgStart.class);
-  
+
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
@@ -40,7 +42,7 @@ public class LgStart implements CommandExecutor {
       logger.info("Impossible to launch the game, missing voice lobby");
       return true;
     }
-    
+
     List<LinkedDiscordAccount> playersMissingInServer = new ArrayList<>();
     for(LinkedDiscordAccount registedPlayer : GameData.getPlayersRegistered()) {
       playersMissingInServer.add(registedPlayer);
@@ -51,7 +53,7 @@ public class LgStart implements CommandExecutor {
         }
       }
     }
-    
+
     List<LinkedDiscordAccount> playersMissingInVocal = new ArrayList<>();
     for(LinkedDiscordAccount registedPlayer : GameData.getPlayersRegistered()) {
       playersMissingInVocal.add(registedPlayer);
@@ -61,67 +63,105 @@ public class LgStart implements CommandExecutor {
         }
       }
     }
-    
+
     if(!playersMissingInServer.isEmpty() || !playersMissingInVocal.isEmpty()) {
       StringBuilder fixMessage = new StringBuilder();
-      
+
       fixMessage.append("Joueurs qui sont enregistrés et qui manque sur le serveur (Pseudo Minecraft) :\n");
-      
+
       for(LinkedDiscordAccount linkedAccount : playersMissingInServer) {
         OfflinePlayer player = server.getOfflinePlayer(linkedAccount.getPlayerUUID());
         fixMessage.append(player.getName() + "\n");
       }
-      
+
       fixMessage.append("Joueurs qu'ils manquent dans la lobby vocal (Pseudo Discord) : \n");
       for(LinkedDiscordAccount missingPlayer : playersMissingInVocal) {
         fixMessage.append(missingPlayer.getDiscordUser().getAsMention() + "\n");
       }
-      
+
       GameData.getLobbyTextChannel().sendMessage(fixMessage.toString()).queue();
       return true;
     }
-    
+
     GameData.setGameStatus(GameStatus.IN_GAME);
-    
+
     startTheGame(server);
-    
+
     defineWorldBorder();
+
+    
     
     tpPlayers();
-    
-    
-    
+
     return true;
   }
 
   private void tpPlayers() {
-    List<Location> locations = new ArrayList<>();
-    
+    List<Location> startLocations = new ArrayList<>();
+
+    World world = ZoePluginMaster.getMinecraftServer().getWorld("world");
     Location spawnLocation = GameData.getLobbyLocation();
-    
+
     for(PlayerData playerData : GameData.getPlayersInGame()) {
-      double x = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
-      double z = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
-      
-      x = spawnLocation.getX() + x;
-      z = spawnLocation.getZ() + z;
+
+      startLocations.add(getRandomSpawnLocation(world, spawnLocation));
+
+      playerData.getAccount().getPlayer().getPlayer()
+      .addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 15, 50, false, true, false));
+    }
+
+    for(Location location : startLocations) {
+      while(isLocationNearOfTheList(location, startLocations)) {
+        Location newLocation = getRandomSpawnLocation(location.getWorld(), spawnLocation);
+        location.setX(newLocation.getX());
+        location.setZ(newLocation.getZ());
+      }
     }
     
+    int i = -1;
+    for(PlayerData player : GameData.getPlayersInGame()) {
+      i++;
+      
+      player.getAccount().getPlayer().teleport(startLocations.get(i));
+    }
+  }
+
+  private boolean isLocationNearOfTheList(Location location, List<Location> locations) {
+    boolean isLocationNearOfTheList = false;
+    for(Location locationToCheck : locations) {
+      if(!location.equals(locationToCheck) 
+          && location.distanceSquared(locationToCheck) < GameData.getSpawnMinBlockDistance()) {
+        isLocationNearOfTheList = true;
+        break;
+      }
+    }
+    return isLocationNearOfTheList;
+  }
+  
+
+  private Location getRandomSpawnLocation(World world, Location spawnLocation) {
+    double x = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
+    double z = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
+
+    x = spawnLocation.getX() + x;
+    z = spawnLocation.getZ() + z;
+
+    return new Location(world, x, spawnLocation.getY() - 5, z);
   }
 
   private void defineWorldBorder() {
     World world = ZoePluginMaster.getMinecraftServer().getWorld("world");
-    
+
     world.getWorldBorder().setCenter(world.getSpawnLocation());
-    
+
     world.getWorldBorder().setSize(GameData.getBaseWorldBorderSize());
   }
 
   private void startTheGame(Server server) {
     GameData.getPlayersRegistered().forEach(e -> e.getPlayer().sendTitle("La partie va commencer !", "Vous allez être téleporté ...", 10, 40, 10));
-    
+
     List<Role> rolesInTheGame = getRoleWithNumberOfPlayer(GameData.getPlayersRegistered().size());
-    
+
     definePlayerInGame(rolesInTheGame);
   }
 
@@ -130,21 +170,21 @@ public class LgStart implements CommandExecutor {
     for(Role role : rolesInTheGame) {
       i++;
       LinkedDiscordAccount account = GameData.getPlayersRegistered().get(i);
-      
+
       PlayerData playerInGame = new PlayerData(account);
       playerInGame.setRole(role);
-      
+
       GameData.getPlayersInGame().add(playerInGame);
     }
   }
 
   private List<Role> getRoleWithNumberOfPlayer(int numberOfPlayer) {
     GameConfig config = GameConfig.getGameConfigWithPlayerNumber(numberOfPlayer);
-    
+
     List<Role> roles = config.getRoles(config);
-    
+
     Collections.shuffle(roles);
-    
+
     return roles;
   }
 
