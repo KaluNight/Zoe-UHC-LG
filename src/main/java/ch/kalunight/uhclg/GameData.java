@@ -5,8 +5,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Location;
+
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
+import ch.kalunight.uhclg.model.PlayerData;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 
@@ -16,11 +18,15 @@ public class GameData {
   
   private static final List<LinkedDiscordAccount> playersRegistered = Collections.synchronizedList(new ArrayList<>());
   
+  private static final List<PlayerData> playersInGame = Collections.synchronizedList(new ArrayList<>());
+  
   private static VoiceChannel lobbyVoiceChannel;
   
   private static TextChannel lobbyTextChannel;
   
   private static Location lobbyLocation;
+  
+  private static int baseWorldBorderSize = 3000;
 
   private GameData() {
     //hide default public constructor
@@ -60,6 +66,18 @@ public class GameData {
 
   public static void setLobbyTextChannel(TextChannel lobbyTextChannel) {
     GameData.lobbyTextChannel = lobbyTextChannel;
+  }
+
+  public static List<PlayerData> getPlayersInGame() {
+    return playersInGame;
+  }
+
+  public static int getBaseWorldBorderSize() {
+    return baseWorldBorderSize;
+  }
+
+  public static void setBaseWorldBorderSize(int baseWorldBorderSize) {
+    GameData.baseWorldBorderSize = baseWorldBorderSize;
   }
   
 }

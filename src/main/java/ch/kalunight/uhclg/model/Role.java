@@ -44,17 +44,19 @@ public enum Role {
       do {
         roleToAdd = getRandomVillagerSpecialRole();
       }while(roles.contains(roleToAdd));
+      roles.add(roleToAdd);
     }
-    
+
     for(int i = 0; i < config.getWolfsNumber(); i++) {
       roles.add(Role.LOUP_GAROU);
     }
-    
+
     for(int i = 0; i < config.getSpecialWolfsNumber(); i++) {
       Role roleToAdd;
       do {
         roleToAdd = getRandomWolfsSpecialRole();
       }while(roles.contains(roleToAdd));
+      roles.add(roleToAdd);
     }
 
     return roles;
@@ -64,17 +66,17 @@ public enum Role {
     Role role;
     do {
       role = VALUES.get(RANDOM.nextInt(SIZE));
-    }while(!role.getClan().equals(RoleClan.VILLAGE) || !role.getClan().equals(RoleClan.SPECIAL));
-    
+    }while(!role.getClan().equals(RoleClan.VILLAGE) || !role.getClan().equals(RoleClan.SPECIAL) || role.equals(Role.VILLAGEOIS));
+
     return role;
   }
-  
+
   private static Role getRandomWolfsSpecialRole() {
     Role role;
     do {
       role = VALUES.get(RANDOM.nextInt(SIZE));
-    }while(!role.getClan().equals(RoleClan.WOLFS) || !role.getClan().equals(RoleClan.SPECIAL));
-    
+    }while(!role.getClan().equals(RoleClan.WOLFS) || !role.getClan().equals(RoleClan.SPECIAL) || role.equals(Role.LOUP_GAROU));
+
     return role;
   }
 

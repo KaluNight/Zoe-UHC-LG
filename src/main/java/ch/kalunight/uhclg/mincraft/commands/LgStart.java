@@ -1,10 +1,13 @@
 package ch.kalunight.uhclg.mincraft.commands;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,7 +20,10 @@ import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameConfig;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
+import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.util.MathUtil;
+import ch.kalunight.uhclg.worker.VocalSystemWorker;
 import net.dv8tion.jda.api.entities.Member;
 
 public class LgStart implements CommandExecutor {
@@ -68,32 +74,78 @@ public class LgStart implements CommandExecutor {
       
       fixMessage.append("Joueurs qu'ils manquent dans la lobby vocal (Pseudo Discord) : \n");
       for(LinkedDiscordAccount missingPlayer : playersMissingInVocal) {
-        fixMessage.append(ZoePluginMaster.getJda().getUserById(missingPlayer.getDiscordId()).getAsMention() + "\n");
+        fixMessage.append(missingPlayer.getDiscordUser().getAsMention() + "\n");
       }
       
       GameData.getLobbyTextChannel().sendMessage(fixMessage.toString()).queue();
       return true;
     }
     
+    GameData.setGameStatus(GameStatus.IN_GAME);
+    
     startTheGame(server);
-
+    
+    defineWorldBorder();
+    
+    tpPlayers();
+    
+    
+    
     return true;
   }
 
+  private void tpPlayers() {
+    List<Location> locations = new ArrayList<>();
+    
+    Location spawnLocation = GameData.getLobbyLocation();
+    
+    for(PlayerData playerData : GameData.getPlayersInGame()) {
+      double x = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
+      double z = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
+      
+      x = spawnLocation.getX() + x;
+      z = spawnLocation.getZ() + z;
+    }
+    
+  }
+
+  private void defineWorldBorder() {
+    World world = ZoePluginMaster.getMinecraftServer().getWorld("world");
+    
+    world.getWorldBorder().setCenter(world.getSpawnLocation());
+    
+    world.getWorldBorder().setSize(GameData.getBaseWorldBorderSize());
+  }
+
   private void startTheGame(Server server) {
-    server.broadcastMessage("The game start !");
+    GameData.getPlayersRegistered().forEach(e -> e.getPlayer().sendTitle("La partie va commencer !", "Vous allez être téleporté ...", 10, 40, 10));
     
-    GameData.setGameStatus(GameStatus.IN_GAME);
+    List<Role> rolesInTheGame = getRoleWithNumberOfPlayer(GameData.getPlayersRegistered().size());
     
-    List<Role> roleInTheGame = getRoleWithNumberOfPlayer(GameData.getPlayersRegistered().size());
-    
-    
+    definePlayerInGame(rolesInTheGame);
+  }
+
+  private void definePlayerInGame(List<Role> rolesInTheGame) {
+    int i = -1;
+    for(Role role : rolesInTheGame) {
+      i++;
+      LinkedDiscordAccount account = GameData.getPlayersRegistered().get(i);
+      
+      PlayerData playerInGame = new PlayerData(account);
+      playerInGame.setRole(role);
+      
+      GameData.getPlayersInGame().add(playerInGame);
+    }
   }
 
   private List<Role> getRoleWithNumberOfPlayer(int numberOfPlayer) {
     GameConfig config = GameConfig.getGameConfigWithPlayerNumber(numberOfPlayer);
     
-    return config.getRoles(config);
+    List<Role> roles = config.getRoles(config);
+    
+    Collections.shuffle(roles);
+    
+    return roles;
   }
 
 }
