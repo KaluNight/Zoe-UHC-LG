@@ -3,6 +3,7 @@ package ch.kalunight.uhclg.mincraft.commands;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,8 +14,10 @@ import org.slf4j.LoggerFactory;
 
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
+import ch.kalunight.uhclg.model.GameConfig;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
+import ch.kalunight.uhclg.model.Role;
 import net.dv8tion.jda.api.entities.Member;
 
 public class LgStart implements CommandExecutor {
@@ -32,12 +35,12 @@ public class LgStart implements CommandExecutor {
       return true;
     }
     
-    List<Player> playersMissingInServer = new ArrayList<>();
-    for(Player player : server.getOnlinePlayers()) {
-      playersMissingInServer.add(player);
-      for(LinkedDiscordAccount registedPlayer : GameData.getPlayersRegistered()) {
+    List<LinkedDiscordAccount> playersMissingInServer = new ArrayList<>();
+    for(LinkedDiscordAccount registedPlayer : GameData.getPlayersRegistered()) {
+      playersMissingInServer.add(registedPlayer);
+      for(Player player : server.getOnlinePlayers()) {
         if(registedPlayer.getPlayerUUID().equals(player.getUniqueId())) {
-          playersMissingInServer.remove(player);
+          playersMissingInServer.remove(registedPlayer);
           break;
         }
       }
@@ -58,7 +61,8 @@ public class LgStart implements CommandExecutor {
       
       fixMessage.append("Joueurs qui sont enregistrés et qui manque sur le serveur (Pseudo Minecraft) :\n");
       
-      for(Player player : playersMissingInServer) {
+      for(LinkedDiscordAccount linkedAccount : playersMissingInServer) {
+        OfflinePlayer player = server.getOfflinePlayer(linkedAccount.getPlayerUUID());
         fixMessage.append(player.getName() + "\n");
       }
       
@@ -68,20 +72,28 @@ public class LgStart implements CommandExecutor {
       }
       
       GameData.getLobbyTextChannel().sendMessage(fixMessage.toString()).queue();
-      
       return true;
     }
     
-    
-    
-    
+    startTheGame(server);
+
+    return true;
+  }
+
+  private void startTheGame(Server server) {
     server.broadcastMessage("The game start !");
-    
-    
     
     GameData.setGameStatus(GameStatus.IN_GAME);
     
-    return true;
+    List<Role> roleInTheGame = getRoleWithNumberOfPlayer(GameData.getPlayersRegistered().size());
+    
+    
+  }
+
+  private List<Role> getRoleWithNumberOfPlayer(int numberOfPlayer) {
+    GameConfig config = GameConfig.getGameConfigWithPlayerNumber(numberOfPlayer);
+    
+    return config.getRoles(config);
   }
 
 }
