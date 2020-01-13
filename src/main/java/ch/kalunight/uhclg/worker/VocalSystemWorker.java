@@ -7,6 +7,7 @@ import java.util.List;
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
+import ch.kalunight.uhclg.model.PlayerVoicePosition;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -20,6 +21,8 @@ public class VocalSystemWorker implements Runnable {
   private static final List<Long> listIdVoiceChannel = Collections.synchronizedList(new ArrayList<>());
 
   private static final List<PlayerData> playersAlreadyTreated = Collections.synchronizedList(new ArrayList<>());
+  
+  private static final List<PlayerVoicePosition> playersVoicePositions = Collections.synchronizedList(new ArrayList<>());
 
   private static long idDeadPlayer;
 
@@ -35,20 +38,25 @@ public class VocalSystemWorker implements Runnable {
 
             if(player.getAccount().getPlayer().getLocation().distanceSquared(playerNear.getAccount().getPlayer().getLocation()) < voiceDistance) {
 
-              VoiceChannel voiceChannelPlayer = getVoiceChannelByMember(guild, player.getAccount().getDiscordId());
-              VoiceChannel voiceChannelPlayerNear = getVoiceChannelByMember(guild, playerNear.getAccount().getDiscordId());
+              PlayerVoicePosition voiceChannelPlayer = getPlayerVoicePosition(player.getAccount().getDiscordId());
+              PlayerVoicePosition voiceChannelPlayerNear = getPlayerVoicePosition(playerNear.getAccount().getDiscordId());
               
               if(voiceChannelPlayer != null && voiceChannelPlayerNear != null) {
-                if(voiceChannelPlayer.getIdLong() != voiceChannelPlayerNear.getIdLong()) {
-                  if(isAValidChannel(voiceChannelPlayer)) {
+                if(voiceChannelPlayer.getActualVoiceChannelId() != voiceChannelPlayerNear.getActualVoiceChannelId()) {
+                  if(isAValidChannel(voiceChannelPlayer.getActualVoiceChannelId())) {
                     Member member = guild.getMember(playerNear.getAccount().getDiscordUser());
                     
-                    guild.moveVoiceMember(member, voiceChannelPlayer).complete();
+                    voiceChannelPlayerNear.setActualVoiceChannelId(voiceChannelPlayer.getActualVoiceChannelId());
+                    
+                    guild.moveVoiceMember(member, voiceChannelPlayer.getActualVoiceChannel(guild)).queue();
                     playersAlreadyTreated.add(player);
                     playersAlreadyTreated.add(playerNear);
-                  }else if(isAValidChannel(voiceChannelPlayerNear)) {
+                  }else if(isAValidChannel(voiceChannelPlayerNear.getActualVoiceChannelId())) {
                     Member member = guild.getMember(player.getAccount().getDiscordUser());
-                    guild.moveVoiceMember(member, voiceChannelPlayerNear).complete();
+                    
+                    voiceChannelPlayer.setActualVoiceChannelId(voiceChannelPlayerNear.getActualVoiceChannelId());
+                    
+                    guild.moveVoiceMember(member, voiceChannelPlayerNear.getActualVoiceChannel(guild)).queue();
                     playersAlreadyTreated.add(player);
                     playersAlreadyTreated.add(playerNear);
                   }
@@ -56,14 +64,20 @@ public class VocalSystemWorker implements Runnable {
               }
 
             }else {
-              VoiceChannel voiceChannelPlayer = getVoiceChannelByMember(guild, player.getAccount().getDiscordId());
-              VoiceChannel voiceChannelPlayerNear = getVoiceChannelByMember(guild, playerNear.getAccount().getDiscordId());
+              PlayerVoicePosition voiceChannelPlayer = getPlayerVoicePosition(player.getAccount().getDiscordId());
+              PlayerVoicePosition voiceChannelPlayerNear = getPlayerVoicePosition(playerNear.getAccount().getDiscordId());
 
-              if(voiceChannelPlayer.getIdLong() == voiceChannelPlayerNear.getIdLong()) {
+              if(voiceChannelPlayer == null || voiceChannelPlayerNear == null) {
+                continue;
+              }
+              
+              if(voiceChannelPlayer.getActualVoiceChannelId() == voiceChannelPlayerNear.getActualVoiceChannelId()) {
                 VoiceChannel emptyVoiceChannel = getEmptyVoiceChannel(guild);
                 Member member = guild.getMember(playerNear.getAccount().getDiscordUser());
                 if(emptyVoiceChannel != null) {
-                  guild.moveVoiceMember(member, emptyVoiceChannel).complete();
+                  voiceChannelPlayerNear.setActualVoiceChannelId(emptyVoiceChannel.getIdLong());
+                  
+                  guild.moveVoiceMember(member, emptyVoiceChannel).queue();
                   playersAlreadyTreated.add(player);
                   playersAlreadyTreated.add(playerNear);
                 }
@@ -85,9 +99,9 @@ public class VocalSystemWorker implements Runnable {
     return null; //Normally impossible
   }
 
-  private boolean isAValidChannel(VoiceChannel voiceChannelPlayer) {
+  private boolean isAValidChannel(long voiceChannelPlayerId) {
     for(long idValidVoiceChannel : listIdVoiceChannel) {
-      if(idValidVoiceChannel == voiceChannelPlayer.getIdLong()) {
+      if(idValidVoiceChannel == voiceChannelPlayerId) {
         return true;
       }
     }
@@ -105,31 +119,22 @@ public class VocalSystemWorker implements Runnable {
 
 
   public VoiceChannel getVoiceChannelByMember(Guild guild, long discordId) {
-    for(VoiceChannel voiceChannel : guild.getVoiceChannels()) {
-      for(Member member : voiceChannel.getMembers()) {
-        if(member.getIdLong() == discordId) {
-          return voiceChannel;
-        }
+    PlayerVoicePosition playerVoicePosition = getPlayerVoicePosition(discordId);
+    if(playerVoicePosition == null) {
+      return null;
+    }
+    return guild.getVoiceChannelById(playerVoicePosition.getActualVoiceChannelId());
+  }
+  
+  private PlayerVoicePosition getPlayerVoicePosition(long discordId) {
+    for(PlayerVoicePosition playerVoicePosition : playersVoicePositions) {
+      if(playerVoicePosition.getPlayerData().getAccount().getDiscordId() == discordId) {
+        return playerVoicePosition;
       }
     }
-
-    for(Member member : GameData.getLobby().getMembers()) {
-      if(member.getIdLong() == discordId) {
-        return movePlayerInAEmptyChannel(guild, discordId);
-      }
-    }
-
     return null;
   }
-
-  private VoiceChannel movePlayerInAEmptyChannel(Guild guild, long discordId) {
-
-    VoiceChannel voiceChannel = getEmptyVoiceChannel(guild);
-    guild.moveVoiceMember(guild.getMemberById(discordId), voiceChannel).complete();
-    
-    return voiceChannel;
-  }
-
+  
   public static void setupVoiceChannels(List<PlayerData> playersInGame) {
     Guild guild = GameData.getLobby().getGuild();
     Role everyoneRole = guild.getPublicRole();
@@ -151,6 +156,7 @@ public class VocalSystemWorker implements Runnable {
           e -> {
             listIdVoiceChannel.add(e.getIdLong());
             guild.moveVoiceMember(member, e).queue();
+            playersVoicePositions.add(new PlayerVoicePosition(player, e.getIdLong()));
           });
     }
   }
