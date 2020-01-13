@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.security.auth.login.LoginException;
 
 import org.bukkit.Location;
@@ -24,6 +27,7 @@ import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
 import ch.kalunight.uhclg.model.GameStatus;
+import ch.kalunight.uhclg.model.JdaWithRateLimit;
 import ch.kalunight.uhclg.worker.PositionWorker;
 import ch.kalunight.uhclg.worker.ScoreboardWorker;
 import ch.kalunight.uhclg.worker.VocalSystemWorker;
@@ -39,6 +43,8 @@ public class ZoePluginMaster extends JavaPlugin {
 
   private static final File OWNER_ID_FILE = new File("plugins/owner.txt");
 
+  private static final File JDA_WORKERS_FILE = new File("plugins/jdaWorkers.txt");
+
   private static Server server;
 
   private static JDA jda;
@@ -51,9 +57,9 @@ public class ZoePluginMaster extends JavaPlugin {
   public void onEnable() {
 
     setMinecraftServer(getServer());
-    
+
     GameData.setGameStatus(GameStatus.IN_LOBBY);
-    
+
     CommandClientBuilder client = new CommandClientBuilder();
 
     client.setPrefix("/");
@@ -71,19 +77,53 @@ public class ZoePluginMaster extends JavaPlugin {
           .setStatus(OnlineStatus.ONLINE)//
           .addEventListeners(new DiscordEventListener())//
           .addEventListeners(client.build()).build());
+      VocalSystemWorker.getJdaWorkers().add(new JdaWithRateLimit(getJda()));
     } catch (LoginException | IOException e) {
       logger.error("Issue when loading Discord !", e);
     }
 
+    try {
+      generateJdaVoiceWorker();
+    } catch (IOException e) {
+      logger.error("Issue when loading Discord !", e);
+    }
+
     this.getCommand("lgstart").setExecutor(new LgStart());
-    
+
     generateLobby();
-    
+
     getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 10, 10);
     getServer().getScheduler().runTaskTimer(this, new VocalSystemWorker(), 10, 10);
     getServer().getScheduler().runTaskTimer(this, new ScoreboardWorker(), 20, 20);
-    
+
     getServer().getPluginManager().registerEvents(new MinecraftEventListener(), this);
+  }
+
+  private void generateJdaVoiceWorker() throws IOException {
+    List<String> tockenList = getFileListParam(JDA_WORKERS_FILE);
+
+    for(String tocken : tockenList) {
+      try {
+        VocalSystemWorker.getJdaWorkers().add(new JdaWithRateLimit(new JDABuilder()//
+            .setToken(tocken)//
+            .setStatus(OnlineStatus.ONLINE).build()));
+      } catch (LoginException e) {
+        logger.error("Issue when loading Discord !", e);
+      }
+    }
+  }
+
+  private List<String> getFileListParam(File jdaWorkersFile) throws IOException {
+    List<String> tocken = new ArrayList<>();
+
+    try(BufferedReader br = new BufferedReader(new FileReader(jdaWorkersFile))){
+      String ligne;
+      while ((ligne=br.readLine())!=null){
+        tocken.add(ligne);
+      }
+    }
+
+    return tocken;
   }
 
   private void generateLobby() {
@@ -92,15 +132,15 @@ public class ZoePluginMaster extends JavaPlugin {
 
     int spawnSize = 25;
     int spawnHigh = 200;
-    
+
     for(int j = 0; j < spawnSize; j++) {
       for(int i = 0; i < spawnSize; i++) {
         world.getBlockAt(spawn.getBlockX() + i, spawnHigh, spawn.getBlockY() + j).setType(Material.GLASS);
       }
     }
-    
+
     world.setSpawnLocation(spawn.getBlockX() + (spawnSize / 2), spawnHigh + 1, spawn.getBlockY() + (spawnSize / 2));
-    
+
     GameData.setLobbyLocation(spawn);
   }
 
@@ -115,7 +155,7 @@ public class ZoePluginMaster extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    jda.shutdownNow();
+    VocalSystemWorker.getJdaWorkers().forEach(e -> jda.shutdownNow());
   }
 
   public static Server getMinecraftServer() {

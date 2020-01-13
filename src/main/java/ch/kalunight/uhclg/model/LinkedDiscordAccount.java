@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 
 import ch.kalunight.uhclg.ZoePluginMaster;
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 
 public class LinkedDiscordAccount {
@@ -23,6 +24,10 @@ public class LinkedDiscordAccount {
 
   public User getDiscordUser() {
     return ZoePluginMaster.getJda().retrieveUserById(discordId).complete();
+  }
+  
+  public User getDiscordUser(JDA jda) {
+    return jda.retrieveUserById(discordId).complete();
   }
 
   public void setDiscordId(long discordId) {
