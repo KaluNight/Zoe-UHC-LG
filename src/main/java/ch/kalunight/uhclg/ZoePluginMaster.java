@@ -25,6 +25,7 @@ import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.worker.PositionWorker;
+import ch.kalunight.uhclg.worker.ScoreboardWorker;
 import ch.kalunight.uhclg.worker.VocalSystemWorker;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -78,8 +79,9 @@ public class ZoePluginMaster extends JavaPlugin {
     
     generateLobby();
     
-    getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 5, 5);
+    getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 10, 10);
     getServer().getScheduler().runTaskTimer(this, new VocalSystemWorker(), 10, 10);
+    getServer().getScheduler().runTaskTimer(this, new ScoreboardWorker(), 20, 20);
     
     getServer().getPluginManager().registerEvents(new MinecraftEventListener(), this);
   }
