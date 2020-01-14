@@ -3,12 +3,13 @@ package ch.kalunight.uhclg;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import java.util.UUID;
 import org.bukkit.Location;
 
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import ch.kalunight.uhclg.model.PlayerData;
+import ch.kalunight.uhclg.model.RoleClan;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 
@@ -32,6 +33,55 @@ public class GameData {
 
   private GameData() {
     //hide default public constructor
+  }
+  
+  public static int getPlayerAlive() {
+    int playerAlive = 0;
+    for(PlayerData player : playersInGame) {
+      if(player.isAlive()) {
+        playerAlive++;
+      }
+    }
+    return playerAlive;
+  }
+  
+  public static int getWolfAlive() {
+    int wolfAlive = 0;
+    for(PlayerData player : playersInGame) {
+      if(player.getRole().getClan().equals(RoleClan.WOLFS) && player.isAlive()) {
+        wolfAlive++;
+      }
+    }
+    return wolfAlive;
+  }
+  
+  public static int getVillagerAlive() {
+    int villagersAlive = 0;
+    for(PlayerData player : playersInGame) {
+      if(player.getRole().getClan().equals(RoleClan.VILLAGE) && player.isAlive()) {
+        villagersAlive++;
+      }
+    }
+    return villagersAlive;
+  }
+  
+  public static int getSpecialAlive() {
+    int specialAlive = 0;
+    for(PlayerData player : playersInGame) {
+      if(player.getRole().getClan().equals(RoleClan.SPECIAL) && player.isAlive()) {
+        specialAlive++;
+      }
+    }
+    return specialAlive;
+  }
+  
+  public static PlayerData getPlayerInGame(UUID uuid) {
+    for(PlayerData player : playersInGame) {
+      if(player.getAccount().getPlayerUUID().equals(uuid)) {
+        return player;
+      }
+    }
+    return null;
   }
   
   public static GameStatus getGameStatus() {

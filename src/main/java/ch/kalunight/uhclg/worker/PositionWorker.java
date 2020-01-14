@@ -21,7 +21,6 @@ public class PositionWorker implements Runnable {
         }
       }
     }
-    
   }
 
 }

@@ -26,8 +26,10 @@ import ch.kalunight.uhclg.discord.commands.LinkCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
+import ch.kalunight.uhclg.minecraft.MinecraftEventListener;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.JdaWithRateLimit;
+import ch.kalunight.uhclg.worker.GameWorker;
 import ch.kalunight.uhclg.worker.PositionWorker;
 import ch.kalunight.uhclg.worker.ScoreboardWorker;
 import ch.kalunight.uhclg.worker.VocalSystemWorker;
@@ -95,7 +97,8 @@ public class ZoePluginMaster extends JavaPlugin {
     getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 10, 10);
     getServer().getScheduler().runTaskTimer(this, new VocalSystemWorker(), 10, 10);
     getServer().getScheduler().runTaskTimer(this, new ScoreboardWorker(), 20, 20);
-
+    getServer().getScheduler().runTaskTimer(this, new GameWorker(), 20, 20);
+    
     getServer().getPluginManager().registerEvents(new MinecraftEventListener(), this);
   }
 
@@ -128,6 +131,9 @@ public class ZoePluginMaster extends JavaPlugin {
 
   private void generateLobby() {
     World world = getMinecraftServer().getWorld("world");
+    
+    GameWorker.setWorld(world);
+    
     Location spawn = world.getSpawnLocation();
 
     int spawnSize = 25;
@@ -155,7 +161,7 @@ public class ZoePluginMaster extends JavaPlugin {
 
   @Override
   public void onDisable() {
-    VocalSystemWorker.getJdaWorkers().forEach(e -> jda.shutdownNow());
+    VocalSystemWorker.getJdaWorkers().forEach(e -> e.getJda().shutdownNow());
   }
 
   public static Server getMinecraftServer() {

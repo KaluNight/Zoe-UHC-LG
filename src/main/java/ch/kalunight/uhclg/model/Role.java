@@ -7,29 +7,31 @@ import java.util.List;
 import java.util.Random;
 
 public enum Role {
-  ANGE(RoleClan.VILLAGE),
-  VOYANTE(RoleClan.VILLAGE),
-  CUPIDON(RoleClan.VILLAGE),
-  PETITE_FILLE(RoleClan.VILLAGE),
-  SORCIERE(RoleClan.VILLAGE),
-  ANCIEN(RoleClan.VILLAGE),
-  RENARD(RoleClan.VILLAGE),
-  CHAMAN(RoleClan.VILLAGE),
-  VILLAGEOIS(RoleClan.VILLAGE),
-  ENFANT_SAUVAGE(RoleClan.SPECIAL),
-  ASSASSIN(RoleClan.SPECIAL),
-  LOUP_GAROU(RoleClan.WOLFS),
-  INFECT_PERE_DES_LOUPS(RoleClan.WOLFS),
-  LOUP_GAROU_BLANC(RoleClan.WOLFS);
+  ANGE(RoleClan.VILLAGE, "Ange"),
+  VOYANTE(RoleClan.VILLAGE, "Voyante"),
+  CUPIDON(RoleClan.VILLAGE, "Cupidon"),
+  PETITE_FILLE(RoleClan.VILLAGE, "Petite Fille"),
+  SORCIERE(RoleClan.VILLAGE, "Sorcière"),
+  ANCIEN(RoleClan.VILLAGE, "Ancien"),
+  RENARD(RoleClan.VILLAGE, "Renard"),
+  CHAMAN(RoleClan.VILLAGE, "Chaman"),
+  VILLAGEOIS(RoleClan.VILLAGE, "Villageois"),
+  ENFANT_SAUVAGE(RoleClan.SPECIAL, "Enfant Sauvage"),
+  ASSASSIN(RoleClan.SPECIAL, "Assassin"),
+  LOUP_GAROU(RoleClan.WOLFS, "Loup Garou"),
+  INFECT_PERE_DES_LOUPS(RoleClan.WOLFS, "Infect Père des Loups Garou"),
+  LOUP_GAROU_BLANC(RoleClan.WOLFS, "Loup Garou Blanc");
 
   private static final List<Role> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
   private static final int SIZE = VALUES.size();
   private static final Random RANDOM = new Random();
 
   private RoleClan clan;
+  private String name;
 
-  private Role(RoleClan clan) {
+  private Role(RoleClan clan, String name) {
     this.clan = clan;
+    this.name = name;
   }
 
   public static List<Role> getRolesWithConfig(GameConfig config){
@@ -82,6 +84,10 @@ public enum Role {
 
   public RoleClan getClan() {
     return clan;
+  }
+
+  public String getName() {
+    return name;
   }
 
 }

@@ -10,8 +10,11 @@ public class PlayerData {
   
   private Scoreboard scoreboard;
   
+  private boolean alive;
+  
   public PlayerData(LinkedDiscordAccount account) {
     this.account = account;
+    this.alive = true;
   }
 
   public LinkedDiscordAccount getAccount() {
@@ -37,6 +40,13 @@ public class PlayerData {
   public void setScoreboard(Scoreboard scoreboard) {
     this.scoreboard = scoreboard;
   }
-  
+
+  public boolean isAlive() {
+    return alive;
+  }
+
+  public void setAlive(boolean alive) {
+    this.alive = alive;
+  }
   
 }
