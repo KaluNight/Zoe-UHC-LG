@@ -2,10 +2,8 @@ package ch.kalunight.uhclg.worker;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +47,7 @@ public class VocalSystemWorker implements Runnable {
           PlayerVoicePosition voiceChannelPlayer = getPlayerVoicePosition(player.getAccount().getDiscordId());
 
           if(voiceChannelPlayer != null) {
-            Set<PlayerVoicePosition> playersInTheSameChannel = getPlayersNeededInTheChannel(new ArrayList<>(), voiceChannelPlayer);
+            List<PlayerVoicePosition> playersInTheSameChannel = getPlayersNeededInTheChannel(new ArrayList<>(), voiceChannelPlayer);
 
             if(playersInTheSameChannel.size() == 1) {
               if(!isPlayerAlone(voiceChannelPlayer)) {
@@ -99,7 +97,7 @@ public class VocalSystemWorker implements Runnable {
     return jda.getJda().getGuildById(GameData.getLobby().getGuild().getIdLong());
   }
 
-  private long getVoiceMostPopulatedChannel(Set<PlayerVoicePosition> playersInTheSameChannel) {
+  private long getVoiceMostPopulatedChannel(List<PlayerVoicePosition> playersInTheSameChannel) {
 
     List<Long> listIdChannel = new ArrayList<>();
 
@@ -122,18 +120,17 @@ public class VocalSystemWorker implements Runnable {
     return idMostPopulatedChannel;
   }
 
-  private Set<PlayerVoicePosition> getPlayersNeededInTheChannel(List<PlayerVoicePosition> playersAlreadyAdded, PlayerVoicePosition player) {
+  private List<PlayerVoicePosition> getPlayersNeededInTheChannel(List<PlayerVoicePosition> playersAlreadyAdded, PlayerVoicePosition player) {
 
-    Set<PlayerVoicePosition> playersLinked = new HashSet<>();
-    playersLinked.add(player);
+    playersAlreadyAdded.add(player);
 
     for(long userNearThePlayer : player.getUsersIdNearPlayer()) {
       PlayerVoicePosition playerNear = getPlayerVoicePosition(userNearThePlayer);
       if(!playersAlreadyAdded.contains(playerNear)) {
-        playersLinked.addAll(getPlayersNeededInTheChannel(playersAlreadyAdded, playerNear));}
+        playersAlreadyAdded.addAll(getPlayersNeededInTheChannel(playersAlreadyAdded, playerNear));}
     }
 
-    return playersLinked;
+    return playersAlreadyAdded;
   }
 
   private void refreshPlayerVoiceLink() {

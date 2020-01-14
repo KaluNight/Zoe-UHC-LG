@@ -134,7 +134,7 @@ public class LgStart implements CommandExecutor {
     }
 
     for(Location location : startLocations) {
-      while(isLocationNearOfTheList(location, startLocations) || isAForbidenBiome(location)) {
+      while(isLocationNearOfTheList(location, startLocations) || isAForbidenBiome(location)) {// TODO Fix that
         Location newLocation = getRandomSpawnLocation(location.getWorld(), spawnLocation);
         location.setX(newLocation.getX());
         location.setZ(newLocation.getZ());
@@ -144,7 +144,6 @@ public class LgStart implements CommandExecutor {
     int i = -1;
     for(PlayerData player : GameData.getPlayersInGame()) {
       i++;
-      
       world.getChunkAt(startLocations.get(i));
       
       player.getAccount().getPlayer().getPlayer()
@@ -195,7 +194,7 @@ public class LgStart implements CommandExecutor {
     x = spawnLocation.getX() + x;
     z = spawnLocation.getZ() + z;
 
-    return new Location(world, x, spawnLocation.getY() - 5, z);
+    return new Location(world, x, spawnLocation.getY() + 500, z);
   }
 
   private void defineWorldBorder() {
