@@ -6,6 +6,10 @@ public class MathUtil {
 
   private static final Random random = new Random();
   
+  private MathUtil() {
+    // Util class
+  }
+  
   public static int getRandomNumberInRange(int min, int max) {
 
     if (min >= max) {
