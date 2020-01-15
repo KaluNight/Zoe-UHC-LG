@@ -34,22 +34,25 @@ public class ScoreboardWorker implements Runnable {
   private Scoreboard inGameScoreBoard;
 
   private Score joueurRestant;
-  
+
   private Score villageoisRestant;
-  
+
   private Score loupGarouRestant;
 
   private Score specialRestant;
-  
+
   @Override
   public void run() {
 
     if(GameData.getGameStatus().equals(GameStatus.IN_GAME)) {
       defineInGameScoreBoard();
       for(PlayerData player : GameData.getPlayersInGame()) {
-        player.getAccount().getPlayer().setScoreboard(inGameScoreBoard);
-        player.setScoreboard(inGameScoreBoard);
+        if(player.isConnected()) {
+          player.setScoreboard(inGameScoreBoard);
+        }
       }
+      ZoePluginMaster.getMinecraftServer().getOnlinePlayers().forEach(e -> e.setScoreboard(inGameScoreBoard));
+
     }else if(GameData.getGameStatus().equals(GameStatus.IN_LOBBY)) {
       updateLobbyScoreBoard();
       for(Player player : ZoePluginMaster.getMinecraftServer().getOnlinePlayers()) {
@@ -103,29 +106,29 @@ public class ScoreboardWorker implements Runnable {
     if(joueurRestant == null) {
       joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
       joueurRestant.setScore(9);
-      
+
       villageoisRestant = objective.getScore("Villageois : " + GameData.getVillagerAlive());
       villageoisRestant.setScore(6);
-      
+
       loupGarouRestant = objective.getScore("Loups : " + GameData.getWolfAlive());
       loupGarouRestant.setScore(5);
-      
+
       specialRestant = objective.getScore("Specials : " + GameData.getSpecialAlive());
       specialRestant.setScore(4);
-      
+
     }else {
       inGameScoreBoard.resetScores(joueurRestant.getEntry());
       joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
       joueurRestant.setScore(9);
-      
+
       inGameScoreBoard.resetScores(villageoisRestant.getEntry());
       villageoisRestant = objective.getScore("Villageois : " + GameData.getVillagerAlive());
       villageoisRestant.setScore(6);
-      
+
       inGameScoreBoard.resetScores(loupGarouRestant.getEntry());
       loupGarouRestant = objective.getScore("Loups : " + GameData.getWolfAlive());
       loupGarouRestant.setScore(5);
-      
+
       inGameScoreBoard.resetScores(specialRestant.getEntry());
       specialRestant = objective.getScore("Spéciaux : " + GameData.getSpecialAlive());
       specialRestant.setScore(4);

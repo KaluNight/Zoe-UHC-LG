@@ -13,22 +13,48 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import ch.kalunight.uhclg.GameData;
+import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 
 public class MinecraftEventListener implements Listener {
 
   private static final int TIME_BEFORE_LIGHTNING_DAMAGE = 3;
-  
+
   private static LocalDateTime lastTimePlayerKilled = LocalDateTime.now();
 
   @EventHandler
   public void onPlayerJoin(final PlayerJoinEvent event) {
-    event.setJoinMessage("Bienvenue sur le serveur " + event.getPlayer().getName() + " !");
+    if(GameData.getGameStatus().equals(GameStatus.IN_LOBBY)) {
+      event.setJoinMessage("Bienvenue sur le serveur " + event.getPlayer().getName() + " !");
 
-    event.getPlayer().setGameMode(GameMode.ADVENTURE);
+      event.getPlayer().setGameMode(GameMode.ADVENTURE);
 
-    event.getPlayer().setInvulnerable(true);
+      event.getPlayer().setInvulnerable(true);
+    }else {
+      PlayerData playerInGame = GameData.getPlayerInGame(event.getPlayer().getUniqueId());
+      
+      if(playerInGame == null) {
+        event.setJoinMessage(null);
+        event.getPlayer().setGameMode(GameMode.SPECTATOR);
+      }else {
+        playerInGame.setMinecraftConnected(true);
+      }
+    }
+  }
+  
+  @EventHandler
+  public void onPlayerQuit(final PlayerQuitEvent event) {
+    
+    PlayerData playerInGame = GameData.getPlayerInGame(event.getPlayer().getUniqueId());
+    
+    if(playerInGame != null) {
+      playerInGame.setMinecraftConnected(false);
+      event.setQuitMessage("Le joueur " + event.getPlayer().getName() + " c'est déconnecté !");
+    }else {
+      event.setQuitMessage(null);
+    }
   }
 
   @EventHandler
@@ -42,7 +68,8 @@ public class MinecraftEventListener implements Listener {
     player.getLocation().getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
 
     Location thunderLocation = 
-        new Location(player.getLocation().getWorld(), player.getLocation().getX(), player.getLocation().getY() + 3, player.getLocation().getZ());
+        new Location(player.getLocation().getWorld(), player.getLocation().getX(), player.getLocation().getY() - 3,
+            player.getLocation().getZ());
 
     player.getLocation().getWorld().spawnEntity(thunderLocation, EntityType.LIGHTNING);
 
@@ -50,7 +77,7 @@ public class MinecraftEventListener implements Listener {
   }
 
   @EventHandler
-  public void onEntityDamageEvent(final EntityDamageEvent e) {
+  public void onEntityDamage(final EntityDamageEvent e) {
     if (!(e.getEntity() instanceof Player || e.getEntityType().equals(EntityType.DROPPED_ITEM))) {
       return;
     }
@@ -64,15 +91,13 @@ public class MinecraftEventListener implements Listener {
   }
 
   @EventHandler
-  public void onEntityCombustByEntityEvent​(final EntityCombustEvent event) {
+  public void onEntityCombustByEntity​(final EntityCombustEvent event) {
     if ((event.getEntityType().equals(EntityType.DROPPED_ITEM) || event.getEntityType().equals(EntityType.PLAYER)) 
         && LocalDateTime.now().minusSeconds(TIME_BEFORE_LIGHTNING_DAMAGE).isBefore(lastTimePlayerKilled)) {
       event.setCancelled(true);
       event.setDuration(0);
     }
   }
-
-
 
   private static void setLastTimePlayerKilled(LocalDateTime lastTimePlayerKilled) {
     MinecraftEventListener.lastTimePlayerKilled = lastTimePlayerKilled;
