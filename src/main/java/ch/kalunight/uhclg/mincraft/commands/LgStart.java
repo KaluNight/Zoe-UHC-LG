@@ -101,6 +101,8 @@ public class LgStart implements CommandExecutor {
     
     GameWorker.setGameStartTime(Stopwatch.createStarted());
     
+    GameWorker.setupGameWorker();
+    
     GameData.setGameStatus(GameStatus.IN_GAME);
     
     return true;
@@ -147,7 +149,7 @@ public class LgStart implements CommandExecutor {
       world.getChunkAt(startLocations.get(i));
       
       player.getAccount().getPlayer().getPlayer()
-      .addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 300, 500, false, true, false));
+      .addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 500, 500, false, true, false));
       
       player.getAccount().getPlayer().teleport(startLocations.get(i));
     }

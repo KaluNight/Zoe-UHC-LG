@@ -136,8 +136,8 @@ public class VocalSystemWorker implements Runnable {
   private void refreshPlayerVoiceLink() {
     for(PlayerData player : GameData.getPlayersInGame()) {
       for(PlayerData playerNear : GameData.getPlayersInGame()) {
-        if(!player.equals(playerNear) && (!playersAlreadyTreated.contains(player) || !playersAlreadyTreated.contains(playerNear)
-            && (player.isConnected() && playerNear.isConnected()))) {
+        if(!player.equals(playerNear) && (!playersAlreadyTreated.contains(player) || !playersAlreadyTreated.contains(playerNear))
+            && (player.isConnected() && playerNear.isConnected())) {
 
           if(isPlayersInTheSameWorld(player, playerNear)
               && player.getAccount().getPlayer().getLocation().distanceSquared
@@ -183,7 +183,7 @@ public class VocalSystemWorker implements Runnable {
         .equals(playerNear.getAccount().getPlayer().getWorld().getName());
   }
 
-  private JdaWithRateLimit getAvaibleJda() {
+  public static JdaWithRateLimit getAvaibleJda() {
     for(JdaWithRateLimit jda : jdaWorkers) {
       if(jda.refreshCalls()) {
         return jda;
@@ -204,7 +204,7 @@ public class VocalSystemWorker implements Runnable {
     return guild.getVoiceChannelById(voiceChannelAvailble.get(0));
   }
 
-  private PlayerVoicePosition getPlayerVoicePosition(long discordId) {
+  public static PlayerVoicePosition getPlayerVoicePosition(long discordId) {
     for(PlayerVoicePosition playerVoicePosition : playersVoicePositions) {
       if(playerVoicePosition.getPlayerData().getAccount().getDiscordId() == discordId) {
         return playerVoicePosition;
