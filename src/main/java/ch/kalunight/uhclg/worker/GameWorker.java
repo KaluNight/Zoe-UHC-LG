@@ -1,13 +1,25 @@
 package ch.kalunight.uhclg.worker;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.bukkit.World;
 import com.google.common.base.Stopwatch;
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.GameStatus;
+import ch.kalunight.uhclg.model.TimeStatus;
 
 public class GameWorker implements Runnable {
 
+  private static final int dayDuration = 24000;
+  private static final Duration DAY1_DURATION = Duration.ofMinutes(20);
+  private static final Duration DAY2_DURATION = Duration.ofMinutes(10);
+  
+  private static final int START_OF_DAY = 0;
+  
+  private static final int START_OF_NIGHT = 12000;
+  
+  private static TimeStatus timeStatus;
+  
   private static Stopwatch chrono;
   
   private static World world;
@@ -16,7 +28,13 @@ public class GameWorker implements Runnable {
   public void run() {
     if(GameData.getGameStatus().equals(GameStatus.IN_GAME)) {
       
+      
     }
+  }
+  
+  public static void setupGameWorker() {
+    world.setTime(START_OF_DAY);
+    timeStatus = TimeStatus.DAY;
   }
   
   public static String getChronoString() {

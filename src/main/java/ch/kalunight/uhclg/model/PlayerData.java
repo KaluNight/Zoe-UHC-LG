@@ -12,9 +12,15 @@ public class PlayerData {
   
   private boolean alive;
   
+  private boolean minecraftConnected;
+  
+  private boolean discordVoiceConnected;
+  
   public PlayerData(LinkedDiscordAccount account) {
     this.account = account;
     this.alive = true;
+    this.minecraftConnected = true;
+    this.discordVoiceConnected = true;
   }
 
   public LinkedDiscordAccount getAccount() {
@@ -47,6 +53,26 @@ public class PlayerData {
 
   public void setAlive(boolean alive) {
     this.alive = alive;
+  }
+  
+  public boolean isConnected() {
+    return minecraftConnected && discordVoiceConnected;
+  }
+
+  public boolean isMinecraftConnected() {
+    return minecraftConnected;
+  }
+
+  public void setMinecraftConnected(boolean connected) {
+    this.minecraftConnected = connected;
+  }
+
+  public boolean isDiscordVoiceConnected() {
+    return discordVoiceConnected;
+  }
+
+  public void setDiscordVoiceConnected(boolean discordVoiceConnected) {
+    this.discordVoiceConnected = discordVoiceConnected;
   }
   
 }

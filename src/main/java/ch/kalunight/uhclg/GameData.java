@@ -84,6 +84,15 @@ public class GameData {
     return null;
   }
   
+  public static PlayerData getPlayerInGame(long discordID) {
+    for(PlayerData player : playersInGame) {
+      if(player.getAccount().getDiscordId() == discordID) {
+        return player;
+      }
+    }
+    return null;
+  }
+  
   public static GameStatus getGameStatus() {
     return gameStatus;
   }
