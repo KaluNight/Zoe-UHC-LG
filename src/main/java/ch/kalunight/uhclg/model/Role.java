@@ -16,11 +16,14 @@ public enum Role {
   RENARD(RoleClan.VILLAGE, "Renard"),
   CHAMAN(RoleClan.VILLAGE, "Chaman"),
   VILLAGEOIS(RoleClan.VILLAGE, "Villageois"),
-  ENFANT_SAUVAGE(RoleClan.SPECIAL, "Enfant Sauvage"),
   ASSASSIN(RoleClan.SPECIAL, "Assassin"),
   LOUP_GAROU(RoleClan.WOLFS, "Loup Garou"),
+  ENFANT_SAUVAGE(RoleClan.WOLFS, "Enfant Sauvage"),
   INFECT_PERE_DES_LOUPS(RoleClan.WOLFS, "Infect Père des Loups Garou"),
-  LOUP_GAROU_BLANC(RoleClan.WOLFS, "Loup Garou Blanc");
+  LOUP_GAROU_BLANC(RoleClan.SPECIAL, "Loup Garou Blanc"),
+  LOUP_GAROU_AMNESIQUE(RoleClan.WOLFS, "Loup Garou Amnésique"),
+  PETIT_LOUP_GAROU(RoleClan.WOLFS, "Vilain Petit Loup"),
+  GRAND_MERE_LOUP(RoleClan.WOLFS, "Grand-Mère Loup");
 
   private static final List<Role> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
   private static final int SIZE = VALUES.size();

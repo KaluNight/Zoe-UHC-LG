@@ -33,6 +33,8 @@ public class GameWorker implements Runnable {
     if(GameData.getGameStatus().equals(GameStatus.IN_GAME)) {
       defineWorldTime();
       
+      
+      
     }
   }
 

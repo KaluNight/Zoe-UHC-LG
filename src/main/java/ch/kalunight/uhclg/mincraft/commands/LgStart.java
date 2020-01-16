@@ -5,16 +5,23 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
@@ -86,38 +93,115 @@ public class LgStart implements CommandExecutor {
     }
 
     GameData.setGameStatus(GameStatus.STARTING_GAME);
-    
+
     startTheGame();
 
     defineWorldBorder();
-    
+
     VocalSystemWorker.setupVoiceChannels(GameData.getPlayersInGame());
-    
+
     tpPlayers();
-    
+
     sayRoleToPlayer();
-    
+
     giveStuffOfRole();
-    
+
     GameWorker.setGameStartTime(Stopwatch.createStarted());
-    
+
     GameWorker.setupGameWorker();
-    
+
     GameData.setGameStatus(GameStatus.IN_GAME);
-    
+
     return true;
   }
 
   private void sayRoleToPlayer() {
     for(PlayerData player : GameData.getPlayersInGame()) {
       Role role = player.getRole();
-      
+
       player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
     }
   }
 
   private void giveStuffOfRole() {
-    
+    for(PlayerData playerData : GameData.getPlayersInGame()) {
+      switch(playerData.getRole()) {
+      case ANCIEN:
+        break;
+      case ANGE:
+        break;
+      case ASSASSIN:
+        
+        ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
+        book.addEnchantment(Enchantment.DAMAGE_ALL, 3);
+        playerData.getAccount().getPlayer().getInventory().addItem(book);
+        book = new ItemStack(Material.ENCHANTED_BOOK, 1);
+        book.addEnchantment(Enchantment.ARROW_DAMAGE, 3);
+        playerData.getAccount().getPlayer().getInventory().addItem(book);
+        book = new ItemStack(Material.ENCHANTED_BOOK, 1);
+        book.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+        playerData.getAccount().getPlayer().getInventory().addItem(book);
+        break;
+      case CHAMAN:
+        break;
+      case CUPIDON:
+        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.STRING, 4));
+        book = new ItemStack(Material.ENCHANTED_BOOK, 4);
+        book.addEnchantment(Enchantment.DAMAGE_ALL, 2);
+        book.addEnchantment(Enchantment.KNOCKBACK, 1);
+        playerData.getAccount().getPlayer().getInventory().addItem(book);
+        break;
+      case ENFANT_SAUVAGE:
+        break;
+      case GRAND_MERE_LOUP:
+        break;
+      case INFECT_PERE_DES_LOUPS:
+        break;
+      case LOUP_GAROU:
+        break;
+      case LOUP_GAROU_AMNESIQUE:
+        break;
+      case LOUP_GAROU_BLANC:
+        playerData.getAccount().getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(30);
+        break;
+      case PETITE_FILLE:
+        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.TNT, 5));
+        break;
+      case PETIT_LOUP_GAROU:
+        break;
+      case RENARD:
+        playerData.getAccount().getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 1, false, false, true));
+        break;
+      case SORCIERE:
+        
+        ItemStack potion = new ItemStack(Material.POTION, 1);
+        PotionMeta meta = (PotionMeta) potion.getItemMeta();
+        meta.setBasePotionData(new PotionData(PotionType.REGEN));
+        potion.setItemMeta(meta);
+        playerData.getAccount().getPlayer().getInventory().addItem(potion);
+        
+        potion = new ItemStack(Material.POTION, 3);
+        meta = (PotionMeta) potion.getItemMeta();
+        meta.setBasePotionData(new PotionData(PotionType.INSTANT_DAMAGE));
+        potion.setItemMeta(meta);
+        playerData.getAccount().getPlayer().getInventory().addItem(potion);
+        
+        potion = new ItemStack(Material.POTION, 3);
+        meta = (PotionMeta) potion.getItemMeta();
+        meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
+        potion.setItemMeta(meta);
+        playerData.getAccount().getPlayer().getInventory().addItem(potion);
+        break;
+      case VILLAGEOIS:
+        break;
+      case VOYANTE:
+        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.OBSIDIAN, 4));
+        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.BOOKSHELF, 4));
+        break;
+      default:
+        break;
+      }
+    }
   }
 
   private void tpPlayers() {
@@ -131,7 +215,7 @@ public class LgStart implements CommandExecutor {
       startLocations.add(getRandomSpawnLocation(world, spawnLocation));
 
       playerData.getAccount().getPlayer().setGameMode(GameMode.SURVIVAL);
-      
+
       playerData.getAccount().getPlayer().setInvulnerable(false);
     }
 
@@ -142,37 +226,37 @@ public class LgStart implements CommandExecutor {
         location.setZ(newLocation.getZ());
       }
     }
-    
+
     int i = -1;
     for(PlayerData player : GameData.getPlayersInGame()) {
       i++;
       world.getChunkAt(startLocations.get(i));
-      
+
       player.getAccount().getPlayer().getPlayer()
       .addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 500, 500, false, true, false));
-      
+
       player.getAccount().getPlayer().teleport(startLocations.get(i));
     }
   }
 
   private boolean isAForbidenBiome(Location location) {
-    
+
     Biome biome = location.getWorld().getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-    
+
     switch(biome) {
-      case COLD_OCEAN:
-      case DEEP_COLD_OCEAN:
-      case DEEP_FROZEN_OCEAN:
-      case DEEP_LUKEWARM_OCEAN:
-      case DEEP_OCEAN:
-      case DEEP_WARM_OCEAN:
-      case FROZEN_OCEAN:
-      case LUKEWARM_OCEAN:
-      case OCEAN:
-      case WARM_OCEAN:
-        return true;
-      default:
-        return false;
+    case COLD_OCEAN:
+    case DEEP_COLD_OCEAN:
+    case DEEP_FROZEN_OCEAN:
+    case DEEP_LUKEWARM_OCEAN:
+    case DEEP_OCEAN:
+    case DEEP_WARM_OCEAN:
+    case FROZEN_OCEAN:
+    case LUKEWARM_OCEAN:
+    case OCEAN:
+    case WARM_OCEAN:
+      return true;
+    default:
+      return false;
     }
   }
 
@@ -187,7 +271,7 @@ public class LgStart implements CommandExecutor {
     }
     return isLocationNearOfTheList;
   }
-  
+
 
   private Location getRandomSpawnLocation(World world, Location spawnLocation) {
     double x = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
