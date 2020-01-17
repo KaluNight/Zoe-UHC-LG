@@ -74,7 +74,7 @@ public class MinecraftEventListener implements Listener {
 
     if(playerCanBeSaved()) {
       KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
-      ZoePluginMaster.getMinecraftServer().getScheduler().runTask(ZoePluginMaster.getPlugin(), )
+      ZoePluginMaster.getMinecraftServer().getScheduler().runTask(ZoePluginMaster.getPlugin(), killerWorker);
     }
     
     event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
@@ -94,7 +94,9 @@ public class MinecraftEventListener implements Listener {
   private PlayerData getFirstSavior() {
     
     for(PlayerData savior : GameData.getPlayersInGame()) {
-      
+      if(savior.getRole().equals(Role.SORCIERE)) {
+        
+      }
     }
     
     return null;
