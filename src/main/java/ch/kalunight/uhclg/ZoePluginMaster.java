@@ -9,6 +9,7 @@ import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
+import org.bukkit.GameRule;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -50,6 +51,8 @@ public class ZoePluginMaster extends JavaPlugin {
   private static Server server;
 
   private static JDA jda;
+  
+  private static ZoePluginMaster plugin;
 
   public static void main(String[] args) {
     //Do not use
@@ -57,6 +60,8 @@ public class ZoePluginMaster extends JavaPlugin {
 
   @Override
   public void onEnable() {
+    
+    setPlugin(plugin);
 
     setMinecraftServer(getServer());
 
@@ -93,6 +98,8 @@ public class ZoePluginMaster extends JavaPlugin {
     this.getCommand("lgstart").setExecutor(new LgStart());
 
     generateLobby();
+    
+    defineGameRule();
 
     getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 10, 10);
     getServer().getScheduler().runTaskTimer(this, new VocalSystemWorker(), 10, 10);
@@ -100,6 +107,14 @@ public class ZoePluginMaster extends JavaPlugin {
     getServer().getScheduler().runTaskTimer(this, new GameWorker(), 10, 10);
     
     getServer().getPluginManager().registerEvents(new MinecraftEventListener(), this);
+  }
+
+  private void defineGameRule() {
+    for(World world : ZoePluginMaster.getMinecraftServer().getWorlds()) {
+      world.setGameRule(GameRule.ANNOUNCE_ADVANCEMENTS, false);
+      world.setGameRule(GameRule.NATURAL_REGENERATION, true);
+      world.setPVP(true);
+    }
   }
 
   private void generateJdaVoiceWorker() throws IOException {
@@ -178,6 +193,14 @@ public class ZoePluginMaster extends JavaPlugin {
 
   private static void setJda(JDA jda) {
     ZoePluginMaster.jda = jda;
+  }
+
+  public static ZoePluginMaster getPlugin() {
+    return plugin;
+  }
+
+  public static void setPlugin(ZoePluginMaster plugin) {
+    ZoePluginMaster.plugin = plugin;
   }
 
 }

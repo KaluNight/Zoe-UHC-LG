@@ -1,6 +1,10 @@
 package ch.kalunight.uhclg.minecraft;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -15,12 +19,18 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import ch.kalunight.uhclg.GameData;
+import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
+import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.RoleClan;
+import ch.kalunight.uhclg.worker.KillerWorker;
 
 public class MinecraftEventListener implements Listener {
 
   private static final int TIME_BEFORE_LIGHTNING_DAMAGE = 3;
+  
+  private static final List<KillerWorker> killedPlayersWhoCanBeSaved = Collections.synchronizedList(new ArrayList<>());
 
   private static LocalDateTime lastTimePlayerKilled = LocalDateTime.now();
 
@@ -62,6 +72,11 @@ public class MinecraftEventListener implements Listener {
     Player player = event.getEntity();
     PlayerData playerData = GameData.getPlayerInGame(player.getUniqueId());
 
+    if(playerCanBeSaved()) {
+      KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
+      ZoePluginMaster.getMinecraftServer().getScheduler().runTask(ZoePluginMaster.getPlugin(), )
+    }
+    
     event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
     playerData.setAlive(false);
 
@@ -74,6 +89,24 @@ public class MinecraftEventListener implements Listener {
     player.getLocation().getWorld().spawnEntity(thunderLocation, EntityType.LIGHTNING);
 
     setLastTimePlayerKilled(LocalDateTime.now());
+  }
+
+  private PlayerData getFirstSavior() {
+    
+    for(PlayerData savior : GameData.getPlayersInGame()) {
+      
+    }
+    
+    return null;
+  }
+
+  private boolean playerCanBeSaved() {
+    for(PlayerData playerCheckRole : GameData.getPlayersInGame()) {
+      if(playerCheckRole.getRole().equals(Role.SORCIERE) || playerCheckRole.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @EventHandler

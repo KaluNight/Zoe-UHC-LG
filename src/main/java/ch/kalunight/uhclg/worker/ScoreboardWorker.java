@@ -14,6 +14,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameStatus;
+import ch.kalunight.uhclg.model.GroupConfig;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import ch.kalunight.uhclg.model.PlayerData;
 
@@ -40,6 +41,8 @@ public class ScoreboardWorker implements Runnable {
   private Score loupGarouRestant;
 
   private Score specialRestant;
+  
+  private Score groupMax;
 
   @Override
   public void run() {
@@ -102,7 +105,7 @@ public class ScoreboardWorker implements Runnable {
     Objective objective = inGameScoreBoard.getObjective(IN_GAME_OBJECTIVE_ID);
     objective.setDisplayName("Loup Garou - UHC | " + GameWorker.getChronoString());
 
-    objective.getScore(" ").setScore(10);
+    objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName()).setScore(10);
     if(joueurRestant == null) {
       joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
       joueurRestant.setScore(9);
@@ -115,6 +118,10 @@ public class ScoreboardWorker implements Runnable {
 
       specialRestant = objective.getScore("Specials : " + GameData.getSpecialAlive());
       specialRestant.setScore(4);
+      
+      groupMax = objective.getScore("Taille de groupe maximal : " 
+      + GroupConfig.getGroupConfig(GameData.getPlayerAlive()));
+      groupMax.setScore(2);
 
     }else {
       inGameScoreBoard.resetScores(joueurRestant.getEntry());
@@ -132,11 +139,15 @@ public class ScoreboardWorker implements Runnable {
       inGameScoreBoard.resetScores(specialRestant.getEntry());
       specialRestant = objective.getScore("Spéciaux : " + GameData.getSpecialAlive());
       specialRestant.setScore(4);
+      
+      groupMax = objective.getScore("Taille de groupe maximal : " 
+      + GroupConfig.getGroupConfig(GameData.getPlayerAlive()));
+      groupMax.setScore(2);
     }
 
+    objective.getScore("    ").setScore(3);
     objective.getScore("  ").setScore(8);
-    objective.getScore("Rôles restant").setScore(7);
-
+    objective.getScore("Rôles restants").setScore(7);
   }
 
 }

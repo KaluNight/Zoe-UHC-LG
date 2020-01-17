@@ -45,6 +45,16 @@ public class LgStart implements CommandExecutor {
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
     Server server = sender.getServer();
+    
+    if(!sender.isOp()) {
+      sender.sendMessage("Vous devez être administrateur pour pouvoir faire cette commande.");
+      return true;
+    }
+    
+    if(!GameData.getGameStatus().equals(GameStatus.IN_LOBBY)) {
+      sender.sendMessage("La partie est déjà lancé");
+      return true;
+    }
 
     if(GameData.getLobby() == null) {
       sender.sendMessage("Vous ne pouvez pas lancer une partie si le lobby n'a pas été défini !");
@@ -102,10 +112,6 @@ public class LgStart implements CommandExecutor {
 
     tpPlayers();
 
-    sayRoleToPlayer();
-
-    giveStuffOfRole();
-
     GameWorker.setGameStartTime(Stopwatch.createStarted());
 
     GameWorker.setupGameWorker();
@@ -113,95 +119,6 @@ public class LgStart implements CommandExecutor {
     GameData.setGameStatus(GameStatus.IN_GAME);
 
     return true;
-  }
-
-  private void sayRoleToPlayer() {
-    for(PlayerData player : GameData.getPlayersInGame()) {
-      Role role = player.getRole();
-
-      player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
-    }
-  }
-
-  private void giveStuffOfRole() {
-    for(PlayerData playerData : GameData.getPlayersInGame()) {
-      switch(playerData.getRole()) {
-      case ANCIEN:
-        break;
-      case ANGE:
-        break;
-      case ASSASSIN:
-        
-        ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        book.addEnchantment(Enchantment.DAMAGE_ALL, 3);
-        playerData.getAccount().getPlayer().getInventory().addItem(book);
-        book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        book.addEnchantment(Enchantment.ARROW_DAMAGE, 3);
-        playerData.getAccount().getPlayer().getInventory().addItem(book);
-        book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        book.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
-        playerData.getAccount().getPlayer().getInventory().addItem(book);
-        break;
-      case CHAMAN:
-        break;
-      case CUPIDON:
-        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.STRING, 4));
-        book = new ItemStack(Material.ENCHANTED_BOOK, 4);
-        book.addEnchantment(Enchantment.DAMAGE_ALL, 2);
-        book.addEnchantment(Enchantment.KNOCKBACK, 1);
-        playerData.getAccount().getPlayer().getInventory().addItem(book);
-        break;
-      case ENFANT_SAUVAGE:
-        break;
-      case GRAND_MERE_LOUP:
-        break;
-      case INFECT_PERE_DES_LOUPS:
-        break;
-      case LOUP_GAROU:
-        break;
-      case LOUP_GAROU_AMNESIQUE:
-        break;
-      case LOUP_GAROU_BLANC:
-        playerData.getAccount().getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(30);
-        break;
-      case PETITE_FILLE:
-        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.TNT, 5));
-        break;
-      case PETIT_LOUP_GAROU:
-        break;
-      case RENARD:
-        playerData.getAccount().getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 1, false, false, true));
-        break;
-      case SORCIERE:
-        
-        ItemStack potion = new ItemStack(Material.POTION, 1);
-        PotionMeta meta = (PotionMeta) potion.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.REGEN));
-        potion.setItemMeta(meta);
-        playerData.getAccount().getPlayer().getInventory().addItem(potion);
-        
-        potion = new ItemStack(Material.POTION, 3);
-        meta = (PotionMeta) potion.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.INSTANT_DAMAGE));
-        potion.setItemMeta(meta);
-        playerData.getAccount().getPlayer().getInventory().addItem(potion);
-        
-        potion = new ItemStack(Material.POTION, 3);
-        meta = (PotionMeta) potion.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
-        potion.setItemMeta(meta);
-        playerData.getAccount().getPlayer().getInventory().addItem(potion);
-        break;
-      case VILLAGEOIS:
-        break;
-      case VOYANTE:
-        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.OBSIDIAN, 4));
-        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.BOOKSHELF, 4));
-        break;
-      default:
-        break;
-      }
-    }
   }
 
   private void tpPlayers() {
