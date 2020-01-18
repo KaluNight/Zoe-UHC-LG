@@ -8,6 +8,8 @@ import ch.kalunight.uhclg.model.PlayerData;
 
 public class KillerWorker implements Runnable {
   
+  private final List<PlayerData> saviorAlreadyAsked = new ArrayList<>();
+  
   private PlayerData playerKilled;
   
   private PlayerData potentialSavior;
@@ -21,7 +23,10 @@ public class KillerWorker implements Runnable {
   
   @Override
   public void run() {
-
+    
+    if(hasBeenSaved) {
+      
+    }
     
   }
 

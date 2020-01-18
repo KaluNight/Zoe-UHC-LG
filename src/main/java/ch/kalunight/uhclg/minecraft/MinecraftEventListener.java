@@ -18,12 +18,14 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionType;
+
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
-import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.worker.KillerWorker;
 
 public class MinecraftEventListener implements Listener {
@@ -72,11 +74,12 @@ public class MinecraftEventListener implements Listener {
     Player player = event.getEntity();
     PlayerData playerData = GameData.getPlayerInGame(player.getUniqueId());
 
-    if(playerCanBeSaved()) {
+    if(playerCanBeSaved(playerData)) {
       KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
       ZoePluginMaster.getMinecraftServer().getScheduler().runTask(ZoePluginMaster.getPlugin(), killerWorker);
-    }
-    
+      killedPlayersWhoCanBeSaved.add(killerWorker);
+      playerData.getAccount().getPlayer().setInvulnerable(true);
+      playerData.getAccount().getPlayer().addPotionEffect(new PotionEffect(PotionType.INVISIBILITY, 600); //TODO EFFECT    
     event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
     playerData.setAlive(false);
 
@@ -102,9 +105,10 @@ public class MinecraftEventListener implements Listener {
     return null;
   }
 
-  private boolean playerCanBeSaved() {
+  private boolean playerCanBeSaved(PlayerData playerToBeSaved) {
     for(PlayerData playerCheckRole : GameData.getPlayersInGame()) {
-      if(playerCheckRole.getRole().equals(Role.SORCIERE) || playerCheckRole.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) {
+      if((playerCheckRole.getRole().equals(Role.SORCIERE) || playerCheckRole.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) && playerCheckRole.isAlive()
+          && !playerToBeSaved.getAccount().getPlayerUUID().equals(playerCheckRole.getAccount().getPlayerUUID())) {
         return true;
       }
     }
@@ -136,6 +140,10 @@ public class MinecraftEventListener implements Listener {
 
   private static void setLastTimePlayerKilled(LocalDateTime lastTimePlayerKilled) {
     MinecraftEventListener.lastTimePlayerKilled = lastTimePlayerKilled;
+  }
+  
+  private static List<KillerWorker> getKilledplayerswhocanbesaved() {
+    return killedPlayersWhoCanBeSaved;
   }
 
 }
