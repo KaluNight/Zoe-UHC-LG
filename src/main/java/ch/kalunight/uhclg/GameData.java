@@ -47,10 +47,18 @@ public class GameData {
   }
   
   public static int getGroupSize() {
-    if(getWolfAlive() > getVillagerAlive()) {
-      return getVillagerAlive();
+    
+    int wolfsAlive = getWolfAlive();
+    int villagersAlive = getVillagerAlive();
+    
+    if(wolfsAlive < 3 && villagersAlive < 3) {
+      return 3;
+    }
+    
+    if(wolfsAlive > villagersAlive) {
+      return villagersAlive;
     }else {
-      return getVillagerAlive();
+      return wolfsAlive;
     }
   }
   
