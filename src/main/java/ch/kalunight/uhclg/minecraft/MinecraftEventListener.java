@@ -19,6 +19,7 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import ch.kalunight.uhclg.GameData;
@@ -74,12 +75,25 @@ public class MinecraftEventListener implements Listener {
     Player player = event.getEntity();
     PlayerData playerData = GameData.getPlayerInGame(player.getUniqueId());
 
+    if(isSavior(playerData)) {
+      
+    }
+    
     if(playerCanBeSaved(playerData)) {
       KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
       ZoePluginMaster.getMinecraftServer().getScheduler().runTask(ZoePluginMaster.getPlugin(), killerWorker);
       killedPlayersWhoCanBeSaved.add(killerWorker);
       playerData.getAccount().getPlayer().setInvulnerable(true);
-      playerData.getAccount().getPlayer().addPotionEffect(new PotionEffect(PotionType.INVISIBILITY, 600); //TODO EFFECT    
+      playerData.getAccount().getPlayer().addPotionEffect(
+          new PotionEffect(PotionEffectType.INVISIBILITY, 600, 1, false, false, false));
+      playerData.getAccount().getPlayer().addPotionEffect(
+          new PotionEffect(PotionEffectType.BLINDNESS, 600, 5, false, false, false));
+      playerData.getAccount().getPlayer().addPotionEffect(
+          new PotionEffect(PotionEffectType.SLOW, 600, 5, false, false, false));
+      return;
+    }
+
+    
     event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
     playerData.setAlive(false);
 
@@ -92,6 +106,13 @@ public class MinecraftEventListener implements Listener {
     player.getLocation().getWorld().spawnEntity(thunderLocation, EntityType.LIGHTNING);
 
     setLastTimePlayerKilled(LocalDateTime.now());
+  }
+
+  private boolean isSavior(PlayerData playerData) {
+    if(playerData.getRole().equals(Role.SORCIERE) || playerData.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) {
+      return true;
+    }
+    return false;
   }
 
   private PlayerData getFirstSavior() {
