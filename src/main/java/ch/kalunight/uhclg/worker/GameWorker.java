@@ -1,7 +1,6 @@
 package ch.kalunight.uhclg.worker;
 
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.GameRule;
@@ -30,9 +29,9 @@ import ch.kalunight.uhclg.util.PotionUtil;
 public class GameWorker implements Runnable {
 
   private static final int DAY_DURATION = 24000;
-  private static final Duration DAY1_DURATION = Duration.ofMinutes(20);
-  private static final Duration DAY2_DURATION = Duration.ofMinutes(10);
-  private static final Duration PVP_START_DURATION = Duration.ofMinutes(30);
+  private static final Duration DAY1_DURATION = Duration.ofMinutes(10);
+  private static final Duration DAY2_DURATION = Duration.ofMinutes(5);
+  private static final Duration PVP_START_DURATION = Duration.ofMinutes(10);
 
   private static final int START_OF_DAY = 0;
 
@@ -192,7 +191,7 @@ public class GameWorker implements Runnable {
 
       if(actualDayNumber == ROLE_START_DAY_NUMBER) {
         ZoePluginMaster.getMinecraftServer().broadcastMessage("Le jour 2 commence ! "
-            + "Vos rôles sont dévoilés maintenant ! Le PVP sera activé à " + PVP_START_DURATION.get(ChronoUnit.MINUTES) + " minutes !");
+            + "Vos rôles sont dévoilés maintenant ! Le PVP sera activé à " + PVP_START_DURATION.getSeconds() / 60 + " minutes !");
         sayRoleToPlayer(); //Les rôles sont disponible a partir du jour 2
         giveStuffOfRole();
       }
