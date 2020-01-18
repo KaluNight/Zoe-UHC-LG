@@ -33,6 +33,8 @@ public class ScoreboardWorker implements Runnable {
 
   private Scoreboard inGameScoreBoard;
 
+  private Score dayStatus;
+  
   private Score joueurRestant;
 
   private Score villageoisRestant;
@@ -104,8 +106,10 @@ public class ScoreboardWorker implements Runnable {
     Objective objective = inGameScoreBoard.getObjective(IN_GAME_OBJECTIVE_ID);
     objective.setDisplayName("Loup Garou - UHC | " + GameWorker.getChronoString());
 
-    objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName()).setScore(10);
     if(joueurRestant == null) {
+      dayStatus = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
+      dayStatus.setScore(10);
+      
       joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
       joueurRestant.setScore(9);
 
@@ -123,6 +127,10 @@ public class ScoreboardWorker implements Runnable {
       groupMax.setScore(2);
 
     }else {
+      inGameScoreBoard.resetScores(dayStatus.getEntry());
+      dayStatus = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
+      dayStatus.setScore(10);
+      
       inGameScoreBoard.resetScores(joueurRestant.getEntry());
       joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
       joueurRestant.setScore(9);
@@ -139,6 +147,7 @@ public class ScoreboardWorker implements Runnable {
       specialRestant = objective.getScore("Spéciaux : " + GameData.getSpecialAlive());
       specialRestant.setScore(4);
       
+      inGameScoreBoard.resetScores(groupMax.getEntry());
       groupMax = objective.getScore("Taille de groupe maximal : " 
       + GameData.getGroupSize());
       groupMax.setScore(2);
