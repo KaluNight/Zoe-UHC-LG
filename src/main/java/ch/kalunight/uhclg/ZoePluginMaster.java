@@ -26,6 +26,7 @@ import ch.kalunight.uhclg.discord.commands.DefineLobbyVocalCommand;
 import ch.kalunight.uhclg.discord.commands.LinkCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
+import ch.kalunight.uhclg.mincraft.commands.LgModel;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
 import ch.kalunight.uhclg.minecraft.MinecraftEventListener;
 import ch.kalunight.uhclg.model.GameStatus;
@@ -96,6 +97,7 @@ public class ZoePluginMaster extends JavaPlugin {
     }
 
     this.getCommand("lgstart").setExecutor(new LgStart());
+    this.getCommand("lgmodel").setExecutor(new LgModel());
 
     generateLobby();
     

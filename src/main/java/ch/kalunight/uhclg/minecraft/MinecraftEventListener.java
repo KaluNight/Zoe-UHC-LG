@@ -20,19 +20,19 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.util.DeathUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
 
 public class MinecraftEventListener implements Listener {
 
   private static final int TIME_BEFORE_LIGHTNING_DAMAGE = 3;
-  
+
   private static final List<KillerWorker> killedPlayersWhoCanBeSaved = Collections.synchronizedList(new ArrayList<>());
 
   private static LocalDateTime lastTimePlayerKilled = LocalDateTime.now();
@@ -47,7 +47,7 @@ public class MinecraftEventListener implements Listener {
       event.getPlayer().setInvulnerable(true);
     }else {
       PlayerData playerInGame = GameData.getPlayerInGame(event.getPlayer().getUniqueId());
-      
+
       if(playerInGame == null) {
         event.setJoinMessage(null);
         event.getPlayer().setGameMode(GameMode.SPECTATOR);
@@ -56,12 +56,12 @@ public class MinecraftEventListener implements Listener {
       }
     }
   }
-  
+
   @EventHandler
   public void onPlayerQuit(final PlayerQuitEvent event) {
-    
+
     PlayerData playerInGame = GameData.getPlayerInGame(event.getPlayer().getUniqueId());
-    
+
     if(playerInGame != null) {
       playerInGame.setMinecraftConnected(false);
       event.setQuitMessage("Le joueur " + event.getPlayer().getName() + " c'est déconnecté !");
@@ -71,41 +71,46 @@ public class MinecraftEventListener implements Listener {
   }
 
   @EventHandler
-  public void onPlayerDeath(final PlayerDeathEvent event){
+  public void onPlayerDeath(final PlayerDeathEvent event) {
     Player player = event.getEntity();
     PlayerData playerData = GameData.getPlayerInGame(player.getUniqueId());
+    
+    if(playerData != null) {
+      event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
+      playerData.setAlive(false);
 
-    if(isSavior(playerData)) {
+      makeRoleEffect(playerData);
       
+      player.getLocation().getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
+
+      Location thunderLocation = 
+          new Location(player.getLocation().getWorld(), player.getLocation().getX(), player.getLocation().getY() - 3,
+              player.getLocation().getZ());
+      
+      setLastTimePlayerKilled(LocalDateTime.now());
+      player.getLocation().getWorld().spawnEntity(thunderLocation, EntityType.LIGHTNING);
+      player.setGameMode(GameMode.SPECTATOR);
+    }else {
+      event.setDeathMessage(null);
     }
-    
-    if(playerCanBeSaved(playerData)) {
-      KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
-      ZoePluginMaster.getMinecraftServer().getScheduler().runTask(ZoePluginMaster.getPlugin(), killerWorker);
-      killedPlayersWhoCanBeSaved.add(killerWorker);
-      playerData.getAccount().getPlayer().setInvulnerable(true);
-      playerData.getAccount().getPlayer().addPotionEffect(
-          new PotionEffect(PotionEffectType.INVISIBILITY, 600, 1, false, false, false));
-      playerData.getAccount().getPlayer().addPotionEffect(
-          new PotionEffect(PotionEffectType.BLINDNESS, 600, 5, false, false, false));
-      playerData.getAccount().getPlayer().addPotionEffect(
-          new PotionEffect(PotionEffectType.SLOW, 600, 5, false, false, false));
-      return;
+  }
+
+  private void makeRoleEffect(PlayerData playerKilled) {
+    if(playerKilled.equals(GameData.getEnfantSauvageModel())) {
+      PlayerData enfantSauvage = null;
+      
+      for(PlayerData player : GameData.getPlayersInGame()) {
+        if(player.getRole().equals(Role.ENFANT_SAUVAGE)) {
+          enfantSauvage = player;
+        }
+      }
+      
+      if(enfantSauvage != null && enfantSauvage.isAlive()) {
+        enfantSauvage.getAccount().getPlayer().sendMessage("Votre modèle vient de mourir, vous êtes donc désormais un loup garou ! "
+            + "Vous optenez également tous les bonus de votre modèle qui était " + playerKilled.getRole().getName());
+        GameData.setEnfantSauvageBuffVole(playerKilled.getRole());
+      }
     }
-
-    
-    event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
-    playerData.setAlive(false);
-
-    player.getLocation().getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
-
-    Location thunderLocation = 
-        new Location(player.getLocation().getWorld(), player.getLocation().getX(), player.getLocation().getY() - 3,
-            player.getLocation().getZ());
-
-    player.getLocation().getWorld().spawnEntity(thunderLocation, EntityType.LIGHTNING);
-
-    setLastTimePlayerKilled(LocalDateTime.now());
   }
 
   private boolean isSavior(PlayerData playerData) {
@@ -116,13 +121,13 @@ public class MinecraftEventListener implements Listener {
   }
 
   private PlayerData getFirstSavior() {
-    
+
     for(PlayerData savior : GameData.getPlayersInGame()) {
       if(savior.getRole().equals(Role.SORCIERE)) {
-        
+
       }
     }
-    
+
     return null;
   }
 
@@ -138,8 +143,27 @@ public class MinecraftEventListener implements Listener {
 
   @EventHandler
   public void onEntityDamage(final EntityDamageEvent e) {
-    if (!(e.getEntity() instanceof Player || e.getEntityType().equals(EntityType.DROPPED_ITEM))) {
-      return;
+
+    PlayerData playerData = GameData.getPlayerInGame(e.getEntity().getUniqueId());
+
+    if(playerData != null && playerData.isAlive()) {
+      if(playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
+
+        if(playerCanBeSaved(playerData)) {
+          KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
+          ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), killerWorker, DeathUtil.DEATH_TIME_IN_TICKS);
+          killedPlayersWhoCanBeSaved.add(killerWorker);
+          playerData.getAccount().getPlayer().setInvulnerable(true);
+          playerData.getAccount().getPlayer().addPotionEffect(
+              new PotionEffect(PotionEffectType.INVISIBILITY, DeathUtil.DEATH_TIME_IN_TICKS, 1, false, false, false));
+          playerData.getAccount().getPlayer().addPotionEffect(
+              new PotionEffect(PotionEffectType.BLINDNESS, DeathUtil.DEATH_TIME_IN_TICKS, 5, false, false, false));
+          playerData.getAccount().getPlayer().addPotionEffect(
+              new PotionEffect(PotionEffectType.SLOW, DeathUtil.DEATH_TIME_IN_TICKS, 30, false, false, false));
+          playerData.getAccount().getPlayer().sendMessage("Vous êtes aux portes de la mort. Quelqu'un peux encore vous sauver ...");
+          e.setDamage(0);
+        }
+      }
     }
 
     if (e.getCause() == DamageCause.LIGHTNING) {
@@ -162,8 +186,8 @@ public class MinecraftEventListener implements Listener {
   private static void setLastTimePlayerKilled(LocalDateTime lastTimePlayerKilled) {
     MinecraftEventListener.lastTimePlayerKilled = lastTimePlayerKilled;
   }
-  
-  private static List<KillerWorker> getKilledplayerswhocanbesaved() {
+
+  public static List<KillerWorker> getKilledPlayersWhoCanBeSaved() {
     return killedPlayersWhoCanBeSaved;
   }
 

@@ -1,6 +1,7 @@
 package ch.kalunight.uhclg.worker;
 
 import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.GameRule;
@@ -16,6 +17,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import com.google.common.base.Stopwatch;
+
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameStatus;
@@ -45,7 +47,7 @@ public class GameWorker implements Runnable {
   private static long actualTime;
 
   private static long actualDayNumber;
-  
+
   private static Stopwatch chrono;
 
   private static boolean pvpActivate;
@@ -69,7 +71,7 @@ public class GameWorker implements Runnable {
     for(PlayerData player : GameData.getPlayersInGame()) {
       if(player.isAlive()) {
 
-        if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
+        if(player.getRole().getClan().equals(RoleClan.WOLFS) && !player.getRole().equals(Role.ENFANT_SAUVAGE)) {
           if(timeStatus.equals(TimeStatus.NIGHT)) {
             player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
             player.getAccount().getPlayer().addPotionEffect(PotionUtil.POWER);
@@ -87,11 +89,10 @@ public class GameWorker implements Runnable {
             player.getAccount().getPlayer().addPotionEffect(PotionUtil.POWER);
           }
           break;
-        case CHAMAN:
-          break;
         case CUPIDON:
           break;
         case ENFANT_SAUVAGE:
+          getEnfantSauvageBuff(player);
           break;
         case GRAND_MERE_LOUP:
           break;
@@ -107,6 +108,7 @@ public class GameWorker implements Runnable {
           if(timeStatus.equals(TimeStatus.NIGHT)) {
             player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_INVISIBILITY);
             player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_WEAKNESS);
+            player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
           }
           break;
         case PETIT_LOUP_GAROU:
@@ -126,6 +128,43 @@ public class GameWorker implements Runnable {
         default:
           break;
         }
+      }
+    }
+  }
+
+  private void getEnfantSauvageBuff(PlayerData player) {
+    if(GameData.getEnfantSauvageBuffVole() != null) {
+      if(TimeStatus.NIGHT.equals(timeStatus)) {
+        player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
+        player.getAccount().getPlayer().addPotionEffect(PotionUtil.POWER);
+      }
+
+      switch(GameData.getEnfantSauvageBuffVole()) {
+      case PETITE_FILLE:
+        if(timeStatus.equals(TimeStatus.NIGHT)) {
+          player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_INVISIBILITY);
+          player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_WEAKNESS);
+          player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
+        }
+        break;
+      case VOYANTE:
+        player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
+        break;
+      case PETIT_LOUP_GAROU:
+        if(timeStatus.equals(TimeStatus.NIGHT)) {
+          player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_WOLF_SPEED);
+        }
+        break;
+      case ASSASSIN:
+        if(timeStatus.equals(TimeStatus.DAY)) {
+          player.getAccount().getPlayer().addPotionEffect(PotionUtil.POWER);
+        }
+        break;
+      case ANCIEN:
+        player.getAccount().getPlayer().addPotionEffect(PotionUtil.RESISTANCE);
+        break;
+      default:
+        break;
       }
     }
   }
@@ -152,6 +191,8 @@ public class GameWorker implements Runnable {
       world.setTime(0);
 
       if(actualDayNumber == ROLE_START_DAY_NUMBER) {
+        ZoePluginMaster.getMinecraftServer().broadcastMessage("Le jour 2 commence ! "
+            + "Vos rôles sont dévoilés maintenant ! Le PVP sera activé à " + PVP_START_DURATION.get(ChronoUnit.MINUTES) + " minutes !");
         sayRoleToPlayer(); //Les rôles sont disponible a partir du jour 2
         giveStuffOfRole();
       }
@@ -174,7 +215,6 @@ public class GameWorker implements Runnable {
       case ANGE:
         break;
       case ASSASSIN:
-
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
         book.addEnchantment(Enchantment.DAMAGE_ALL, 3);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
@@ -185,15 +225,13 @@ public class GameWorker implements Runnable {
         book.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
         break;
-      case CHAMAN:
-        break;
       case CUPIDON:
         playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.STRING, 3));
         book = new ItemStack(Material.ENCHANTED_BOOK, 1);
         book.addEnchantment(Enchantment.DAMAGE_ALL, 2);
         book.addEnchantment(Enchantment.KNOCKBACK, 1);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
-        
+
         ItemStack arrows = new ItemStack(Material.ARROW, 64);
         playerData.getAccount().getPlayer().getInventory().addItem(arrows);
         break;
@@ -202,8 +240,6 @@ public class GameWorker implements Runnable {
       case GRAND_MERE_LOUP:
         break;
       case INFECT_PERE_DES_LOUPS:
-        break;
-      case LOUP_GAROU:
         break;
       case LOUP_GAROU_AMNESIQUE:
         break;
@@ -315,7 +351,7 @@ public class GameWorker implements Runnable {
   public static long getActualTime() {
     return actualTime;
   }
-  
+
   public static long getActualDayNumber() {
     return actualDayNumber;
   }

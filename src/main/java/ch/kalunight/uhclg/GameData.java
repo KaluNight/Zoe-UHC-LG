@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import ch.kalunight.uhclg.model.PlayerData;
+import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.VoiceChannel;
@@ -29,10 +30,28 @@ public class GameData {
   
   private static int baseWorldBorderSize = 3000;
   
-  private static double spawnMinBlockDistance = 100;
+  private static double spawnMinDistance = 2000;
+  
+  /*
+   * Role data
+   */
 
+  private static boolean loupAmnesiqueFound = false;
+  
+  private static PlayerData enfantSauvageModel = null;
+  
+  private static Role enfantSauvageBuffVole = null;
+  
   private GameData() {
     //hide default public constructor
+  }
+  
+  public static int getGroupSize() {
+    if(getWolfAlive() > getVillagerAlive()) {
+      return getVillagerAlive();
+    }else {
+      return getVillagerAlive();
+    }
   }
   
   public static int getPlayerAlive() {
@@ -142,11 +161,35 @@ public class GameData {
   }
 
   public static double getSpawnMinBlockDistance() {
-    return spawnMinBlockDistance;
+    return spawnMinDistance;
   }
 
   public static void setSpawnMinBlockDistance(double spawnMinBlockDistance) {
-    GameData.spawnMinBlockDistance = spawnMinBlockDistance;
+    GameData.spawnMinDistance = spawnMinBlockDistance;
+  }
+
+  public static boolean isLoupAmnesiqueFound() {
+    return loupAmnesiqueFound;
+  }
+
+  public static void setLoupAmnesiqueFound(boolean loupAmnesiqueFound) {
+    GameData.loupAmnesiqueFound = loupAmnesiqueFound;
+  }
+
+  public static PlayerData getEnfantSauvageModel() {
+    return enfantSauvageModel;
+  }
+
+  public static void setEnfantSauvageModel(PlayerData enfantSauvageModel) {
+    GameData.enfantSauvageModel = enfantSauvageModel;
+  }
+
+  public static Role getEnfantSauvageBuffVole() {
+    return enfantSauvageBuffVole;
+  }
+
+  public static void setEnfantSauvageBuffVole(Role enfantSauvageBuffVole) {
+    GameData.enfantSauvageBuffVole = enfantSauvageBuffVole;
   }
   
 }

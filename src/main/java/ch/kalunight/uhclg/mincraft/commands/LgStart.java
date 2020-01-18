@@ -5,23 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.World;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.block.Biome;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
@@ -32,7 +22,8 @@ import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
-import ch.kalunight.uhclg.util.MathUtil;
+import ch.kalunight.uhclg.util.LocationUtil;
+import ch.kalunight.uhclg.util.PotionUtil;
 import ch.kalunight.uhclg.worker.GameWorker;
 import ch.kalunight.uhclg.worker.VocalSystemWorker;
 import net.dv8tion.jda.api.entities.Member;
@@ -44,6 +35,10 @@ public class LgStart implements CommandExecutor {
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
+    if(!GameData.getGameStatus().equals(GameStatus.IN_LOBBY)) {
+      sender.sendMessage("La partie est déjà lancé !");
+    }
+    
     Server server = sender.getServer();
     
     if(!sender.isOp()) {
@@ -129,7 +124,7 @@ public class LgStart implements CommandExecutor {
 
     for(PlayerData playerData : GameData.getPlayersInGame()) {
 
-      startLocations.add(getRandomSpawnLocation(world, spawnLocation));
+      startLocations.add(LocationUtil.getRandomSpawnLocation(world, spawnLocation));
 
       playerData.getAccount().getPlayer().setGameMode(GameMode.SURVIVAL);
 
@@ -137,8 +132,8 @@ public class LgStart implements CommandExecutor {
     }
 
     for(Location location : startLocations) {
-      while(isLocationNearOfTheList(location, startLocations) || isAForbidenBiome(location)) {// TODO Fix that
-        Location newLocation = getRandomSpawnLocation(location.getWorld(), spawnLocation);
+      while(LocationUtil.isLocationNearOfTheList(location, startLocations) || LocationUtil.isAForbidenBiome(location)) {
+        Location newLocation = LocationUtil.getRandomSpawnLocation(location.getWorld(), spawnLocation);
         location.setX(newLocation.getX());
         location.setZ(newLocation.getZ());
       }
@@ -150,54 +145,10 @@ public class LgStart implements CommandExecutor {
       world.getChunkAt(startLocations.get(i));
 
       player.getAccount().getPlayer().getPlayer()
-      .addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 500, 500, false, true, false));
+      .addPotionEffect(PotionUtil.SPAWN_RESISTANCE);
 
       player.getAccount().getPlayer().teleport(startLocations.get(i));
     }
-  }
-
-  private boolean isAForbidenBiome(Location location) {
-
-    Biome biome = location.getWorld().getBiome(location.getBlockX(), location.getBlockY(), location.getBlockZ());
-
-    switch(biome) {
-    case COLD_OCEAN:
-    case DEEP_COLD_OCEAN:
-    case DEEP_FROZEN_OCEAN:
-    case DEEP_LUKEWARM_OCEAN:
-    case DEEP_OCEAN:
-    case DEEP_WARM_OCEAN:
-    case FROZEN_OCEAN:
-    case LUKEWARM_OCEAN:
-    case OCEAN:
-    case WARM_OCEAN:
-      return true;
-    default:
-      return false;
-    }
-  }
-
-  private boolean isLocationNearOfTheList(Location location, List<Location> locations) {
-    boolean isLocationNearOfTheList = false;
-    for(Location locationToCheck : locations) {
-      if(!location.equals(locationToCheck) 
-          && location.distanceSquared(locationToCheck) < GameData.getSpawnMinBlockDistance()) {
-        isLocationNearOfTheList = true;
-        break;
-      }
-    }
-    return isLocationNearOfTheList;
-  }
-
-
-  private Location getRandomSpawnLocation(World world, Location spawnLocation) {
-    double x = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
-    double z = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
-
-    x = spawnLocation.getX() + x;
-    z = spawnLocation.getZ() + z;
-
-    return new Location(world, x, spawnLocation.getY() + 500, z);
   }
 
   private void defineWorldBorder() {

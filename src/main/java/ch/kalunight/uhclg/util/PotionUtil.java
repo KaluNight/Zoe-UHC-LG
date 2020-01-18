@@ -23,7 +23,10 @@ public class PotionUtil {
   public static final PotionEffect RESISTANCE = 
       new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 1, false, false, false);
   
+  public static final PotionEffect SPAWN_RESISTANCE =
+      new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 500, 500, false, true, false);
+  
   private PotionUtil() {
-    // TODO Auto-generated constructor stub
+    // util class
   }
 }

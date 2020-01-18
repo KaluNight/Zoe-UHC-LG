@@ -16,6 +16,8 @@ public class PlayerData {
   
   private boolean discordVoiceConnected;
   
+  private boolean inLove;
+  
   public PlayerData(LinkedDiscordAccount account) {
     this.account = account;
     this.alive = true;
@@ -73,6 +75,14 @@ public class PlayerData {
 
   public void setDiscordVoiceConnected(boolean discordVoiceConnected) {
     this.discordVoiceConnected = discordVoiceConnected;
+  }
+
+  public boolean isInLove() {
+    return inLove;
+  }
+
+  public void setInLove(boolean inLove) {
+    this.inLove = inLove;
   }
   
 }

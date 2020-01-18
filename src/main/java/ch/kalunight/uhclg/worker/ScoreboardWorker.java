@@ -14,7 +14,6 @@ import org.bukkit.scoreboard.Scoreboard;
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameStatus;
-import ch.kalunight.uhclg.model.GroupConfig;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import ch.kalunight.uhclg.model.PlayerData;
 
@@ -120,7 +119,7 @@ public class ScoreboardWorker implements Runnable {
       specialRestant.setScore(4);
       
       groupMax = objective.getScore("Taille de groupe maximal : " 
-      + GroupConfig.getGroupConfig(GameData.getPlayerAlive()));
+      + GameData.getGroupSize());
       groupMax.setScore(2);
 
     }else {
@@ -141,7 +140,7 @@ public class ScoreboardWorker implements Runnable {
       specialRestant.setScore(4);
       
       groupMax = objective.getScore("Taille de groupe maximal : " 
-      + GroupConfig.getGroupConfig(GameData.getPlayerAlive()));
+      + GameData.getGroupSize());
       groupMax.setScore(2);
     }
 
