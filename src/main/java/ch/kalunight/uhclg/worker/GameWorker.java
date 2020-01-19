@@ -6,8 +6,10 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.GameRule;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.WorldBorder;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -31,8 +33,8 @@ import ch.kalunight.uhclg.util.PotionUtil;
 public class GameWorker implements Runnable {
 
   private static final int DAY_DURATION = 24000;
-  private static final Duration DAY1_DURATION = Duration.ofMinutes(10);
-  private static final Duration DAY2_DURATION = Duration.ofMinutes(5);
+  private static final Duration DAY1_DURATION = Duration.ofMinutes(20);
+  private static final Duration DAY2_DURATION = Duration.ofMinutes(10);
   private static final Duration PVP_START_DURATION = Duration.ofMinutes(10);
 
   private static final int START_OF_DAY = 0;
@@ -235,6 +237,17 @@ public class GameWorker implements Runnable {
       }
       
       sayMessageOfDay();
+      
+      WorldBorder worldBorder = world.getWorldBorder();
+      if(worldBorder.getSize() > 750) {
+        worldBorder.setSize(worldBorder.getSize() - 500, 180);
+        if(worldBorder.getSize() > 750) {
+          sayWorldBorderMove(false);
+        }else {
+          sayWorldBorderMove(false);
+        }
+      }
+      
     }else {
       if(actualTime > START_OF_NIGHT) {
         setTimeStatus(TimeStatus.NIGHT);
@@ -243,6 +256,16 @@ public class GameWorker implements Runnable {
       }
       world.setTime(actualTime);
     }
+  }
+
+  private void sayWorldBorderMove(boolean minSizeHit) {
+    if(minSizeHit) {
+      ZoePluginMaster.getMinecraftServer().broadcastMessage("La carte se réduit de 500 blocks !");
+    }else {
+      ZoePluginMaster.getMinecraftServer()
+      .broadcastMessage("La carte se réduit de 500 blocks ! Sa taille minimal à été atteinte !");
+    }
+    
   }
 
   private void sayMessageOfDay() {
@@ -266,8 +289,6 @@ public class GameWorker implements Runnable {
     for(PlayerData playerData : GameData.getPlayersInGame()) {
       switch(playerData.getRole()) {
       case ANCIEN:
-        break;
-      case ANGE:
         break;
       case ASSASSIN:
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
@@ -360,7 +381,8 @@ public class GameWorker implements Runnable {
   public static void setupGameWorker() {
     world.setTime(START_OF_DAY);
     setTimeStatus(TimeStatus.DAY);
-
+    world.getWorldBorder().setWarningDistance(500);
+    
     secondsTime = DAY_DURATION / DAY1_DURATION.getSeconds() / 2;
     actualTime = 0;
 

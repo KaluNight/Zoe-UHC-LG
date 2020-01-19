@@ -9,7 +9,7 @@ import java.util.Random;
 import ch.kalunight.uhclg.GameData;
 
 public enum Role {
-  ANGE(RoleClan.VILLAGE, "Ange"),
+  /*ANGE(RoleClan.VILLAGE, "Ange"),*/
   VOYANTE(RoleClan.VILLAGE, "Voyante"),
   CUPIDON(RoleClan.VILLAGE, "Cupidon"),
   PETITE_FILLE(RoleClan.VILLAGE, "Petite Fille"),
