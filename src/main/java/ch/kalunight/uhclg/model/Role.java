@@ -22,7 +22,7 @@ public enum Role {
   ENFANT_SAUVAGE(RoleClan.WOLFS, "Enfant Sauvage"),
   INFECT_PERE_DES_LOUPS(RoleClan.WOLFS, "Infect Père des Loups Garou"),
   LOUP_GAROU_BLANC(RoleClan.WOLFS, "Loup Garou Blanc"),
-  LOUP_GAROU_AMNESIQUE(RoleClan.WOLFS, "Villageois"),
+  LOUP_GAROU_AMNESIQUE(RoleClan.WOLFS, "Loup Garou Amnésique"),
   PETIT_LOUP_GAROU(RoleClan.WOLFS, "Vilain Petit Loup"),
   GRAND_MERE_LOUP(RoleClan.WOLFS, "Grand-Mère Loup");
 

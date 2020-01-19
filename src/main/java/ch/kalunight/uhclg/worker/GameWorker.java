@@ -70,12 +70,19 @@ public class GameWorker implements Runnable {
 
   private void givePlayerEffect() {
     for(PlayerData player : GameData.getPlayersInGame()) {
-      if(player.isAlive()) {
+      if(player.isAlive() && player.isConnected()) {
 
-        if(player.getRole().getClan().equals(RoleClan.WOLFS) && !player.getRole().equals(Role.ENFANT_SAUVAGE)) {
+        if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
           if(timeStatus.equals(TimeStatus.NIGHT)) {
-            player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
-            player.getAccount().getPlayer().addPotionEffect(PotionUtil.POWER);
+            if(player.getRole().equals(Role.ENFANT_SAUVAGE)) {
+              if(GameData.getEnfantSauvageBuffVole() != null) {
+                giveNightVision(player);
+              }
+            }else {
+              giveNightVision(player);
+            }
+          } else {
+            clearNightVision(player);
           }
         }
 
@@ -109,7 +116,10 @@ public class GameWorker implements Runnable {
           if(timeStatus.equals(TimeStatus.NIGHT)) {
             player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_INVISIBILITY);
             player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_WEAKNESS);
-            player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
+            
+            giveNightVision(player);
+          }else {
+            clearNightVision(player);
           }
           break;
         case PETIT_LOUP_GAROU:
@@ -130,6 +140,32 @@ public class GameWorker implements Runnable {
           break;
         }
       }
+    }
+  }
+
+  private void clearNightVision(PlayerData player) {
+    PotionEffect nightVision = null;
+    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
+      if(potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)) {
+        nightVision = potionEffect;
+      }
+    }
+    
+    if(nightVision != null) {
+      player.getAccount().getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
+    }
+  }
+
+  private void giveNightVision(PlayerData player) {
+    PotionEffect nightVision = null;
+    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
+      if(potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)) {
+        nightVision = potionEffect;
+      }
+    }
+    
+    if(nightVision == null) {
+      player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
     }
   }
 
@@ -309,7 +345,11 @@ public class GameWorker implements Runnable {
     for(PlayerData player : GameData.getPlayersInGame()) {
       Role role = player.getRole();
 
-      player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
+      if(player.getRole().equals(Role.LOUP_GAROU_AMNESIQUE) && !GameData.isLoupAmnesiqueFound()) {
+        player.getAccount().getPlayer().sendMessage("Votre rôle : Villageois");
+      }else {
+        player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
+      }
       player.getAccount().getPlayer().sendMessage("Description : " + role.getDescription());
       if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
         player.getAccount().getPlayer().sendMessage(LgListe.getListWolfs());

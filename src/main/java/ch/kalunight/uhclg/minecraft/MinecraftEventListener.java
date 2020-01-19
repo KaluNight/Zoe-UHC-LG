@@ -10,9 +10,11 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityCombustEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -20,6 +22,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
 
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
@@ -171,6 +174,14 @@ public class MinecraftEventListener implements Listener {
         e.setCancelled(true);
         e.setDamage(0);
       }
+    }
+  }
+  
+  @EventHandler
+  public void onEntityDamageByEntityEvent(final EntityDamageByEntityEvent event) {
+    if(event.getCause() == DamageCause.PROJECTILE) {
+      ProjectileSource projectilSource = ((Projectile)event.getDamager()).getShooter();
+      //TODO finish
     }
   }
 

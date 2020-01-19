@@ -42,6 +42,8 @@ public class GameData {
   
   private static Role enfantSauvageBuffVole = null;
   
+  private static boolean grandMereLoupReveal = false;
+  
   private GameData() {
     //hide default public constructor
   }
@@ -198,6 +200,14 @@ public class GameData {
 
   public static void setEnfantSauvageBuffVole(Role enfantSauvageBuffVole) {
     GameData.enfantSauvageBuffVole = enfantSauvageBuffVole;
+  }
+
+  public static boolean isGrandMereLoupReveal() {
+    return grandMereLoupReveal;
+  }
+
+  public static void setGrandMereLoupReveal(boolean grandMereLoupReveal) {
+    GameData.grandMereLoupReveal = grandMereLoupReveal;
   }
   
 }

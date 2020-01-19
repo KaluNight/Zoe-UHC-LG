@@ -68,7 +68,21 @@ public class LgVoir implements CommandExecutor {
     
     setRoleChecked(true);
     
-    sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"" + playerToCheck.getRole().getName() + "\" !");
+    if(playerToCheck.getRole().equals(Role.GRAND_MERE_LOUP)) {
+      if(GameData.isGrandMereLoupReveal()) {
+        sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"" + playerToCheck.getRole().getName() + "\" !");
+      }else {
+        sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"Villageois\" !");
+      }
+    }else if(playerToCheck.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {
+      if(GameData.isLoupAmnesiqueFound()) {
+        sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"" + playerToCheck.getRole().getName() + "\" !");
+      }else {
+        sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"Villageois\" !");
+      }
+    }else {
+      sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"" + playerToCheck.getRole().getName() + "\" !");
+    }
     
     return true;
   }

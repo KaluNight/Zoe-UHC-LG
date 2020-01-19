@@ -6,7 +6,7 @@ import org.bukkit.potion.PotionEffectType;
 public class PotionUtil {
 
   public static final PotionEffect NIGHT_VISION = 
-      new PotionEffect(PotionEffectType.NIGHT_VISION, 60, 1, false, false, false);
+      new PotionEffect(PotionEffectType.NIGHT_VISION, 999999, 1, false, false, false);
   
   public static final PotionEffect POWER  = 
       new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 60, 1, false, false, false);
@@ -24,7 +24,7 @@ public class PotionUtil {
       new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 60, 1, false, false, false);
   
   public static final PotionEffect SPAWN_RESISTANCE =
-      new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 500, 500, false, true, false);
+      new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 500, 1000, false, true, false);
   
   private PotionUtil() {
     // util class
