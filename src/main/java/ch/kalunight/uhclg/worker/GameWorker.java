@@ -9,7 +9,6 @@ import org.bukkit.World;
 import org.bukkit.WorldBorder;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Wolf;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -91,8 +90,6 @@ public class GameWorker implements Runnable {
         switch (player.getRole()) {
         case ANCIEN:
           player.getAccount().getPlayer().addPotionEffect(PotionUtil.RESISTANCE);
-          break;
-        case ANGE:
           break;
         case ASSASSIN:
           if(timeStatus.equals(TimeStatus.DAY)) {
@@ -328,7 +325,7 @@ public class GameWorker implements Runnable {
       case PETIT_LOUP_GAROU:
         break;
       case RENARD:
-        playerData.getAccount().getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 1, false, false, true));
+        playerData.getAccount().getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0, false, false, true));
         break;
       case SORCIERE:
 

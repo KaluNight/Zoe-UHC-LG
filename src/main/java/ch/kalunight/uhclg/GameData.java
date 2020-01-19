@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Location;
+import org.bukkit.Server;
+import org.bukkit.World;
 
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
@@ -43,6 +45,10 @@ public class GameData {
   private static Role enfantSauvageBuffVole = null;
   
   private static boolean grandMereLoupReveal = false;
+  
+  private static boolean sorcierePowerUsed = false;
+  
+  private static boolean fatherWolfPowerUsed = false;
   
   private GameData() {
     //hide default public constructor
@@ -167,6 +173,13 @@ public class GameData {
   }
 
   public static int getBaseWorldBorderSize() {
+    Server server = ZoePluginMaster.getMinecraftServer();
+    
+    World world = server.getWorld("world");
+    if(world != null) {
+      return (int) world.getWorldBorder().getSize();
+    }
+    
     return baseWorldBorderSize;
   }
 
@@ -212,6 +225,22 @@ public class GameData {
 
   public static void setGrandMereLoupReveal(boolean grandMereLoupReveal) {
     GameData.grandMereLoupReveal = grandMereLoupReveal;
+  }
+
+  public static boolean isSorcierePowerUsed() {
+    return sorcierePowerUsed;
+  }
+
+  public static void setSorcierePowerUsed(boolean sorcierePowerUsed) {
+    GameData.sorcierePowerUsed = sorcierePowerUsed;
+  }
+
+  public static boolean isFatherWolfPowerUsed() {
+    return fatherWolfPowerUsed;
+  }
+
+  public static void setFatherWolfPowerUsed(boolean fatherWolfPowerUsed) {
+    GameData.fatherWolfPowerUsed = fatherWolfPowerUsed;
   }
   
 }

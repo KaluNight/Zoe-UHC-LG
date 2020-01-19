@@ -28,6 +28,7 @@ import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
 import ch.kalunight.uhclg.mincraft.commands.LgListe;
 import ch.kalunight.uhclg.mincraft.commands.LgModel;
+import ch.kalunight.uhclg.mincraft.commands.LgSauver;
 import ch.kalunight.uhclg.mincraft.commands.LgStart;
 import ch.kalunight.uhclg.mincraft.commands.LgVoir;
 import ch.kalunight.uhclg.minecraft.MinecraftEventListener;
@@ -102,6 +103,7 @@ public class ZoePluginMaster extends JavaPlugin {
     this.getCommand("lgmodel").setExecutor(new LgModel());
     this.getCommand("lgliste").setExecutor(new LgListe());
     this.getCommand("lgvoir").setExecutor(new LgVoir());
+    this.getCommand("lgsauver").setExecutor(new LgSauver());
 
     generateLobby();
     

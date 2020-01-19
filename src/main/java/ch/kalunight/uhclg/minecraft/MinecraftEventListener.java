@@ -30,6 +30,9 @@ import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.util.DeathUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
+import ch.kalunight.uhclg.worker.SpectatorWorker;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 
 public class MinecraftEventListener implements Listener {
 
@@ -82,6 +85,8 @@ public class MinecraftEventListener implements Listener {
       playerData.setAlive(false);
 
       makeRoleEffect(playerData);
+      
+      checkIfTheGameIsEnded();
 
       player.getLocation().getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
 
@@ -91,10 +96,38 @@ public class MinecraftEventListener implements Listener {
 
       setLastTimePlayerKilled(LocalDateTime.now());
       player.getLocation().getWorld().spawnEntity(thunderLocation, EntityType.LIGHTNING);
-      player.setGameMode(GameMode.SPECTATOR);
-    }else {
+      
+      ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), new SpectatorWorker(player), 100);
+    } else {
       event.setDeathMessage(null);
     }
+  }
+
+  private void checkIfTheGameIsEnded() {
+    
+    List<PlayerData> villageList = new ArrayList<>();
+    List<PlayerData> wolfsList = new ArrayList<>();
+    List<PlayerData> loverList = new ArrayList<>();
+    List<PlayerData> specialList = new ArrayList<>();
+    
+    for(PlayerData player : GameData.getPlayersInGame()) {
+      if(player.getRole().getClan().equals(RoleClan.SPECIAL) || player.getRole().equals(Role.LOUP_GAROU_BLANC)) {
+        specialList.add(player);
+      }else if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
+        wolfsList.add(player);
+      }else if(player.getRole().getClan().equals(RoleClan.VILLAGE)) {
+        villageList.add(player);
+      }
+    }
+    
+    if(!villageList.isEmpty() && wolfsList.isEmpty() && specialList.isEmpty()) {
+      ZoePluginMaster.getMinecraftServer().broadcastMessage("Le village gagne !");
+    }else if(villageList.isEmpty() && !wolfsList.isEmpty() && specialList.isEmpty()) {
+      ZoePluginMaster.getMinecraftServer().broadcastMessage("Les loups gagnent !");
+    }else if(villageList.isEmpty() && wolfsList.isEmpty() && !specialList.isEmpty()) {
+      ZoePluginMaster.getMinecraftServer().broadcastMessage("Un joueur avec un rôle spécial gagne !");
+    }
+    
   }
 
   private void makeRoleEffect(PlayerData playerKilled) {
@@ -149,22 +182,24 @@ public class MinecraftEventListener implements Listener {
     PlayerData playerData = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
     if(playerData != null && playerData.isAlive()) {
-      
       if(playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
-
         if(playerCanBeSaved(playerData)) {
           KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
           ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), killerWorker, DeathUtil.DEATH_TIME_IN_TICKS);
           killedPlayersWhoCanBeSaved.add(killerWorker);
           playerData.getAccount().getPlayer().setInvulnerable(true);
           playerData.getAccount().getPlayer().addPotionEffect(
-              new PotionEffect(PotionEffectType.INVISIBILITY, DeathUtil.DEATH_TIME_IN_TICKS, 1, false, false, false));
+              new PotionEffect(PotionEffectType.INVISIBILITY, DeathUtil.DEATH_TIME_IN_TICKS, 0, false, false, false));
           playerData.getAccount().getPlayer().addPotionEffect(
               new PotionEffect(PotionEffectType.BLINDNESS, DeathUtil.DEATH_TIME_IN_TICKS, 5, false, false, false));
           playerData.getAccount().getPlayer().addPotionEffect(
               new PotionEffect(PotionEffectType.SLOW, DeathUtil.DEATH_TIME_IN_TICKS, 30, false, false, false));
           playerData.getAccount().getPlayer().sendMessage("Vous êtes aux portes de la mort. Quelqu'un peux encore vous sauver ...");
           e.setDamage(0);
+        }else {
+          Guild guild = GameData.getLobby().getGuild();
+          Member member = guild.getMemberById(playerData.getAccount().getDiscordId());
+          guild.mute(member, true).queue();
         }
       }
     }

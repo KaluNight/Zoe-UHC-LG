@@ -42,8 +42,6 @@ public enum Role {
     switch(this) {
     case ANCIEN:
       return "Ancien : Il dispose de l’effet resistance 1 s’il meurt d’un loup garou, il sera ressuscité (1 seule fois). S’il est tué par un villageois, celui-ci perdra la moitié de sa vie.";
-    case ANGE:
-      return "Ange : à chaque 2 personnes qui votent contre lui, il gagne un coeur supplémentaire jusqu’à un maximum de 15, il prend bien sûr quand même les dégâts des votes.";
     case ASSASSIN:
       return "Assassin : Dispose de l’effet force 1 le jour et doit gagner seul. Il reçoit à l’annonces des rôles un livre power 3, un tranchant 3, un protection 3.";
     case CUPIDON:

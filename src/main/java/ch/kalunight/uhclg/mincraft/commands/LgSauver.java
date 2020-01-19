@@ -9,7 +9,6 @@ import ch.kalunight.uhclg.minecraft.MinecraftEventListener;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
-import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.worker.GameWorker;
 import ch.kalunight.uhclg.worker.KillerWorker;
 
@@ -41,6 +40,16 @@ public class LgSauver implements CommandExecutor {
       return true;
     }
     
+    if(playerSender.getRole().equals(Role.SORCIERE) && GameData.isSorcierePowerUsed()) {
+      sender.sendMessage("Vous avez déjà utilisé votre pouvoir !");
+      return true;
+    }
+    
+    if(playerSender.getRole().equals(Role.INFECT_PERE_DES_LOUPS) && GameData.isFatherWolfPowerUsed()) {
+      sender.sendMessage("Vous avez déjà utilisé votre pouvoir !");
+      return true;
+    }
+    
     if(args.length != 1) {
       sender.sendMessage("Vous devez mentionner quelqu'un pour pour pouvoir voir son rôle !");
       return false;
@@ -54,20 +63,32 @@ public class LgSauver implements CommandExecutor {
     }
     
     if(playerToSave == null) {
-      sender.sendMessage("Le nom du joueur à vérifier n'est pas valide !");
+      sender.sendMessage("Le nom du joueur à sauver n'est pas valide !");
       return true;
     }
     
     KillerWorker killerWorker = null;
     for(KillerWorker killerWorkerToCheck : MinecraftEventListener.getKilledPlayersWhoCanBeSaved()) {
-      
       if(killerWorkerToCheck.getPlayerKilled().getAccount().getPlayerUUID().equals(playerToSave.getAccount().getPlayerUUID()) && 
           killerWorkerToCheck.getPotentialSavior().getAccount().getPlayerUUID().equals(playerSender.getAccount().getPlayerUUID())) {
         killerWorker = killerWorkerToCheck;
       }
     }
     
+    if(killerWorker == null) {
+      playerSender.getAccount().getPlayer().sendMessage("Vous ne pouvez pas (encore ?) le sauver.");
+      return true;
+    }
     
+    killerWorker.setHasBeenSaved(true);
+    
+    if(playerSender.getRole().equals(Role.SORCIERE)) {
+      GameData.setSorcierePowerUsed(true);
+    }else {
+      GameData.setFatherWolfPowerUsed(true);
+    }
+    
+    playerSender.getAccount().getPlayer().sendMessage("Vous avez bien sauvé le joueur " + playerToSave.getAccount().getPlayer().getName() + " !");
     
     return true;
   }
