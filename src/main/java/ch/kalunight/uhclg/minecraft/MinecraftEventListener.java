@@ -11,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityCombustEvent;
@@ -23,8 +22,6 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.projectiles.ProjectileSource;
-
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameStatus;
