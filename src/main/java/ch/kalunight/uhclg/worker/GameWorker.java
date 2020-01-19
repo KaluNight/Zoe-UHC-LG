@@ -260,7 +260,7 @@ public class GameWorker implements Runnable {
 
   private void sayWorldBorderMove(boolean minSizeHit) {
     if(minSizeHit) {
-      ZoePluginMaster.getMinecraftServer().broadcastMessage("La carte se réduit de 500 blocks !");
+      ZoePluginMaster.getMinecraftServer().broadcastMessage("La carte se réduit de 500 blocs !");
     }else {
       ZoePluginMaster.getMinecraftServer()
       .broadcastMessage("La carte se réduit de 500 blocks ! Sa taille minimal à été atteinte !");
