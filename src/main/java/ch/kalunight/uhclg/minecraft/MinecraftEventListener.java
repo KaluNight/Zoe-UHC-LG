@@ -8,6 +8,7 @@ import java.util.List;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -77,19 +78,19 @@ public class MinecraftEventListener implements Listener {
   public void onPlayerDeath(final PlayerDeathEvent event) {
     Player player = event.getEntity();
     PlayerData playerData = GameData.getPlayerInGame(player.getUniqueId());
-    
+
     if(playerData != null) {
       event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
       playerData.setAlive(false);
 
       makeRoleEffect(playerData);
-      
+
       player.getLocation().getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
 
       Location thunderLocation = 
           new Location(player.getLocation().getWorld(), player.getLocation().getX(), player.getLocation().getY() - 3,
               player.getLocation().getZ());
-      
+
       setLastTimePlayerKilled(LocalDateTime.now());
       player.getLocation().getWorld().spawnEntity(thunderLocation, EntityType.LIGHTNING);
       player.setGameMode(GameMode.SPECTATOR);
@@ -101,13 +102,13 @@ public class MinecraftEventListener implements Listener {
   private void makeRoleEffect(PlayerData playerKilled) {
     if(playerKilled.equals(GameData.getEnfantSauvageModel())) {
       PlayerData enfantSauvage = null;
-      
+
       for(PlayerData player : GameData.getPlayersInGame()) {
         if(player.getRole().equals(Role.ENFANT_SAUVAGE)) {
           enfantSauvage = player;
         }
       }
-      
+
       if(enfantSauvage != null && enfantSauvage.isAlive()) {
         enfantSauvage.getAccount().getPlayer().sendMessage("Votre modèle vient de mourir, vous êtes donc désormais un loup garou ! "
             + "Vous optenez également tous les bonus de votre modèle qui était " + playerKilled.getRole().getName());
@@ -176,12 +177,25 @@ public class MinecraftEventListener implements Listener {
       }
     }
   }
-  
+
   @EventHandler
-  public void onEntityDamageByEntityEvent(final EntityDamageByEntityEvent event) {
-    if(event.getCause() == DamageCause.PROJECTILE) {
-      ProjectileSource projectilSource = ((Projectile)event.getDamager()).getShooter();
-      //TODO finish
+  public void onArrowHit(EntityDamageByEntityEvent e) {
+    if (!GameData.isGrandMereLoupReveal() && e.getCause().equals(DamageCause.PROJECTILE) && e.getDamager() instanceof Arrow) {
+      Arrow a = (Arrow) e.getDamager();
+      if(a.getShooter() instanceof Player && e.getEntity() instanceof Player) {
+        PlayerData playerShooted = null;
+        for(PlayerData playerToCheck : GameData.getPlayersInGame()) {
+          if(playerToCheck.getAccount().getPlayerUUID().equals(e.getEntity().getUniqueId())) {
+            playerShooted = playerToCheck;
+          }
+        }
+
+        if(playerShooted != null) {
+          if(playerShooted.getRole().equals(Role.GRAND_MERE_LOUP)) {
+            GameData.setGrandMereLoupReveal(true);
+          }
+        }
+      }
     }
   }
 

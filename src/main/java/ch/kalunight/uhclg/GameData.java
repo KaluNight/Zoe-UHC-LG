@@ -57,6 +57,10 @@ public class GameData {
       return 3;
     }
     
+    if(wolfsAlive > 5 && villagersAlive > 5) {
+      return 5;
+    }
+    
     if(wolfsAlive > villagersAlive) {
       return villagersAlive;
     }else {
