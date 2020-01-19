@@ -197,9 +197,10 @@ public class MinecraftEventListener implements Listener {
           playerData.getAccount().getPlayer().sendMessage("Vous êtes aux portes de la mort. Quelqu'un peux encore vous sauver ...");
           e.setDamage(0);
         }else {
-          Guild guild = GameData.getLobby().getGuild();
-          Member member = guild.getMemberById(playerData.getAccount().getDiscordId());
-          guild.mute(member, true).queue();
+          
+          //Guild guild = GameData.getLobby().getGuild();
+          //Member member = guild.getMemberById(playerData.getAccount().getDiscordId());
+          //guild.mute(member, true).queue();
         }
       }
     }

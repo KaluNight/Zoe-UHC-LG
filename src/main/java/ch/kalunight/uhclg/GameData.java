@@ -173,13 +173,6 @@ public class GameData {
   }
 
   public static int getBaseWorldBorderSize() {
-    Server server = ZoePluginMaster.getMinecraftServer();
-    
-    World world = server.getWorld("world");
-    if(world != null) {
-      return (int) world.getWorldBorder().getSize();
-    }
-    
     return baseWorldBorderSize;
   }
 
