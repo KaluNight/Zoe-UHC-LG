@@ -30,6 +30,7 @@ import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.util.DeathUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
 
@@ -151,6 +152,7 @@ public class MinecraftEventListener implements Listener {
     PlayerData playerData = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
     if(playerData != null && playerData.isAlive()) {
+      
       if(playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
 
         if(playerCanBeSaved(playerData)) {
@@ -179,21 +181,34 @@ public class MinecraftEventListener implements Listener {
   }
 
   @EventHandler
-  public void onArrowHit(EntityDamageByEntityEvent e) {
-    if (!GameData.isGrandMereLoupReveal() && e.getCause().equals(DamageCause.PROJECTILE) && e.getDamager() instanceof Arrow) {
+  public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent e) {
+    if(!GameData.isGrandMereLoupReveal() && e.getCause().equals(DamageCause.PROJECTILE) && e.getDamager() instanceof Arrow) {
       Arrow a = (Arrow) e.getDamager();
       if(a.getShooter() instanceof Player && e.getEntity() instanceof Player) {
-        PlayerData playerShooted = null;
-        for(PlayerData playerToCheck : GameData.getPlayersInGame()) {
-          if(playerToCheck.getAccount().getPlayerUUID().equals(e.getEntity().getUniqueId())) {
-            playerShooted = playerToCheck;
-          }
-        }
+        PlayerData playerShooted = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
         if(playerShooted != null) {
           if(playerShooted.getRole().equals(Role.GRAND_MERE_LOUP)) {
             GameData.setGrandMereLoupReveal(true);
           }
+        }
+        return;
+      }else {
+        return;
+      }
+    }
+    
+    if(!GameData.isLoupAmnesiqueFound()) {
+      PlayerData potentionLoupAmnesique = GameData.getPlayerInGame(e.getEntity().getUniqueId());
+      
+      if(potentionLoupAmnesique != null && potentionLoupAmnesique.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {
+        PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
+        
+        if(damager != null && damager.isAlive() && damager.getRole().getClan().equals(RoleClan.WOLFS)) {
+          GameData.setLoupAmnesiqueFound(true);
+          
+          potentionLoupAmnesique.getAccount().getPlayer()
+          .sendMessage("Vous êtes un LOUP GAROU AMNESIQUE ! PREVENEZ VOS ALLIÉS LOUPS !");
         }
       }
     }
