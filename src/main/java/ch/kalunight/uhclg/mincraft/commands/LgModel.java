@@ -21,7 +21,7 @@ public class LgModel implements CommandExecutor {
       }
     }
     
-    if(enfantSauvage == null) {
+    if(enfantSauvage == null || !enfantSauvage.getAccount().getPlayer().getName().equals(sender.getName())) {
       sender.sendMessage("Vous n'êtes pas l'enfant sauvage !");
       return true;
     }
@@ -38,7 +38,7 @@ public class LgModel implements CommandExecutor {
     
     if(args.length != 1) {
       sender.sendMessage("Vous devez mentionner un joueur !");
-      return true;
+      return false;
     }
     
     String modelName = args[0];

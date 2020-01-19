@@ -19,6 +19,8 @@ import com.google.common.base.Stopwatch;
 
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
+import ch.kalunight.uhclg.mincraft.commands.LgListe;
+import ch.kalunight.uhclg.mincraft.commands.LgVoir;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
@@ -195,7 +197,8 @@ public class GameWorker implements Runnable {
         sayRoleToPlayer(); //Les rôles sont disponible a partir du jour 2
         giveStuffOfRole();
       }
-
+      
+      sayMessageOfDay();
     }else {
       if(actualTime > START_OF_NIGHT) {
         setTimeStatus(TimeStatus.NIGHT);
@@ -204,6 +207,23 @@ public class GameWorker implements Runnable {
       }
       world.setTime(actualTime);
     }
+  }
+
+  private void sayMessageOfDay() {
+
+    PlayerData voyante = null;
+    
+    for(PlayerData player : GameData.getPlayersInGame()) {
+      if(player.getRole().equals(Role.VOYANTE)) {
+        voyante = player;
+      }
+    }
+    
+    if(voyante != null && voyante.isConnected() && voyante.isAlive()) {
+      voyante.getAccount().getPlayer().sendMessage("Vous pouvez utiliser votre pouvoir de voyante maintenant avec la commande \"lgvoir nomDuJoueur\".");
+    }
+    
+    LgVoir.setRoleChecked(false);
   }
 
   private void giveStuffOfRole() {
@@ -290,6 +310,10 @@ public class GameWorker implements Runnable {
       Role role = player.getRole();
 
       player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
+      player.getAccount().getPlayer().sendMessage("Description : " + role.getDescription());
+      if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
+        player.getAccount().getPlayer().sendMessage(LgListe.getListWolfs());
+      }
     }
   }
 

@@ -11,3 +11,9 @@ commands:
  lgmodel:
   description: Définit un modèle pour l'enfant sauvage
   usage: /lgmodel nomModele
+ lgliste:
+  description: Liste tous les loups garous de la partie
+  usage: /lgliste
+ lgvoir:
+  description: Révèle un rôle d'un joueur une fois pas jour, vous devez être voyante.
+  usage: /lgvoir nomDuJoueur
