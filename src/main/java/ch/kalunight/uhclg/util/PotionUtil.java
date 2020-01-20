@@ -8,6 +8,9 @@ public class PotionUtil {
   public static final PotionEffect NIGHT_VISION = 
       new PotionEffect(PotionEffectType.NIGHT_VISION, 999999, 0, false, false, false);
   
+  public static final PotionEffect INVISIBILITY = 
+      new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, false, false, false);
+  
   public static final PotionEffect POWER  = 
       new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 60, 0, false, false, false);
 

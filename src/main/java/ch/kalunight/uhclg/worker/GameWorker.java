@@ -10,6 +10,7 @@ import org.bukkit.WorldBorder;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
@@ -113,11 +114,12 @@ public class GameWorker implements Runnable {
           break;
         case PETITE_FILLE:
           if(timeStatus.equals(TimeStatus.NIGHT)) {
-            player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_INVISIBILITY);
             player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_WEAKNESS);
             
+            giveInvisiblity(player);
             giveNightVision(player);
           }else {
+            clearInvisibility(player);
             clearNightVision(player);
           }
           break;
@@ -139,6 +141,32 @@ public class GameWorker implements Runnable {
           break;
         }
       }
+    }
+  }
+
+  private void clearInvisibility(PlayerData player) {
+    PotionEffect nightVision = null;
+    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
+      if(potionEffect.getType().equals(PotionEffectType.INVISIBILITY)) {
+        nightVision = potionEffect;
+      }
+    }
+    
+    if(nightVision != null) {
+      player.getAccount().getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
+    }
+  }
+
+  private void giveInvisiblity(PlayerData player) {
+    PotionEffect nightVision = null;
+    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
+      if(potionEffect.getType().equals(PotionEffectType.INVISIBILITY)) {
+        nightVision = potionEffect;
+      }
+    }
+    
+    if(nightVision == null) {
+      player.getAccount().getPlayer().addPotionEffect(PotionUtil.INVISIBILITY);
     }
   }
 
@@ -178,9 +206,12 @@ public class GameWorker implements Runnable {
       switch(GameData.getEnfantSauvageBuffVole()) {
       case PETITE_FILLE:
         if(timeStatus.equals(TimeStatus.NIGHT)) {
-          player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_INVISIBILITY);
           player.getAccount().getPlayer().addPotionEffect(PotionUtil.LITTLE_GIRL_WEAKNESS);
-          player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
+          giveInvisiblity(player);
+          giveNightVision(player);
+        }else {
+          clearInvisibility(player);
+          clearNightVision(player);
         }
         break;
       case VOYANTE:
@@ -208,7 +239,7 @@ public class GameWorker implements Runnable {
   private void checkPVP() {
     if(!pvpActivate && chrono.elapsed(TimeUnit.MINUTES) > PVP_START_DURATION.toMinutes()) {
       for(World world : ZoePluginMaster.getMinecraftServer().getWorlds()) {
-        world.setGameRule(GameRule.NATURAL_REGENERATION, false);
+        world.setGameRule(GameRule.NATURAL_REGENERATION, true); //TODO : Disable natural regeneration ?
         world.setPVP(true);
       }
 
@@ -241,7 +272,7 @@ public class GameWorker implements Runnable {
         if(worldBorder.getSize() > 750) {
           sayWorldBorderMove(false);
         }else {
-          sayWorldBorderMove(false);
+          sayWorldBorderMove(true);
         }
       }
       
@@ -256,11 +287,12 @@ public class GameWorker implements Runnable {
   }
 
   private void sayWorldBorderMove(boolean minSizeHit) {
-    if(minSizeHit) {
+    if(!minSizeHit) {
       ZoePluginMaster.getMinecraftServer().broadcastMessage("La carte se réduit de 500 blocs !");
     }else {
       ZoePluginMaster.getMinecraftServer()
       .broadcastMessage("La carte se réduit de 500 blocks ! Sa taille minimal à été atteinte !");
+      world.getWorldBorder().setWarningDistance(0);
     }
     
   }
@@ -289,20 +321,28 @@ public class GameWorker implements Runnable {
         break;
       case ASSASSIN:
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        book.addEnchantment(Enchantment.DAMAGE_ALL, 3);
+        ItemMeta bookMeta = book.getItemMeta();
+        bookMeta.addEnchant(Enchantment.DAMAGE_ALL, 2, true);
+        book.setItemMeta(bookMeta);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
         book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        book.addEnchantment(Enchantment.ARROW_DAMAGE, 3);
+        bookMeta = book.getItemMeta();
+        bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 2, true);
+        book.setItemMeta(bookMeta);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
         book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        book.addEnchantment(Enchantment.PROTECTION_ENVIRONMENTAL, 3);
+        bookMeta = book.getItemMeta();
+        bookMeta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2, true);
+        book.setItemMeta(bookMeta);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
         break;
       case CUPIDON:
         playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.STRING, 3));
         book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        book.addEnchantment(Enchantment.DAMAGE_ALL, 2);
-        book.addEnchantment(Enchantment.KNOCKBACK, 1);
+        bookMeta = book.getItemMeta();
+        bookMeta.addEnchant(Enchantment.KNOCKBACK, 0, true);
+        bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
+        book.setItemMeta(bookMeta);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
 
         ItemStack arrows = new ItemStack(Material.ARROW, 64);
