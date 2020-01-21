@@ -45,6 +45,8 @@ public class GameData {
   
   private static boolean fatherWolfPowerUsed = false;
   
+  private static boolean oldVillagerHasRespawn = false;
+  
   private GameData() {
     //hide default public constructor
   }
@@ -221,6 +223,14 @@ public class GameData {
 
   public static void setFatherWolfPowerUsed(boolean fatherWolfPowerUsed) {
     GameData.fatherWolfPowerUsed = fatherWolfPowerUsed;
+  }
+
+  public static boolean isOldVillagerHasRespawn() {
+    return oldVillagerHasRespawn;
+  }
+
+  public static void setOldVillagerHasRespawn(boolean oldVillagerHasRespawn) {
+    GameData.oldVillagerHasRespawn = oldVillagerHasRespawn;
   }
   
 }

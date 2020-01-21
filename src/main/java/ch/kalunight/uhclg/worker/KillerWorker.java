@@ -40,7 +40,7 @@ public class KillerWorker implements Runnable {
         playerKilled.setRole(Role.LOUP_GAROU);
         playerKilled.getAccount().getPlayer().sendMessage("Vous avez été sauvé par l'infect père des loups garous, vous êtes désomais un loup garou !");
       }else {
-        playerKilled.getAccount().getPlayer().sendMessage("Vous avez été sauvé par la sorcière, votre rôle n'a pas changé ...");
+        playerKilled.getAccount().getPlayer().sendMessage("Vous avez été sauvé par la sorcière !");
       }
       
       Location location = LocationUtil.getRandomSpawnLocation(ZoePluginMaster.getMinecraftServer().getWorld("world"), GameData.getLobbyLocation());
@@ -86,6 +86,11 @@ public class KillerWorker implements Runnable {
             new PotionEffect(PotionEffectType.BLINDNESS, DeathUtil.DEATH_TIME_IN_TICKS, 5, false, false, false));
         playerKilled.getAccount().getPlayer().addPotionEffect(
             new PotionEffect(PotionEffectType.SLOW, DeathUtil.DEATH_TIME_IN_TICKS, 30, false, false, false));
+        
+        potentialSavior.getAccount().getPlayer()
+        .sendMessage(playerKilled.getAccount().getPlayer().getName() + " est entrain de mourir, "
+            + "vous avez 30 secondes pour sauver cette personne avec la commande \"lgsauver " 
+            + playerKilled.getAccount().getPlayer().getName() + "\".");
         ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), this, DeathUtil.DEATH_TIME_IN_TICKS);
       }
     }

@@ -8,6 +8,7 @@ import java.util.List;
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -29,6 +30,8 @@ import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.util.DeathUtil;
+import ch.kalunight.uhclg.util.LocationUtil;
+import ch.kalunight.uhclg.util.PotionUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
 import ch.kalunight.uhclg.worker.SpectatorWorker;
 
@@ -79,6 +82,7 @@ public class MinecraftEventListener implements Listener {
     PlayerData playerData = GameData.getPlayerInGame(player.getUniqueId());
 
     if(playerData != null) {
+
       event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
       playerData.setAlive(false);
 
@@ -176,11 +180,66 @@ public class MinecraftEventListener implements Listener {
 
   @EventHandler
   public void onEntityDamage(final EntityDamageEvent e) {
+    if (e.getCause() == DamageCause.LIGHTNING) {
+      if(LocalDateTime.now().minusSeconds(TIME_BEFORE_LIGHTNING_DAMAGE).isBefore(lastTimePlayerKilled)) {
+        e.setCancelled(true);
+        e.setDamage(0);
+      }
+    }
+  }
 
+  private void reviveOldVillager(PlayerData playerData, RoleClan killer) {
+    GameData.setOldVillagerHasRespawn(true);
+    
+    List<Location> locationsOfEveryone = new ArrayList<>();
+    
+    for(PlayerData playerAliveAndConnected : GameData.getPlayersInGame()) {
+      if(playerAliveAndConnected.isAlive() && playerAliveAndConnected.isConnected()) {
+        locationsOfEveryone.add(playerAliveAndConnected.getAccount().getPlayer().getLocation());
+      }
+    }
+    
+    locationsOfEveryone.add(GameData.getLobbyLocation());
+    
+    Location location = LocationUtil.getRandomSpawnLocation(ZoePluginMaster.getMinecraftServer().getWorld("world"),
+        GameData.getLobbyLocation());
+    
+    while(LocationUtil.isLocationNearOfTheList(location, locationsOfEveryone) || LocationUtil.isAForbidenBiome(location)) {
+      Location newLocation = LocationUtil.getRandomSpawnLocation(location.getWorld(), GameData.getLobbyLocation());
+      location.setX(newLocation.getX());
+      location.setZ(newLocation.getZ());
+    }
+    
+    double respawnLife = playerData.getAccount().getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
+    if(killer.equals(RoleClan.VILLAGE)) {
+      respawnLife /= 2;
+    }
+    
+    playerData.getAccount().getPlayer().setHealth(respawnLife);
+    playerData.getAccount().getPlayer().addPotionEffect(PotionUtil.SPAWN_RESISTANCE);
+    playerData.getAccount().getPlayer().teleport(location);
+  }
+
+  @EventHandler
+  public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent e) {
     PlayerData playerData = GameData.getPlayerInGame(e.getEntity().getUniqueId());
-
+    
+    if(playerData != null && playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
+      if(playerData.getRole().equals(Role.ANCIEN) && !GameData.isOldVillagerHasRespawn()) {
+        PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
+        
+        if(damager != null) {
+          reviveOldVillager(playerData, damager.getRole().getClan());
+        }else {
+          reviveOldVillager(playerData, RoleClan.WOLFS);
+        }
+        return;
+      }
+    }
+    
     if(playerData != null && playerData.isAlive()) {
       if(playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
+        
         if(playerCanBeSaved(playerData)) {
           KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
           ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), killerWorker, DeathUtil.DEATH_TIME_IN_TICKS);
@@ -193,26 +252,15 @@ public class MinecraftEventListener implements Listener {
           playerData.getAccount().getPlayer().addPotionEffect(
               new PotionEffect(PotionEffectType.SLOW, DeathUtil.DEATH_TIME_IN_TICKS, 30, false, false, false));
           playerData.getAccount().getPlayer().sendMessage("Vous êtes aux portes de la mort. Quelqu'un peux encore vous sauver ...");
+          killerWorker.getPotentialSavior().getAccount().getPlayer()
+          .sendMessage(playerData.getAccount().getPlayer().getName() + " est entrain de mourir, "
+              + "vous avez 30 secondes pour sauver cette personne avec la commande \"lgsauver " 
+              + playerData.getAccount().getPlayer().getName() + "\".");
           e.setDamage(0);
-        }else {
-          
-          //Guild guild = GameData.getLobby().getGuild();
-          //Member member = guild.getMemberById(playerData.getAccount().getDiscordId());
-          //guild.mute(member, true).queue();
         }
       }
     }
-
-    if (e.getCause() == DamageCause.LIGHTNING) {
-      if(LocalDateTime.now().minusSeconds(TIME_BEFORE_LIGHTNING_DAMAGE).isBefore(lastTimePlayerKilled)) {
-        e.setCancelled(true);
-        e.setDamage(0);
-      }
-    }
-  }
-
-  @EventHandler
-  public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent e) {
+    
     if(!GameData.isGrandMereLoupReveal() && e.getCause().equals(DamageCause.PROJECTILE) && e.getDamager() instanceof Arrow) {
       Arrow a = (Arrow) e.getDamager();
       if(a.getShooter() instanceof Player && e.getEntity() instanceof Player) {
@@ -223,9 +271,6 @@ public class MinecraftEventListener implements Listener {
             GameData.setGrandMereLoupReveal(true);
           }
         }
-        return;
-      }else {
-        return;
       }
     }
     
