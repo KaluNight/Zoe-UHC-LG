@@ -251,7 +251,7 @@ public class GameWorker implements Runnable {
     setActualTime(actualTime + secondsTime);
 
     if(actualTime > DAY_DURATION) {
-      setSecondsTime(DAY_DURATION / DAY2_DURATION.getSeconds() / 2);
+      setSecondsTime(DAY_DURATION / DAY2_DURATION.getSeconds());
       setActualTime(0);
       setTimeStatus(TimeStatus.DAY);
       actualDayNumber++;
@@ -420,7 +420,7 @@ public class GameWorker implements Runnable {
     setTimeStatus(TimeStatus.DAY);
     world.getWorldBorder().setWarningDistance(500);
     
-    secondsTime = DAY_DURATION / DAY1_DURATION.getSeconds() / 2;
+    secondsTime = DAY_DURATION / DAY1_DURATION.getSeconds();
     actualTime = 0;
 
     actualDayNumber = 1;

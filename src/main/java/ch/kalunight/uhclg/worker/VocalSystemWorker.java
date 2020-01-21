@@ -55,12 +55,22 @@ public class VocalSystemWorker implements Runnable {
                 Guild guild = getAvaibleGuild(jda);
                 Member member = guild.getMemberById(player.getAccount().getDiscordId());
 
-                VoiceChannel emptyVoiceChannel = getEmptyVoiceChannel(guild);
+                if(!voiceChannelPlayer.getPlayerData().isAlive()) {
+                  VoiceChannel deadVoiceChannel = guild.getVoiceChannelById(idDeadPlayer);
+                  guild.moveVoiceMember(member, deadVoiceChannel).queue();
+                  
+                  voiceChannelPlayer.setActualVoiceChannelId(idDeadPlayer);
+                  member.mute(false).queue();
+                  jda.addCall();
+                  playersAlreadyTreated.add(player);
+                }else {
+                  VoiceChannel emptyVoiceChannel = getEmptyVoiceChannel(guild);
 
-                guild.moveVoiceMember(member, emptyVoiceChannel).queue();
-                jda.addCall();
-                voiceChannelPlayer.setActualVoiceChannelId(emptyVoiceChannel.getIdLong());
-                playersAlreadyTreated.add(player);
+                  guild.moveVoiceMember(member, emptyVoiceChannel).queue();
+                  jda.addCall();
+                  voiceChannelPlayer.setActualVoiceChannelId(emptyVoiceChannel.getIdLong());
+                  playersAlreadyTreated.add(player);
+                }
               }
             }else {
               long voiceChannelId = getVoiceMostPopulatedChannel(playersInTheSameChannel);
@@ -71,9 +81,17 @@ public class VocalSystemWorker implements Runnable {
                   Guild guild = getAvaibleGuild(jda);
                   Member member = guild.getMemberById(playerToMove.getPlayerData().getAccount().getDiscordId());
 
-                  guild.moveVoiceMember(member, guild.getVoiceChannelById(voiceChannelId)).queue();
+                  try {
+                    if(!playerToMove.getPlayerData().isAlive()) {
+                      member.mute(true).queue();
+                    }
+                    guild.moveVoiceMember(member, guild.getVoiceChannelById(voiceChannelId)).queue();
+                    playerToMove.setActualVoiceChannelId(voiceChannelId);
+                  }catch(IllegalStateException e) {
+                    logger.error("Impossible de bouger quelqu'un qui n'est pas connecté", e);
+                    playerToMove.getPlayerData().setDiscordVoiceConnected(false);
+                  }
                   jda.addCall();
-                  playerToMove.setActualVoiceChannelId(voiceChannelId);
                   playersAlreadyTreated.add(playerToMove.getPlayerData());
                 }
               }

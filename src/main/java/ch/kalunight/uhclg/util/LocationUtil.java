@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 
 import ch.kalunight.uhclg.GameData;
+import ch.kalunight.uhclg.model.GameConfig;
 
 public class LocationUtil {
 
@@ -48,8 +49,10 @@ public class LocationUtil {
   }
 
   public static Location getRandomSpawnLocation(World world, Location spawnLocation) {
-    double x = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
-    double z = MathUtil.getRandomNumberInRange(0, GameData.getBaseWorldBorderSize()) - (GameData.getBaseWorldBorderSize() / 2d);
+    int worldBorder = GameConfig.getGameConfigWithPlayerNumber(GameData.getPlayersInGame().size()).getWorldBorderSize();
+    
+    double x = MathUtil.getRandomNumberInRange(0, worldBorder) - (worldBorder / 2d);
+    double z = MathUtil.getRandomNumberInRange(0, worldBorder) - (worldBorder / 2d);
   
     x = spawnLocation.getX() + x;
     z = spawnLocation.getZ() + z;

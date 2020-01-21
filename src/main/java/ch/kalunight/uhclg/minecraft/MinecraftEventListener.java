@@ -31,8 +31,6 @@ import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.util.DeathUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
 import ch.kalunight.uhclg.worker.SpectatorWorker;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
 
 public class MinecraftEventListener implements Listener {
 
@@ -69,7 +67,7 @@ public class MinecraftEventListener implements Listener {
 
     if(playerInGame != null) {
       playerInGame.setMinecraftConnected(false);
-      event.setQuitMessage("Le joueur " + event.getPlayer().getName() + " c'est déconnecté !");
+      event.setQuitMessage("Le joueur " + event.getPlayer().getName() + " s'est déconnecté !");
     }else {
       event.setQuitMessage(null);
     }

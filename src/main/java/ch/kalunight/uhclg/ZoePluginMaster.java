@@ -65,7 +65,7 @@ public class ZoePluginMaster extends JavaPlugin {
   @Override
   public void onEnable() {
     
-    setPlugin(plugin);
+    setPlugin(this);
 
     setMinecraftServer(getServer());
 
@@ -112,7 +112,7 @@ public class ZoePluginMaster extends JavaPlugin {
     getServer().getScheduler().runTaskTimer(this, new PositionWorker(), 10, 10);
     getServer().getScheduler().runTaskTimer(this, new VocalSystemWorker(), 10, 10);
     getServer().getScheduler().runTaskTimer(this, new ScoreboardWorker(), 20, 20);
-    getServer().getScheduler().runTaskTimer(this, new GameWorker(), 10, 10);
+    getServer().getScheduler().runTaskTimer(this, new GameWorker(), 20, 20);
     
     getServer().getPluginManager().registerEvents(new MinecraftEventListener(), this);
   }

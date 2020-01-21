@@ -156,7 +156,7 @@ public class LgStart implements CommandExecutor {
 
     world.getWorldBorder().setCenter(world.getSpawnLocation());
 
-    world.getWorldBorder().setSize(GameData.getBaseWorldBorderSize());
+    world.getWorldBorder().setSize(GameConfig.getGameConfigWithPlayerNumber(GameData.getPlayersRegistered().size()).getWorldBorderSize());
   }
 
   private void startTheGame() {

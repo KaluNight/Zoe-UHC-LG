@@ -5,9 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.bukkit.Location;
-import org.bukkit.Server;
-import org.bukkit.World;
-
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import ch.kalunight.uhclg.model.PlayerData;
@@ -29,8 +26,6 @@ public class GameData {
   private static TextChannel lobbyTextChannel;
   
   private static Location lobbyLocation;
-  
-  private static int baseWorldBorderSize = 3000;
   
   private static double spawnMinDistance = 2000;
   
@@ -170,14 +165,6 @@ public class GameData {
 
   public static List<PlayerData> getPlayersInGame() {
     return playersInGame;
-  }
-
-  public static int getBaseWorldBorderSize() {
-    return baseWorldBorderSize;
-  }
-
-  public static void setBaseWorldBorderSize(int baseWorldBorderSize) {
-    GameData.baseWorldBorderSize = baseWorldBorderSize;
   }
 
   public static double getSpawnMinBlockDistance() {
