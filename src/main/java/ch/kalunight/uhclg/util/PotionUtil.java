@@ -12,13 +12,13 @@ public class PotionUtil {
       new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, false, false, false);
   
   public static final PotionEffect POWER  = 
-      new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 60, 0, false, false, false);
+      new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 0, false, false, false);
 
-  public static final PotionEffect LITTLE_WOLF_SPEED = 
-      new PotionEffect(PotionEffectType.SPEED, 60, 0, false, false, false);
+  public static final PotionEffect SPEED = 
+      new PotionEffect(PotionEffectType.SPEED, 999999, 0, false, false, false);
 
-  public static final PotionEffect LITTLE_GIRL_WEAKNESS = 
-      new PotionEffect(PotionEffectType.WEAKNESS, 60, 0, false, false, false);
+  public static final PotionEffect WEAKNESS = 
+      new PotionEffect(PotionEffectType.WEAKNESS, 999999, 0, false, false, false);
   
   public static final PotionEffect LITTLE_GIRL_INVISIBILITY = 
       new PotionEffect(PotionEffectType.INVISIBILITY, 60, 0, false, false, false);
