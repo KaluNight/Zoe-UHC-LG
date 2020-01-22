@@ -73,8 +73,14 @@ public class LgLove implements CommandExecutor {
       return true;
     }
     
-    
-    return false;
-  }
+    GameData.setCupidonUseHisPower(true);
 
+    loverOne.setInLove(true);
+    loverTwo.setInLove(true);
+    
+    loverOne.getAccount().getPlayer().sendMessage("L'amour est dans l'air ... Vous êtes tombé amoureux de " + loverTwo.getAccount().getPlayer().getName() + " !");
+    loverTwo.getAccount().getPlayer().sendMessage("L'amour est dans l'air ... Vous êtes tombé amoureux de " + loverOne.getAccount().getPlayer().getName() + " !");
+    
+    return true;
+  }
 }

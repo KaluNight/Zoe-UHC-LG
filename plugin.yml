@@ -20,3 +20,6 @@ commands:
  lgsauver:
   description: Sauve un joueur
   usage: /lgsauver nomDuJoueur
+ lglove:
+  description: Rend amoureux deux personnes
+  usage: /lglove nomDuJoueur1 nomDuJoueur2

@@ -11,7 +11,7 @@ public class PotionUtil {
   public static final PotionEffect INVISIBILITY = 
       new PotionEffect(PotionEffectType.INVISIBILITY, 999999, 0, false, false, false);
   
-  public static final PotionEffect POWER  = 
+  public static final PotionEffect STRENGTH  = 
       new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, 0, false, false, false);
 
   public static final PotionEffect SPEED = 

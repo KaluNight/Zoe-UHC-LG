@@ -238,7 +238,7 @@ public class GameWorker implements Runnable {
     }
     
     if(power == null) {
-      player.getAccount().getPlayer().addPotionEffect(PotionUtil.POWER);
+      player.getAccount().getPlayer().addPotionEffect(PotionUtil.STRENGTH);
     }
   }
 

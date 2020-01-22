@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
@@ -33,6 +35,7 @@ import ch.kalunight.uhclg.util.DeathUtil;
 import ch.kalunight.uhclg.util.LocationUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
+import ch.kalunight.uhclg.worker.LoveKillerWorker;
 import ch.kalunight.uhclg.worker.SpectatorWorker;
 
 public class MinecraftEventListener implements Listener {
@@ -83,11 +86,30 @@ public class MinecraftEventListener implements Listener {
 
     if(playerData != null) {
 
+      if(playerData.isInLove()) {
+
+        PlayerData otherLover = getOtherLover(playerData.getAccount().getPlayerUUID());
+        
+        if(otherLover != null && otherLover.isAlive()) {
+          
+          otherLover.getAccount().getPlayer().sendMessage("Votre amant vient de mourir, vous ne pouvez pas supportez cette perte. "
+              + "Votre âmes vous quittera dans 30 secondes. "
+              + "Dans un dernier accès de rage, votre force et votre rapidité se voient augmentés.");
+          
+          otherLover.getAccount().getPlayer().addPotionEffect(PotionUtil.SPEED);
+          otherLover.getAccount().getPlayer().addPotionEffect(PotionUtil.STRENGTH);
+          otherLover.getAccount().getPlayer().playSound(otherLover.getAccount().getPlayer().getLocation(), Sound.MUSIC_END, 1, 1);
+          
+          LoveKillerWorker loveKillerWorker = new LoveKillerWorker(otherLover);
+          ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), loveKillerWorker, DeathUtil.DEATH_TIME_IN_TICKS);
+        }
+      }
+      
       event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
       playerData.setAlive(false);
 
       makeRoleEffect(playerData);
-      
+
       checkIfTheGameIsEnded();
 
       player.getLocation().getWorld().playEffect(player.getLocation(), Effect.SMOKE, 1);
@@ -98,7 +120,7 @@ public class MinecraftEventListener implements Listener {
 
       setLastTimePlayerKilled(LocalDateTime.now());
       player.getLocation().getWorld().spawnEntity(thunderLocation, EntityType.LIGHTNING);
-      
+
       ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), new SpectatorWorker(player), 100);
     } else {
       event.setDeathMessage(null);
@@ -106,30 +128,37 @@ public class MinecraftEventListener implements Listener {
   }
 
   private void checkIfTheGameIsEnded() {
-    
+
     List<PlayerData> villageList = new ArrayList<>();
     List<PlayerData> wolfsList = new ArrayList<>();
     List<PlayerData> loverList = new ArrayList<>();
     List<PlayerData> specialList = new ArrayList<>();
-    
+
     for(PlayerData player : GameData.getPlayersInGame()) {
-      if(player.getRole().getClan().equals(RoleClan.SPECIAL) || player.getRole().equals(Role.LOUP_GAROU_BLANC)) {
-        specialList.add(player);
-      }else if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
-        wolfsList.add(player);
-      }else if(player.getRole().getClan().equals(RoleClan.VILLAGE)) {
-        villageList.add(player);
+      if(player.isAlive()) {
+        if(player.getRole().getClan().equals(RoleClan.SPECIAL) || player.getRole().equals(Role.LOUP_GAROU_BLANC)) {
+          specialList.add(player);
+        }else if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
+          wolfsList.add(player);
+        }else if(player.getRole().getClan().equals(RoleClan.VILLAGE)) {
+          villageList.add(player);
+        }
+        
+        if(player.isInLove()) {
+          loverList.add(player);
+        }
       }
     }
-    
+
     if(!villageList.isEmpty() && wolfsList.isEmpty() && specialList.isEmpty()) {
       ZoePluginMaster.getMinecraftServer().broadcastMessage("Le village gagne !");
     }else if(villageList.isEmpty() && !wolfsList.isEmpty() && specialList.isEmpty()) {
       ZoePluginMaster.getMinecraftServer().broadcastMessage("Les loups gagnent !");
-    }else if(villageList.isEmpty() && wolfsList.isEmpty() && !specialList.isEmpty()) {
+    }else if(villageList.isEmpty() && wolfsList.isEmpty() && specialList.size() == 1) {
       ZoePluginMaster.getMinecraftServer().broadcastMessage("Un joueur avec un rôle spécial gagne !");
+    }else if(villageList.size() + wolfsList.size() + specialList.size() == 2 && !loverList.isEmpty()) {
+      ZoePluginMaster.getMinecraftServer().broadcastMessage("Les amoureux gagnent !");
     }
-    
   }
 
   private void makeRoleEffect(PlayerData playerKilled) {
@@ -158,13 +187,11 @@ public class MinecraftEventListener implements Listener {
   }
 
   private PlayerData getFirstSavior() {
-
     for(PlayerData savior : GameData.getPlayersInGame()) {
       if(savior.getRole().equals(Role.SORCIERE)) {
 
       }
     }
-
     return null;
   }
 
@@ -190,31 +217,31 @@ public class MinecraftEventListener implements Listener {
 
   private void reviveOldVillager(PlayerData playerData, RoleClan killer) {
     GameData.setOldVillagerHasRespawn(true);
-    
+
     List<Location> locationsOfEveryone = new ArrayList<>();
-    
+
     for(PlayerData playerAliveAndConnected : GameData.getPlayersInGame()) {
       if(playerAliveAndConnected.isAlive() && playerAliveAndConnected.isConnected()) {
         locationsOfEveryone.add(playerAliveAndConnected.getAccount().getPlayer().getLocation());
       }
     }
-    
+
     locationsOfEveryone.add(GameData.getLobbyLocation());
-    
+
     Location location = LocationUtil.getRandomSpawnLocation(ZoePluginMaster.getMinecraftServer().getWorld("world"),
         GameData.getLobbyLocation());
-    
+
     while(LocationUtil.isLocationNearOfTheList(location, locationsOfEveryone) || LocationUtil.isAForbidenBiome(location)) {
       Location newLocation = LocationUtil.getRandomSpawnLocation(location.getWorld(), GameData.getLobbyLocation());
       location.setX(newLocation.getX());
       location.setZ(newLocation.getZ());
     }
-    
+
     double respawnLife = playerData.getAccount().getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue();
     if(killer.equals(RoleClan.VILLAGE)) {
       respawnLife /= 2;
     }
-    
+
     playerData.getAccount().getPlayer().setHealth(respawnLife);
     playerData.getAccount().getPlayer().addPotionEffect(PotionUtil.SPAWN_RESISTANCE);
     playerData.getAccount().getPlayer().teleport(location);
@@ -223,11 +250,11 @@ public class MinecraftEventListener implements Listener {
   @EventHandler
   public void onEntityDamageByEntityEvent(EntityDamageByEntityEvent e) {
     PlayerData playerData = GameData.getPlayerInGame(e.getEntity().getUniqueId());
-    
+
     if(playerData != null && playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
       if(playerData.getRole().equals(Role.ANCIEN) && !GameData.isOldVillagerHasRespawn()) {
         PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
-        
+
         if(damager != null) {
           reviveOldVillager(playerData, damager.getRole().getClan());
         }else {
@@ -236,7 +263,7 @@ public class MinecraftEventListener implements Listener {
         return;
       }
     }
-    
+
     if(playerData != null && playerData.isAlive()) {
       if(playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
         
@@ -260,7 +287,7 @@ public class MinecraftEventListener implements Listener {
         }
       }
     }
-    
+
     if(!GameData.isGrandMereLoupReveal() && e.getCause().equals(DamageCause.PROJECTILE) && e.getDamager() instanceof Arrow) {
       Arrow a = (Arrow) e.getDamager();
       if(a.getShooter() instanceof Player && e.getEntity() instanceof Player) {
@@ -273,21 +300,34 @@ public class MinecraftEventListener implements Listener {
         }
       }
     }
-    
+
     if(!GameData.isLoupAmnesiqueFound()) {
       PlayerData potentionLoupAmnesique = GameData.getPlayerInGame(e.getEntity().getUniqueId());
-      
+
       if(potentionLoupAmnesique != null && potentionLoupAmnesique.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {
         PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
-        
+
         if(damager != null && damager.isAlive() && damager.getRole().getClan().equals(RoleClan.WOLFS)) {
           GameData.setLoupAmnesiqueFound(true);
-          
+
           potentionLoupAmnesique.getAccount().getPlayer()
           .sendMessage("Vous êtes un LOUP GAROU AMNESIQUE ! PREVENEZ VOS ALLIÉS LOUPS !");
         }
       }
     }
+  }
+
+  private PlayerData getOtherLover(UUID playerUUID) {
+    PlayerData otherLover = null;
+
+    for(PlayerData player : GameData.getPlayersInGame()) {
+      if(player.isAlive() && !player.getAccount().getPlayerUUID().equals(playerUUID)) {
+        otherLover = player;
+        break;
+      }
+    }
+
+    return otherLover;
   }
 
   @EventHandler
