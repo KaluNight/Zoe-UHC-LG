@@ -47,6 +47,8 @@ public class GameData {
   
   private static boolean oldVillagerHasRespawn = false;
   
+  private static boolean cupidonUseHisPower = false;
+  
   private GameData() {
     //hide default public constructor
   }
@@ -231,6 +233,14 @@ public class GameData {
 
   public static void setOldVillagerHasRespawn(boolean oldVillagerHasRespawn) {
     GameData.oldVillagerHasRespawn = oldVillagerHasRespawn;
+  }
+
+  public static boolean isCupidonUseHisPower() {
+    return cupidonUseHisPower;
+  }
+
+  public static void setCupidonUseHisPower(boolean cupidonUseHisPower) {
+    GameData.cupidonUseHisPower = cupidonUseHisPower;
   }
   
 }
