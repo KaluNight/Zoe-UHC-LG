@@ -92,7 +92,7 @@ public class MinecraftEventListener implements Listener {
         
         if(otherLover != null && otherLover.isAlive()) {
           
-          otherLover.getAccount().getPlayer().sendMessage("Votre amant vient de mourir, vous ne pouvez pas supportez cette perte. "
+          otherLover.getAccount().getPlayer().sendMessage("Votre moitié vient de mourir, vous ne pouvez pas supportez cette perte. "
               + "Votre âmes vous quittera dans 30 secondes. "
               + "Dans un dernier accès de rage, votre force et votre rapidité se voient augmentés.");
           
