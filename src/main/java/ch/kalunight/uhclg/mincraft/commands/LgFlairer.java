@@ -59,7 +59,7 @@ public class LgFlairer implements CommandExecutor {
     }
     
     if(tracked.getAccount().getPlayer().getLocation().distanceSquared(playerSender.getAccount().getPlayer().getLocation())
-        < RENARD_DISTANCE) {
+        > RENARD_DISTANCE) {
       sender.sendMessage("Vous n'êtes pas suffisament proche de ce joueur !");
       return true;
     }
@@ -68,7 +68,7 @@ public class LgFlairer implements CommandExecutor {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est innocent.");
     }else if(tracked.getRole().equals(Role.LOUP_GAROU_AMNESIQUE) && !GameData.isLoupAmnesiqueFound()) {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est innocent.");
-    }else if(tracked.getRole().getClan().equals(RoleClan.VILLAGE)) {
+    }else if(tracked.getRole().getClan().equals(RoleClan.VILLAGE) || tracked.getRole().getClan().equals(RoleClan.SPECIAL)) {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est innocent.");
     }else {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est coupable !");

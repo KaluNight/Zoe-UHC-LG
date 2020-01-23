@@ -234,6 +234,7 @@ public class MinecraftEventListener implements Listener {
     }
 
     playerData.getAccount().getPlayer().setHealth(respawnLife);
+    playerData.getAccount().getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
     playerData.getAccount().getPlayer().addPotionEffect(PotionUtil.SPAWN_RESISTANCE);
     playerData.getAccount().getPlayer().teleport(location);
   }
@@ -312,7 +313,7 @@ public class MinecraftEventListener implements Listener {
     PlayerData otherLover = null;
 
     for(PlayerData player : GameData.getPlayersInGame()) {
-      if(player.isAlive() && !player.getAccount().getPlayerUUID().equals(playerUUID)) {
+      if(player.isAlive() && !player.getAccount().getPlayerUUID().equals(playerUUID) && player.isInLove()) {
         otherLover = player;
         break;
       }

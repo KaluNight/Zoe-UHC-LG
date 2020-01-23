@@ -26,3 +26,6 @@ commands:
  lgdesc:
   description: Envoie la description du rôle du joueur
   usage: /lgdesc
+ lgflairer:
+  description: Révèle un joueur près de vous
+  usage: /lgflairer nomDuJoueur

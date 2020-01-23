@@ -7,7 +7,7 @@ import org.bukkit.World;
 import org.bukkit.block.Biome;
 
 import ch.kalunight.uhclg.GameData;
-import ch.kalunight.uhclg.model.GameConfig;
+import ch.kalunight.uhclg.ZoePluginMaster;
 
 public class LocationUtil {
 
@@ -49,7 +49,7 @@ public class LocationUtil {
   }
 
   public static Location getRandomSpawnLocation(World world, Location spawnLocation) {
-    int worldBorder = GameConfig.getGameConfigWithPlayerNumber(GameData.getPlayersInGame().size()).getWorldBorderSize();
+    int worldBorder = (int) ZoePluginMaster.getMinecraftServer().getWorld("world").getWorldBorder().getSize();
     
     double x = MathUtil.getRandomNumberInRange(0, worldBorder) - (worldBorder / 2d);
     double z = MathUtil.getRandomNumberInRange(0, worldBorder) - (worldBorder / 2d);
