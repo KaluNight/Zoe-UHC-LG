@@ -4,6 +4,7 @@ import java.util.List;
 
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.PlayerData;
+import ch.kalunight.uhclg.model.Role;
 
 public class DeathUtil {
 
@@ -11,19 +12,31 @@ public class DeathUtil {
    * Death time = 30 sec
    */
   public static final int DEATH_TIME_IN_TICKS = 600;
-  
+
   private DeathUtil() {
     // hide default public constructor
   }
-  
+
   public static PlayerData getAviableSavior(List<PlayerData> playerAlreadyAsked) {
+
+    boolean containSorciere = false;
+
     for(PlayerData playerData : GameData.getPlayersInGame()) {
-      if(!playerAlreadyAsked.contains(playerData)) {
-        return playerData;
+      if(!playerAlreadyAsked.contains(playerData) && playerData.getRole().equals(Role.SORCIERE)) {
+        containSorciere = true;
+        break;
       }
     }
-    
+
+    for(PlayerData playerData : GameData.getPlayersInGame()) {
+      if(!playerAlreadyAsked.contains(playerData)) {
+        if((containSorciere && playerData.getRole().equals(Role.SORCIERE)) || (!containSorciere && playerData.getRole().equals(Role.INFECT_PERE_DES_LOUPS))) {
+          return playerData;
+        }
+      }
+    }
+
     return null;
   }
-  
+
 }

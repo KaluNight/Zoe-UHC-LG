@@ -33,7 +33,7 @@ public class LgListe implements CommandExecutor {
       }
     }
     
-    if(playerSender == null || !playerSender.getRole().getClan().equals(RoleClan.WOLFS)) {
+    if(playerSender == null || (!playerSender.getRole().getClan().equals(RoleClan.WOLFS) && !playerSender.isInfected())) {
       sender.sendMessage("Vous n'êtes pas un loup garou !");
       return true;
     }

@@ -33,9 +33,9 @@ import ch.kalunight.uhclg.util.PotionUtil;
 public class GameWorker implements Runnable {
 
   private static final int DAY_DURATION = 24000;
-  private static final Duration DAY1_DURATION = Duration.ofMinutes(20);
-  private static final Duration DAY2_DURATION = Duration.ofMinutes(10);
-  private static final Duration PVP_START_DURATION = Duration.ofMinutes(30);
+  private static final Duration DAY1_DURATION = Duration.ofMinutes(1);
+  private static final Duration DAY2_DURATION = Duration.ofMinutes(1);
+  private static final Duration PVP_START_DURATION = Duration.ofMinutes(1);
 
   private static final int START_OF_DAY = 0;
 
@@ -74,7 +74,7 @@ public class GameWorker implements Runnable {
     for(PlayerData player : GameData.getPlayersInGame()) {
       if(player.isAlive() && player.isConnected()) {
 
-        if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
+        if(player.getRole().getClan().equals(RoleClan.WOLFS) || player.isInfected()) {
           if(timeStatus.equals(TimeStatus.NIGHT)) {
             if(player.getRole().equals(Role.ENFANT_SAUVAGE)) {
               if(GameData.getEnfantSauvageBuffVole() != null) {
@@ -421,17 +421,17 @@ public class GameWorker implements Runnable {
       case ASSASSIN:
         ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
         ItemMeta bookMeta = book.getItemMeta();
-        bookMeta.addEnchant(Enchantment.DAMAGE_ALL, 2, true);
+        bookMeta.addEnchant(Enchantment.DAMAGE_ALL, 3, true);
         book.setItemMeta(bookMeta);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
         book = new ItemStack(Material.ENCHANTED_BOOK, 1);
         bookMeta = book.getItemMeta();
-        bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 2, true);
+        bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 3, true);
         book.setItemMeta(bookMeta);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
         book = new ItemStack(Material.ENCHANTED_BOOK, 1);
         bookMeta = book.getItemMeta();
-        bookMeta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 2, true);
+        bookMeta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 3, true);
         book.setItemMeta(bookMeta);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
         break;
@@ -457,6 +457,7 @@ public class GameWorker implements Runnable {
         break;
       case LOUP_GAROU_BLANC:
         playerData.getAccount().getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(30);
+        playerData.getAccount().getPlayer().setHealth(playerData.getAccount().getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
         break;
       case PETITE_FILLE:
         playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.TNT, 5));
@@ -474,13 +475,13 @@ public class GameWorker implements Runnable {
         potion.setItemMeta(meta);
         playerData.getAccount().getPlayer().getInventory().addItem(potion);
 
-        potion = new ItemStack(Material.POTION, 3);
+        potion = new ItemStack(Material.SPLASH_POTION, 3);
         meta = (PotionMeta) potion.getItemMeta();
         meta.setBasePotionData(new PotionData(PotionType.INSTANT_DAMAGE));
         potion.setItemMeta(meta);
         playerData.getAccount().getPlayer().getInventory().addItem(potion);
 
-        potion = new ItemStack(Material.POTION, 3);
+        potion = new ItemStack(Material.SPLASH_POTION, 3);
         meta = (PotionMeta) potion.getItemMeta();
         meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
         potion.setItemMeta(meta);

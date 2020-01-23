@@ -4,10 +4,10 @@ import java.util.List;
 
 public enum GameConfig {
   ONE_PLAYER(1, 1, 0, 0, 0, 1000),
-  TWO_PLAYERS(2, 1, 0, 1, 0, 1000),
-  THREE_PLAYERS(3, 2, 0, 1, 0, 1000),
-  FOUR_PLAYERS(4, 2, 0, 2, 0, 1000),
-  FIVE_PLAYERS(5, 1, 2, 2, 0, 1500),
+  TWO_PLAYERS(2, 0, 1, 0, 1, 1000),
+  THREE_PLAYERS(3, 0, 2, 0, 1, 1000),
+  FOUR_PLAYERS(4, 0, 2, 0, 2, 1000),
+  FIVE_PLAYERS(5, 1, 2, 0, 2, 1500),
   SIX_PLAYERS(6, 1, 2, 2, 1, 1500),
   SEVEN_PLAYERS(7, 1, 3, 2, 1, 1500),
   EIGHT_PLAYERS(8, 1, 3, 3, 1, 1500),

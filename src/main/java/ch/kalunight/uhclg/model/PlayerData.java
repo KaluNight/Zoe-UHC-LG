@@ -8,6 +8,8 @@ public class PlayerData {
   
   private Role role;
   
+  private boolean infected;
+  
   private Scoreboard scoreboard;
   
   private boolean alive;
@@ -83,6 +85,14 @@ public class PlayerData {
 
   public void setInLove(boolean inLove) {
     this.inLove = inLove;
+  }
+
+  public boolean isInfected() {
+    return infected;
+  }
+
+  public void setInfected(boolean infected) {
+    this.infected = infected;
   }
   
 }

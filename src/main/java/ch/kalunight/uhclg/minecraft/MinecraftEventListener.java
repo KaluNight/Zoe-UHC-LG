@@ -136,11 +136,11 @@ public class MinecraftEventListener implements Listener {
 
     for(PlayerData player : GameData.getPlayersInGame()) {
       if(player.isAlive()) {
-        if(player.getRole().getClan().equals(RoleClan.SPECIAL) || player.getRole().equals(Role.LOUP_GAROU_BLANC)) {
+        if((player.getRole().getClan().equals(RoleClan.SPECIAL) || player.getRole().equals(Role.LOUP_GAROU_BLANC)) && !player.isInfected()) {
           specialList.add(player);
-        }else if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
+        }else if(player.getRole().getClan().equals(RoleClan.WOLFS) || player.isInfected()) {
           wolfsList.add(player);
-        }else if(player.getRole().getClan().equals(RoleClan.VILLAGE)) {
+        }else if((player.getRole().getClan().equals(RoleClan.VILLAGE)) && !player.isInfected()) {
           villageList.add(player);
         }
         
@@ -186,19 +186,10 @@ public class MinecraftEventListener implements Listener {
     return false;
   }
 
-  private PlayerData getFirstSavior() {
-    for(PlayerData savior : GameData.getPlayersInGame()) {
-      if(savior.getRole().equals(Role.SORCIERE)) {
-
-      }
-    }
-    return null;
-  }
-
   private boolean playerCanBeSaved(PlayerData playerToBeSaved) {
     for(PlayerData playerCheckRole : GameData.getPlayersInGame()) {
       if((playerCheckRole.getRole().equals(Role.SORCIERE) || playerCheckRole.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) && playerCheckRole.isAlive()
-          && !playerToBeSaved.getAccount().getPlayerUUID().equals(playerCheckRole.getAccount().getPlayerUUID())) {
+          && !playerToBeSaved.getAccount().getPlayerUUID().equals(playerCheckRole.getAccount().getPlayerUUID()) && playerToBeSaved.isAlive()) {
         return true;
       }
     }
@@ -268,7 +259,7 @@ public class MinecraftEventListener implements Listener {
       if(playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
         
         if(playerCanBeSaved(playerData)) {
-          KillerWorker killerWorker = new KillerWorker(playerData, getFirstSavior());
+          KillerWorker killerWorker = new KillerWorker(playerData, DeathUtil.getAviableSavior(new ArrayList<>()));
           ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), killerWorker, DeathUtil.DEATH_TIME_IN_TICKS);
           killedPlayersWhoCanBeSaved.add(killerWorker);
           playerData.getAccount().getPlayer().setInvulnerable(true);

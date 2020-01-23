@@ -7,7 +7,6 @@ import org.bukkit.command.CommandSender;
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
-import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.worker.GameWorker;
 
 public class LgDescription implements CommandExecutor {

@@ -37,7 +37,7 @@ public class KillerWorker implements Runnable {
     
     if(hasBeenSaved) {
       if(potentialSavior.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) {
-        playerKilled.setRole(Role.LOUP_GAROU);
+        playerKilled.setInfected(true);
         playerKilled.getAccount().getPlayer().sendMessage("Vous avez été sauvé par l'infect père des loups garous, vous êtes désomais un loup garou !");
       }else {
         playerKilled.getAccount().getPlayer().sendMessage("Vous avez été sauvé par la sorcière !");
