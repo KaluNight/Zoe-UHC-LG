@@ -23,3 +23,6 @@ commands:
  lglove:
   description: Rend amoureux deux personnes
   usage: /lglove nomDuJoueur1 nomDuJoueur2
+ lgdesc:
+  description: Envoie la description du rôle du joueur
+  usage: /lgdesc

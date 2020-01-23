@@ -26,6 +26,7 @@ import ch.kalunight.uhclg.discord.commands.DefineLobbyVocalCommand;
 import ch.kalunight.uhclg.discord.commands.LinkCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
+import ch.kalunight.uhclg.mincraft.commands.LgDescription;
 import ch.kalunight.uhclg.mincraft.commands.LgListe;
 import ch.kalunight.uhclg.mincraft.commands.LgLove;
 import ch.kalunight.uhclg.mincraft.commands.LgModel;
@@ -106,6 +107,7 @@ public class ZoePluginMaster extends JavaPlugin {
     this.getCommand("lgvoir").setExecutor(new LgVoir());
     this.getCommand("lgsauver").setExecutor(new LgSauver());
     this.getCommand("lglove").setExecutor(new LgLove());
+    this.getCommand("lgdesc").setExecutor(new LgDescription());
 
     generateLobby();
     
