@@ -4,7 +4,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
@@ -31,10 +36,12 @@ public class ScoreboardWorker implements Runnable {
 
   private Scoreboard lobbyScoreboard;
 
-  private Scoreboard inGameScoreBoard;
+  private Map<UUID, Scoreboard> inGameScoreboards = Collections.synchronizedMap(new HashMap<>());
+
+  private Map<UUID, String> scorePostions = Collections.synchronizedMap(new HashMap<>());
 
   private Score dayStatus;
-  
+
   private Score joueurRestant;
 
   private Score villageoisRestant;
@@ -42,7 +49,7 @@ public class ScoreboardWorker implements Runnable {
   private Score loupGarouRestant;
 
   private Score specialRestant;
-  
+
   private Score groupMax;
 
   @Override
@@ -52,11 +59,13 @@ public class ScoreboardWorker implements Runnable {
       defineInGameScoreBoard();
       for(PlayerData player : GameData.getPlayersInGame()) {
         if(player.isConnected()) {
-          player.setScoreboard(inGameScoreBoard);
+          Scoreboard inGameScoreBoard = inGameScoreboards.get(player.getAccount().getPlayerUUID());
+
+          if(inGameScoreBoard != null && !inGameScoreBoard.equals(player.getAccount().getPlayer().getScoreboard())) {
+            player.setScoreboard(inGameScoreBoard);
+          }
         }
       }
-      ZoePluginMaster.getMinecraftServer().getOnlinePlayers().forEach(e -> e.setScoreboard(inGameScoreBoard));
-
     }else if(GameData.getGameStatus().equals(GameStatus.IN_LOBBY)) {
       updateLobbyScoreBoard();
       for(Player player : ZoePluginMaster.getMinecraftServer().getOnlinePlayers()) {
@@ -96,66 +105,98 @@ public class ScoreboardWorker implements Runnable {
   }
 
   private void defineInGameScoreBoard() {
-    if(inGameScoreBoard == null) {
-      Scoreboard scoreBoard = ZoePluginMaster.getMinecraftServer().getScoreboardManager().getNewScoreboard();
-      Objective objective = scoreBoard.registerNewObjective(IN_GAME_OBJECTIVE_ID, DUMMY, "", RenderType.INTEGER);
-      objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-      inGameScoreBoard = scoreBoard;
+
+    for(PlayerData player : GameData.getPlayersInGame()) {
+
+      if(!player.isConnected()) {
+        continue;
+      }
+
+      Scoreboard inGameScoreBoard = inGameScoreboards.get(player.getAccount().getPlayerUUID());
+
+      if(inGameScoreBoard == null) {
+        Scoreboard scoreBoard = ZoePluginMaster.getMinecraftServer().getScoreboardManager().getNewScoreboard();
+        Objective objective = scoreBoard.registerNewObjective(IN_GAME_OBJECTIVE_ID, DUMMY, "", RenderType.INTEGER);
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        inGameScoreBoard = scoreBoard;
+      }
+
+      Objective objective = inGameScoreBoard.getObjective(IN_GAME_OBJECTIVE_ID);
+      objective.setDisplayName("Loup Garou - UHC | " + GameWorker.getChronoString());
+
+      if(joueurRestant == null) {
+        dayStatus = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
+        dayStatus.setScore(10);
+
+        joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
+        joueurRestant.setScore(9);
+
+        villageoisRestant = objective.getScore("Villageois : " + GameData.getVillagerAlive());
+        villageoisRestant.setScore(6);
+
+        loupGarouRestant = objective.getScore("Loups : " + GameData.getWolfAlive());
+        loupGarouRestant.setScore(5);
+
+        specialRestant = objective.getScore("Specials : " + GameData.getSpecialAlive());
+        specialRestant.setScore(4);
+
+        groupMax = objective.getScore("Taille de groupe maximal : " 
+            + GameData.getGroupSize());
+        groupMax.setScore(2);
+
+      }else {
+        inGameScoreBoard.resetScores(dayStatus.getEntry());
+        dayStatus = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
+        dayStatus.setScore(10);
+
+        inGameScoreBoard.resetScores(joueurRestant.getEntry());
+        joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
+        joueurRestant.setScore(9);
+
+        inGameScoreBoard.resetScores(villageoisRestant.getEntry());
+        villageoisRestant = objective.getScore("Villageois : " + GameData.getVillagerAlive());
+        villageoisRestant.setScore(6);
+
+        inGameScoreBoard.resetScores(loupGarouRestant.getEntry());
+        loupGarouRestant = objective.getScore("Loups : " + GameData.getWolfAlive());
+        loupGarouRestant.setScore(5);
+
+        inGameScoreBoard.resetScores(specialRestant.getEntry());
+        specialRestant = objective.getScore("Spéciaux : " + GameData.getSpecialAlive());
+        specialRestant.setScore(4);
+
+        inGameScoreBoard.resetScores(groupMax.getEntry());
+        groupMax = objective.getScore("Taille de groupe maximal : " 
+            + GameData.getGroupSize());
+        groupMax.setScore(2);
+      }
+
+      objective.getScore("---------------").setScore(3);
+      objective.getScore("  ").setScore(8);
+      objective.getScore("Rôles restants").setScore(7);
+
+
+      String positionText = scorePostions.get(player.getAccount().getPlayerUUID());
+
+      if(positionText != null) {
+        inGameScoreBoard.resetScores(positionText);
+      }
+
+      Location lobbyLocation = GameData.getLobbyLocation();
+      Location playerLocation = player.getAccount().getPlayer().getLocation();
+
+      final Location addaptedLobbyLocation = 
+          new Location(ZoePluginMaster.getMinecraftServer().getWorld("world"),
+              lobbyLocation.getX(), playerLocation.getY(), lobbyLocation.getZ());
+
+      int distanceOfCenter = (int) playerLocation.distanceSquared(addaptedLobbyLocation);
+
+      positionText = "Centre : " + distanceOfCenter + " blocs";
+      objective.getScore(positionText).setScore(2);
+
+      scorePostions.put(player.getAccount().getPlayerUUID(), positionText);
+      inGameScoreboards.put(player.getAccount().getPlayerUUID(), inGameScoreBoard);
     }
 
-    Objective objective = inGameScoreBoard.getObjective(IN_GAME_OBJECTIVE_ID);
-    objective.setDisplayName("Loup Garou - UHC | " + GameWorker.getChronoString());
-
-    if(joueurRestant == null) {
-      dayStatus = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
-      dayStatus.setScore(10);
-      
-      joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
-      joueurRestant.setScore(9);
-
-      villageoisRestant = objective.getScore("Villageois : " + GameData.getVillagerAlive());
-      villageoisRestant.setScore(6);
-
-      loupGarouRestant = objective.getScore("Loups : " + GameData.getWolfAlive());
-      loupGarouRestant.setScore(5);
-
-      specialRestant = objective.getScore("Specials : " + GameData.getSpecialAlive());
-      specialRestant.setScore(4);
-      
-      groupMax = objective.getScore("Taille de groupe maximal : " 
-      + GameData.getGroupSize());
-      groupMax.setScore(2);
-
-    }else {
-      inGameScoreBoard.resetScores(dayStatus.getEntry());
-      dayStatus = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
-      dayStatus.setScore(10);
-      
-      inGameScoreBoard.resetScores(joueurRestant.getEntry());
-      joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
-      joueurRestant.setScore(9);
-
-      inGameScoreBoard.resetScores(villageoisRestant.getEntry());
-      villageoisRestant = objective.getScore("Villageois : " + GameData.getVillagerAlive());
-      villageoisRestant.setScore(6);
-
-      inGameScoreBoard.resetScores(loupGarouRestant.getEntry());
-      loupGarouRestant = objective.getScore("Loups : " + GameData.getWolfAlive());
-      loupGarouRestant.setScore(5);
-
-      inGameScoreBoard.resetScores(specialRestant.getEntry());
-      specialRestant = objective.getScore("Spéciaux : " + GameData.getSpecialAlive());
-      specialRestant.setScore(4);
-      
-      inGameScoreBoard.resetScores(groupMax.getEntry());
-      groupMax = objective.getScore("Taille de groupe maximal : " 
-      + GameData.getGroupSize());
-      groupMax.setScore(2);
-    }
-
-    objective.getScore("    ").setScore(3);
-    objective.getScore("  ").setScore(8);
-    objective.getScore("Rôles restants").setScore(7);
   }
-
 }
