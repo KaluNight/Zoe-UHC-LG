@@ -33,7 +33,7 @@ public class VocalSystemWorker implements Runnable {
 
   private static long idDeadPlayer;
 
-  private static double voiceDistance = 750d;
+  private static double voiceDistance = 30d;
 
   @Override
   public void run() {
@@ -158,7 +158,7 @@ public class VocalSystemWorker implements Runnable {
             && (player.isConnected() && playerNear.isConnected())) {
 
           if(isPlayersInTheSameWorld(player, playerNear)
-              && player.getAccount().getPlayer().getLocation().distanceSquared
+              && player.getAccount().getPlayer().getLocation().distance
               (playerNear.getAccount().getPlayer().getLocation()) < voiceDistance) {
 
             PlayerVoicePosition voiceChannelPlayer = getPlayerVoicePosition(player.getAccount().getDiscordId());

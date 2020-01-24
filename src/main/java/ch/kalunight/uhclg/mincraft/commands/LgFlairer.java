@@ -58,7 +58,7 @@ public class LgFlairer implements CommandExecutor {
       return true;
     }
     
-    if(tracked.getAccount().getPlayer().getLocation().distanceSquared(playerSender.getAccount().getPlayer().getLocation())
+    if(tracked.getAccount().getPlayer().getLocation().distance(playerSender.getAccount().getPlayer().getLocation())
         > RENARD_DISTANCE) {
       sender.sendMessage("Vous n'êtes pas suffisament proche de ce joueur !");
       return true;

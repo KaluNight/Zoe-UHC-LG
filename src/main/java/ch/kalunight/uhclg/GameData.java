@@ -27,7 +27,7 @@ public class GameData {
   
   private static Location lobbyLocation;
   
-  private static double spawnMinDistance = 2000;
+  private static double spawnMinDistance = 100;
   
   /*
    * Role data

@@ -40,7 +40,7 @@ public class LocationUtil {
     boolean isLocationNearOfTheList = false;
     for(Location locationToCheck : locations) {
       if(!location.equals(locationToCheck) 
-          && location.distanceSquared(locationToCheck) < GameData.getSpawnMinBlockDistance()) {
+          && location.distance(locationToCheck) < GameData.getSpawnMinBlockDistance()) {
         isLocationNearOfTheList = true;
         break;
       }

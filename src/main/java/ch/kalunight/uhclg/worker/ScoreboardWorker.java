@@ -63,6 +63,7 @@ public class ScoreboardWorker implements Runnable {
 
           if(inGameScoreBoard != null && !inGameScoreBoard.equals(player.getAccount().getPlayer().getScoreboard())) {
             player.setScoreboard(inGameScoreBoard);
+            player.getAccount().getPlayer().setScoreboard(inGameScoreBoard);;
           }
         }
       }
@@ -189,7 +190,7 @@ public class ScoreboardWorker implements Runnable {
           new Location(ZoePluginMaster.getMinecraftServer().getWorld("world"),
               lobbyLocation.getX(), playerLocation.getY(), lobbyLocation.getZ());
 
-      int distanceOfCenter = (int) playerLocation.distanceSquared(addaptedLobbyLocation);
+      int distanceOfCenter = (int) playerLocation.distance(addaptedLobbyLocation);
 
       positionText = "Centre : " + distanceOfCenter + " blocs";
       objective.getScore(positionText).setScore(2);
