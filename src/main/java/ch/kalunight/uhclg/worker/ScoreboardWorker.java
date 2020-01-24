@@ -197,6 +197,5 @@ public class ScoreboardWorker implements Runnable {
       scorePostions.put(player.getAccount().getPlayerUUID(), positionText);
       inGameScoreboards.put(player.getAccount().getPlayerUUID(), inGameScoreBoard);
     }
-
   }
 }
