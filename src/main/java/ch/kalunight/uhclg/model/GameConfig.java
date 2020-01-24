@@ -3,7 +3,7 @@ package ch.kalunight.uhclg.model;
 import java.util.List;
 
 public enum GameConfig {
-  ONE_PLAYER(1, 1, 0, 0, 0, 1000),
+  ONE_PLAYER(1, 0, 1, 0, 0, 1000),
   TWO_PLAYERS(2, 0, 1, 0, 1, 1000),
   THREE_PLAYERS(3, 0, 2, 0, 1, 1000),
   FOUR_PLAYERS(4, 0, 2, 0, 2, 1000),
