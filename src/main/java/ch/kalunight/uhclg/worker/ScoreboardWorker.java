@@ -154,6 +154,8 @@ public class ScoreboardWorker implements Runnable {
         groupMax.put(playerUUID, groupMaxScore.getEntry());
 
       }else {
+        //TODO Check if the text is the same before change
+        
         inGameScoreBoard.resetScores(dayStatus.get(playerUUID));
         Score dayStatusScore = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
         dayStatusScore.setScore(10);
