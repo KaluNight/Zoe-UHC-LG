@@ -94,7 +94,6 @@ public class KillerWorker implements Runnable {
         ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), this, DeathUtil.DEATH_TIME_IN_TICKS);
       }
     }
-    
   }
 
   public boolean isHasBeenSaved() {

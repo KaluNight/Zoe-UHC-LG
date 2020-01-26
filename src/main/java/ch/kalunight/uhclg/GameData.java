@@ -58,11 +58,11 @@ public class GameData {
     int wolfsAlive = getWolfAlive();
     int villagersAlive = getVillagerAlive();
     
-    if(wolfsAlive < 3 && villagersAlive < 3) {
+    if(wolfsAlive < 3 || villagersAlive < 3) {
       return 3;
     }
     
-    if(wolfsAlive > 5 && villagersAlive > 5) {
+    if(wolfsAlive > 5 || villagersAlive > 5) {
       return 5;
     }
     

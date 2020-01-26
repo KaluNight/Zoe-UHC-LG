@@ -40,17 +40,17 @@ public class ScoreboardWorker implements Runnable {
 
   private Map<UUID, String> scorePostions = Collections.synchronizedMap(new HashMap<>());
 
-  private Score dayStatus;
+  private Map<UUID, String> dayStatus = Collections.synchronizedMap(new HashMap<>());
 
-  private Score joueurRestant;
+  private Map<UUID, String> joueurRestant = Collections.synchronizedMap(new HashMap<>());
 
-  private Score villageoisRestant;
+  private Map<UUID, String> villageoisRestant = Collections.synchronizedMap(new HashMap<>());
 
-  private Score loupGarouRestant;
+  private Map<UUID, String> loupGarouRestant = Collections.synchronizedMap(new HashMap<>());
 
-  private Score specialRestant;
+  private Map<UUID, String> specialRestant = Collections.synchronizedMap(new HashMap<>());
 
-  private Score groupMax;
+  private Map<UUID, String> groupMax = Collections.synchronizedMap(new HashMap<>());
 
   @Override
   public void run() {
@@ -122,54 +122,68 @@ public class ScoreboardWorker implements Runnable {
         inGameScoreBoard = scoreBoard;
       }
 
+      UUID playerUUID = player.getAccount().getPlayerUUID();
+      
       Objective objective = inGameScoreBoard.getObjective(IN_GAME_OBJECTIVE_ID);
       objective.setDisplayName("Loup Garou - UHC | " + GameWorker.getChronoString());
 
-      if(joueurRestant == null) {
-        dayStatus = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
-        dayStatus.setScore(10);
+      if(joueurRestant.get(playerUUID) == null) {
+        Score dayStatusScore = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
+        dayStatusScore.setScore(10);
+        dayStatus.put(playerUUID, dayStatusScore.getEntry());
 
-        joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
-        joueurRestant.setScore(9);
+        Score joueurRestantScore = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
+        joueurRestantScore.setScore(9);
+        joueurRestant.put(playerUUID, joueurRestantScore.getEntry());
 
-        villageoisRestant = objective.getScore("Villageois : " + GameData.getVillagerAlive());
-        villageoisRestant.setScore(6);
+        Score villageoisRestantScore = objective.getScore("Villageois : " + GameData.getVillagerAlive());
+        villageoisRestantScore.setScore(6);
+        villageoisRestant.put(playerUUID, villageoisRestantScore.getEntry());
 
-        loupGarouRestant = objective.getScore("Loups : " + GameData.getWolfAlive());
-        loupGarouRestant.setScore(5);
+        Score loupGarouRestantScore = objective.getScore("Loups : " + GameData.getWolfAlive());
+        loupGarouRestantScore.setScore(5);
+        loupGarouRestant.put(playerUUID, loupGarouRestantScore.getEntry());
 
-        specialRestant = objective.getScore("Specials : " + GameData.getSpecialAlive());
-        specialRestant.setScore(4);
+        Score specialRestantScore = objective.getScore("Specials : " + GameData.getSpecialAlive());
+        specialRestantScore.setScore(4);
+        specialRestant.put(playerUUID, specialRestantScore.getEntry());
 
-        groupMax = objective.getScore("Taille de groupe maximal : " 
+        Score groupMaxScore = objective.getScore("Groupe maximal : " 
             + GameData.getGroupSize());
-        groupMax.setScore(2);
+        groupMaxScore.setScore(2);
+        groupMax.put(playerUUID, groupMaxScore.getEntry());
 
       }else {
-        inGameScoreBoard.resetScores(dayStatus.getEntry());
-        dayStatus = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
-        dayStatus.setScore(10);
+        inGameScoreBoard.resetScores(dayStatus.get(playerUUID));
+        Score dayStatusScore = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
+        dayStatusScore.setScore(10);
+        dayStatus.put(playerUUID, dayStatusScore.getEntry());
+        
+        inGameScoreBoard.resetScores(joueurRestant.get(playerUUID));
+        Score joueurRestantScore = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
+        joueurRestantScore.setScore(9);
+        joueurRestant.put(playerUUID, joueurRestantScore.getEntry());
+        
+        inGameScoreBoard.resetScores(villageoisRestant.get(playerUUID));
+        Score villageoisRestantScore = objective.getScore("Villageois : " + GameData.getVillagerAlive());
+        villageoisRestantScore.setScore(6);
+        villageoisRestant.put(playerUUID, villageoisRestantScore.getEntry());
 
-        inGameScoreBoard.resetScores(joueurRestant.getEntry());
-        joueurRestant = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
-        joueurRestant.setScore(9);
+        inGameScoreBoard.resetScores(loupGarouRestant.get(playerUUID));
+        Score loupGarouRestantScore = objective.getScore("Loups : " + GameData.getWolfAlive());
+        loupGarouRestantScore.setScore(5);
+        loupGarouRestant.put(playerUUID, loupGarouRestantScore.getEntry());
 
-        inGameScoreBoard.resetScores(villageoisRestant.getEntry());
-        villageoisRestant = objective.getScore("Villageois : " + GameData.getVillagerAlive());
-        villageoisRestant.setScore(6);
+        inGameScoreBoard.resetScores(specialRestant.get(playerUUID));
+        Score specialRestantScore = objective.getScore("Spéciaux : " + GameData.getSpecialAlive());
+        specialRestantScore.setScore(4);
+        specialRestant.put(playerUUID, specialRestantScore.getEntry());
 
-        inGameScoreBoard.resetScores(loupGarouRestant.getEntry());
-        loupGarouRestant = objective.getScore("Loups : " + GameData.getWolfAlive());
-        loupGarouRestant.setScore(5);
-
-        inGameScoreBoard.resetScores(specialRestant.getEntry());
-        specialRestant = objective.getScore("Spéciaux : " + GameData.getSpecialAlive());
-        specialRestant.setScore(4);
-
-        inGameScoreBoard.resetScores(groupMax.getEntry());
-        groupMax = objective.getScore("Taille de groupe maximal : " 
+        inGameScoreBoard.resetScores(groupMax.get(playerUUID));
+        Score groupMaxScore = objective.getScore("Taille groupe max : " 
             + GameData.getGroupSize());
-        groupMax.setScore(2);
+        groupMaxScore.setScore(2);
+        groupMax.put(playerUUID, groupMaxScore.getEntry());
       }
 
       objective.getScore("---------------").setScore(3);

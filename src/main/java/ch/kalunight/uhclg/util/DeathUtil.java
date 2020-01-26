@@ -35,8 +35,6 @@ public class DeathUtil {
         }
       }
     }
-
     return null;
   }
-
 }

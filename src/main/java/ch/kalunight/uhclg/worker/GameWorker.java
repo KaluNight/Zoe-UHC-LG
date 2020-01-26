@@ -518,7 +518,7 @@ public class GameWorker implements Runnable {
         player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
       }
       player.getAccount().getPlayer().sendMessage("Description : " + role.getDescription());
-      if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
+      if(player.getRole().getClan().equals(RoleClan.WOLFS) && !player.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {
         player.getAccount().getPlayer().sendMessage(LgListe.getListWolfs());
       }
     }
