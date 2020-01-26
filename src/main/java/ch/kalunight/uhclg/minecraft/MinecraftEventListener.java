@@ -33,6 +33,7 @@ import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.util.DeathUtil;
 import ch.kalunight.uhclg.util.LocationUtil;
+import ch.kalunight.uhclg.util.LoverUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
 import ch.kalunight.uhclg.worker.LoveKillerWorker;
@@ -88,7 +89,7 @@ public class MinecraftEventListener implements Listener {
 
       if(playerData.isInLove()) {
 
-        PlayerData otherLover = getOtherLover(playerData.getAccount().getPlayerUUID());
+        PlayerData otherLover = LoverUtil.getOtherLover(playerData.getAccount().getPlayerUUID());
         
         if(otherLover != null && otherLover.isAlive()) {
           
@@ -307,19 +308,6 @@ public class MinecraftEventListener implements Listener {
         }
       }
     }
-  }
-
-  private PlayerData getOtherLover(UUID playerUUID) {
-    PlayerData otherLover = null;
-
-    for(PlayerData player : GameData.getPlayersInGame()) {
-      if(player.isAlive() && !player.getAccount().getPlayerUUID().equals(playerUUID) && player.isInLove()) {
-        otherLover = player;
-        break;
-      }
-    }
-
-    return otherLover;
   }
 
   @EventHandler

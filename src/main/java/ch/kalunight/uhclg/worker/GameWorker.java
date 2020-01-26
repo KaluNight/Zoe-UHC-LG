@@ -28,14 +28,15 @@ import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.model.TimeStatus;
+import ch.kalunight.uhclg.util.LoverUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
 
 public class GameWorker implements Runnable {
 
   private static final int DAY_DURATION = 24000;
-  private static final Duration DAY1_DURATION = Duration.ofMinutes(1);
-  private static final Duration DAY2_DURATION = Duration.ofMinutes(1);
-  private static final Duration PVP_START_DURATION = Duration.ofMinutes(1);
+  private static final Duration DAY1_DURATION = Duration.ofMinutes(20);
+  private static final Duration DAY2_DURATION = Duration.ofMinutes(10);
+  private static final Duration PVP_START_DURATION = Duration.ofMinutes(30);
 
   private static final int START_OF_DAY = 0;
 
@@ -158,7 +159,7 @@ public class GameWorker implements Runnable {
         resistance = potionEffect;
       }
     }
-    
+
     if(resistance == null) {
       player.getAccount().getPlayer().addPotionEffect(PotionUtil.RESISTANCE);
     }
@@ -171,7 +172,11 @@ public class GameWorker implements Runnable {
         speed = potionEffect;
       }
     }
-    
+
+    if(LoverUtil.isLoverAndOtherLoverDead(player)) {
+      return;
+    }
+
     if(speed != null) {
       player.getAccount().getPlayer().removePotionEffect(PotionEffectType.SPEED);
     }
@@ -184,7 +189,7 @@ public class GameWorker implements Runnable {
         speed = potionEffect;
       }
     }
-    
+
     if(speed == null) {
       player.getAccount().getPlayer().addPotionEffect(PotionUtil.SPEED);
     }
@@ -210,7 +215,7 @@ public class GameWorker implements Runnable {
         weakness = potionEffect;
       }
     }
-    
+
     if(weakness == null) {
       player.getAccount().getPlayer().addPotionEffect(PotionUtil.WEAKNESS);
     }
@@ -222,6 +227,10 @@ public class GameWorker implements Runnable {
       if(potionEffect.getType().equals(PotionEffectType.INCREASE_DAMAGE)) {
         power = potionEffect;
       }
+    }
+
+    if(LoverUtil.isLoverAndOtherLoverDead(player)) {
+      return;
     }
     
     if(power != null) {
@@ -236,7 +245,7 @@ public class GameWorker implements Runnable {
         power = potionEffect;
       }
     }
-    
+
     if(power == null) {
       player.getAccount().getPlayer().addPotionEffect(PotionUtil.STRENGTH);
     }
@@ -249,7 +258,7 @@ public class GameWorker implements Runnable {
         nightVision = potionEffect;
       }
     }
-    
+
     if(nightVision != null) {
       player.getAccount().getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
     }
@@ -262,7 +271,7 @@ public class GameWorker implements Runnable {
         nightVision = potionEffect;
       }
     }
-    
+
     if(nightVision == null) {
       player.getAccount().getPlayer().addPotionEffect(PotionUtil.INVISIBILITY);
     }
@@ -275,7 +284,7 @@ public class GameWorker implements Runnable {
         nightVision = potionEffect;
       }
     }
-    
+
     if(nightVision != null) {
       player.getAccount().getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
     }
@@ -288,7 +297,7 @@ public class GameWorker implements Runnable {
         nightVision = potionEffect;
       }
     }
-    
+
     if(nightVision == null) {
       player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
     }
@@ -362,9 +371,9 @@ public class GameWorker implements Runnable {
         sayRoleToPlayer(); //Les rôles sont disponible a partir du jour 2
         giveStuffOfRole();
       }
-      
+
       sayMessageOfDay();
-      
+
       WorldBorder worldBorder = world.getWorldBorder();
       if(worldBorder.getSize() > 750) {
         worldBorder.setSize(worldBorder.getSize() - 500, 180);
@@ -374,7 +383,7 @@ public class GameWorker implements Runnable {
           sayWorldBorderMove(true);
         }
       }
-      
+
     }else {
       if(actualTime > START_OF_NIGHT) {
         setTimeStatus(TimeStatus.NIGHT);
@@ -393,23 +402,23 @@ public class GameWorker implements Runnable {
       .broadcastMessage("La carte se réduit de 500 blocks ! Sa taille minimal à été atteinte !");
       world.getWorldBorder().setWarningDistance(0);
     }
-    
+
   }
 
   private void sayMessageOfDay() {
 
     PlayerData voyante = null;
-    
+
     for(PlayerData player : GameData.getPlayersInGame()) {
       if(player.getRole().equals(Role.VOYANTE)) {
         voyante = player;
       }
     }
-    
+
     if(voyante != null && voyante.isConnected() && voyante.isAlive()) {
       voyante.getAccount().getPlayer().sendMessage("Vous pouvez utiliser votre pouvoir de voyante maintenant avec la commande \"lgvoir nomDuJoueur\".");
     }
-    
+
     LgVoir.setRoleChecked(false);
   }
 
@@ -519,7 +528,7 @@ public class GameWorker implements Runnable {
     world.setTime(START_OF_DAY);
     setTimeStatus(TimeStatus.DAY);
     world.getWorldBorder().setWarningDistance(500);
-    
+
     secondsTime = DAY_DURATION / DAY1_DURATION.getSeconds();
     actualTime = 0;
 
