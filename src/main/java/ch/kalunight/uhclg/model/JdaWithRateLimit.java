@@ -26,7 +26,7 @@ public class JdaWithRateLimit {
   }
   
   public void defineGuildVoiceHandler(Guild guild) {
-    if(!guild.getAudioManager().getSendingHandler().equals(botVoiceManager.getMusicManager().getSendHandler())){
+    if(guild.getAudioManager().getSendingHandler() == null || !guild.getAudioManager().getSendingHandler().equals(botVoiceManager.getMusicManager().getSendHandler())){
       guild.getAudioManager().setSendingHandler(botVoiceManager.getMusicManager().getSendHandler());
       botVoiceManager.setAudioManager(guild.getAudioManager());
     }

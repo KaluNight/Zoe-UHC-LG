@@ -1,5 +1,6 @@
 package ch.kalunight.uhclg.worker;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,7 +65,13 @@ public class VocalSystemWorker implements Runnable {
             if(voiceChannel != null){
               if(voiceRequest.isNeedToBeAlone() && isPlayerAlone(position)
                   || voiceRequest.isNeedToBeAlone() && !isPlayerAlone(position)) {
-                aviableVoiceJda.getBotVoiceManager().loadAndPlay(voiceRequest.getMusicToPlay(), voiceChannel);
+                
+                File file = new File(voiceRequest.getMusicToPlay());
+                if(file.exists()) {
+                  aviableVoiceJda.getBotVoiceManager().loadAndPlay(file.getAbsolutePath(), voiceChannel);
+                }else {
+                  aviableVoiceJda.getBotVoiceManager().loadAndPlay(voiceRequest.getMusicToPlay(), voiceChannel);
+                }
               }
             }
           }
@@ -292,7 +299,7 @@ public class VocalSystemWorker implements Runnable {
   public static List<JdaWithRateLimit> getAviableVoiceJda() {
     List<JdaWithRateLimit> jdaAvaible = new ArrayList<>();
     for(JdaWithRateLimit jda : jdaWorkers) {
-      if(jda.getBotVoiceManager().getMusicManager().player.getPlayingTrack() != null) {
+      if(jda.getBotVoiceManager().getMusicManager().player.getPlayingTrack() == null) {
         jdaAvaible.add(jda);
       }
     }

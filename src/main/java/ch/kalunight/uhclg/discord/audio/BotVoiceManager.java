@@ -28,9 +28,9 @@ public class BotVoiceManager {
     musicManager = new VoiceManager(playerManager);
   }
 
-  public void loadAndPlay(final File voiceFile, final VoiceChannel voiceChannel) {
+  public void loadAndPlay(final String voiceFile, final VoiceChannel voiceChannel) {
 
-    playerManager.loadItemOrdered(musicManager, voiceFile.getAbsolutePath(), new AudioLoadResultHandler() {
+    playerManager.loadItemOrdered(musicManager, voiceFile, new AudioLoadResultHandler() {
       @Override
       public void trackLoaded(AudioTrack track) {
         play(musicManager, track, voiceChannel);
