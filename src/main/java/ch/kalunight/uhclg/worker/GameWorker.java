@@ -28,6 +28,7 @@ import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.model.TimeStatus;
+import ch.kalunight.uhclg.model.VoiceRequest;
 import ch.kalunight.uhclg.util.LoverUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
 
@@ -376,15 +377,16 @@ public class GameWorker implements Runnable {
 
       WorldBorder worldBorder = world.getWorldBorder();
       if(worldBorder.getSize() > 750) {
-        worldBorder.setSize(worldBorder.getSize() - 500, 180);
-        if(worldBorder.getSize() > 750) {
-          sayWorldBorderMove(false);
-        }else {
-          sayWorldBorderMove(true);
-        }
+        double worldBorderSize = worldBorder.getSize() - 500;
+        worldBorder.setSize(worldBorderSize, 180);
+        sayWorldBorderMove(worldBorderSize > 750);
+      }else {
+        double newSize = worldBorder.getSize() / 2;
+        worldBorder.setSize(newSize, 300);
+        ZoePluginMaster.getMinecraftServer().broadcastMessage("La carte se réduit de " + newSize + " blocs ! ");
       }
 
-    }else {
+    } else {
       if(actualTime > START_OF_NIGHT) {
         setTimeStatus(TimeStatus.NIGHT);
       }else {
@@ -399,7 +401,7 @@ public class GameWorker implements Runnable {
       ZoePluginMaster.getMinecraftServer().broadcastMessage("La carte se réduit de 500 blocs !");
     }else {
       ZoePluginMaster.getMinecraftServer()
-      .broadcastMessage("La carte se réduit de 500 blocks ! Sa taille minimal à été atteinte !");
+      .broadcastMessage("La carte se réduit de 500 blocs ! Elle rétraicira plus doucement à partir de maintenant.");
       world.getWorldBorder().setWarningDistance(0);
     }
 
@@ -448,7 +450,7 @@ public class GameWorker implements Runnable {
         playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.STRING, 3));
         book = new ItemStack(Material.ENCHANTED_BOOK, 1);
         bookMeta = book.getItemMeta();
-        bookMeta.addEnchant(Enchantment.KNOCKBACK, 0, true);
+        bookMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 0, true);
         bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
         book.setItemMeta(bookMeta);
         playerData.getAccount().getPlayer().getInventory().addItem(book);
@@ -514,8 +516,14 @@ public class GameWorker implements Runnable {
 
       if(player.getRole().equals(Role.LOUP_GAROU_AMNESIQUE) && !GameData.isLoupAmnesiqueFound()) {
         player.getAccount().getPlayer().sendMessage("Votre rôle : Villageois");
+        
+        VocalSystemWorker.getVoiceRequests().add(new VoiceRequest(GameData.getLobby().getGuild().getIdLong(),
+            player.getAccount().getDiscordId(), Role.VILLAGEOIS.getVoiceFile(), true));
       }else {
         player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
+        
+        VocalSystemWorker.getVoiceRequests().add(new VoiceRequest(GameData.getLobby().getGuild().getIdLong(),
+            player.getAccount().getDiscordId(), player.getRole().getVoiceFile(), true));
       }
       player.getAccount().getPlayer().sendMessage("Description : " + role.getDescription());
       if(player.getRole().getClan().equals(RoleClan.WOLFS) && !player.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {

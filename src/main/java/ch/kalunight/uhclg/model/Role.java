@@ -1,5 +1,6 @@
 package ch.kalunight.uhclg.model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,32 +11,35 @@ import ch.kalunight.uhclg.GameData;
 
 public enum Role {
   /*ANGE(RoleClan.VILLAGE, "Ange"),*/
-  VOYANTE(RoleClan.VILLAGE, "Voyante"),
-  CUPIDON(RoleClan.VILLAGE, "Cupidon"),
-  PETITE_FILLE(RoleClan.VILLAGE, "Petite Fille"),
-  SORCIERE(RoleClan.VILLAGE, "Sorcière"),
-  ANCIEN(RoleClan.VILLAGE, "Ancien"),
-  RENARD(RoleClan.VILLAGE, "Renard"),
-  VILLAGEOIS(RoleClan.VILLAGE, "Villageois"),
-  ASSASSIN(RoleClan.SPECIAL, "Assassin"),
-  LOUP_GAROU(RoleClan.WOLFS, "Loup Garou"),
-  ENFANT_SAUVAGE(RoleClan.WOLFS, "Enfant Sauvage"),
-  INFECT_PERE_DES_LOUPS(RoleClan.WOLFS, "Infect Père des Loups Garou"),
-  LOUP_GAROU_BLANC(RoleClan.WOLFS, "Loup Garou Blanc"),
-  LOUP_GAROU_AMNESIQUE(RoleClan.WOLFS, "Loup Garou Amnésique"),
-  PETIT_LOUP_GAROU(RoleClan.WOLFS, "Vilain Petit Loup"),
-  GRAND_MERE_LOUP(RoleClan.WOLFS, "Grand-Mère Loup");
+  VOYANTE(RoleClan.VILLAGE, "Voyante", new File(Role.SOUNDS_FOLDER + "voyante.wav")),
+  CUPIDON(RoleClan.VILLAGE, "Cupidon", new File(Role.SOUNDS_FOLDER + "cupidon.wav")),
+  PETITE_FILLE(RoleClan.VILLAGE, "Petite Fille", new File(Role.SOUNDS_FOLDER + "petite_fille.wav")),
+  SORCIERE(RoleClan.VILLAGE, "Sorcière", new File(Role.SOUNDS_FOLDER + "sorciere.wav")),
+  ANCIEN(RoleClan.VILLAGE, "Ancien", new File(Role.SOUNDS_FOLDER + "ancien.wav")),
+  RENARD(RoleClan.VILLAGE, "Renard", new File(Role.SOUNDS_FOLDER + "renard.wav")),
+  VILLAGEOIS(RoleClan.VILLAGE, "Villageois", new File(Role.SOUNDS_FOLDER + "villageois.wav")),
+  ASSASSIN(RoleClan.SPECIAL, "Assassin", new File(Role.SOUNDS_FOLDER + "assassin.wav")),
+  LOUP_GAROU(RoleClan.WOLFS, "Loup Garou", new File(Role.SOUNDS_FOLDER + "loup_garou.wav")),
+  ENFANT_SAUVAGE(RoleClan.WOLFS, "Enfant Sauvage", new File(Role.SOUNDS_FOLDER + "enfant_sauvage.wav")),
+  INFECT_PERE_DES_LOUPS(RoleClan.WOLFS, "Infect Père des Loups Garou", new File(Role.SOUNDS_FOLDER + "infect_loup.wav")),
+  LOUP_GAROU_BLANC(RoleClan.WOLFS, "Loup Garou Blanc", new File(Role.SOUNDS_FOLDER + "loup_garou_blanc.wav")),
+  LOUP_GAROU_AMNESIQUE(RoleClan.WOLFS, "Loup Garou Amnésique", new File(Role.SOUNDS_FOLDER + "loup_garou_amnesique.wav")),
+  PETIT_LOUP_GAROU(RoleClan.WOLFS, "Vilain Petit Loup", new File(Role.SOUNDS_FOLDER + "petit_loup_garou.wav")),
+  GRAND_MERE_LOUP(RoleClan.WOLFS, "Grand-Mère Loup", new File(Role.SOUNDS_FOLDER + "grand_mere_loup.wav"));
 
+  private static final String SOUNDS_FOLDER = "sounds/";
   private static final List<Role> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
   private static final int SIZE = VALUES.size();
   private static final Random RANDOM = new Random();
 
   private RoleClan clan;
   private String name;
+  private File voiceFile;
 
-  private Role(RoleClan clan, String name) {
+  private Role(RoleClan clan, String name, File voiceFile) {
     this.clan = clan;
     this.name = name;
+    this.voiceFile = voiceFile;
   }
   
   public String getDescription() {
@@ -134,6 +138,10 @@ public enum Role {
 
   public String getName() {
     return name;
+  }
+
+  public File getVoiceFile() {
+    return voiceFile;
   }
 
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.JdaWithRateLimit;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.PlayerVoicePosition;
+import ch.kalunight.uhclg.model.VoiceRequest;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -31,6 +33,8 @@ public class VocalSystemWorker implements Runnable {
 
   private static final List<PlayerVoicePosition> playersVoicePositions = Collections.synchronizedList(new ArrayList<>());
 
+  private static final LinkedBlockingQueue<VoiceRequest> voiceRequests = new LinkedBlockingQueue<>();
+
   private static long idDeadPlayer;
 
   private static double voiceDistance = 30d;
@@ -41,59 +45,87 @@ public class VocalSystemWorker implements Runnable {
 
     if(GameData.getGameStatus().equals(GameStatus.IN_GAME)) {
       refreshPlayerVoiceLink();
-      for(PlayerData player : GameData.getPlayersInGame()) {
+      movePlayerWithLink();
+    }
 
-        if(!playersAlreadyTreated.contains(player) && player.isConnected()) {
-          PlayerVoicePosition voiceChannelPlayer = getPlayerVoicePosition(player.getAccount().getDiscordId());
+    if(!voiceRequests.isEmpty()) {
+      List<JdaWithRateLimit> aviablesVoiceJda = getAviableVoiceJda();
+      for(JdaWithRateLimit aviableVoiceJda : aviablesVoiceJda) {
+        if(!voiceRequests.isEmpty()) {
+          VoiceRequest voiceRequest = voiceRequests.poll();
+          Guild guild = aviableVoiceJda.getJda().getGuildById(voiceRequest.getGuildId());
+          aviableVoiceJda.defineGuildVoiceHandler(guild);
 
-          if(voiceChannelPlayer != null) {
-            List<PlayerVoicePosition> playersInTheSameChannel = getPlayersNeededInTheChannel(new ArrayList<>(), voiceChannelPlayer);
+          PlayerVoicePosition position = getPlayerVoicePosition(voiceRequest.getUserId());
 
-            if(playersInTheSameChannel.size() == 1) {
-              if(!isPlayerAlone(voiceChannelPlayer)) {
-                JdaWithRateLimit jda = getAvaibleJda();
-                Guild guild = getAvaibleGuild(jda);
-                Member member = guild.getMemberById(player.getAccount().getDiscordId());
+          if(position != null) {
+            VoiceChannel voiceChannel = position.getActualVoiceChannel(guild);
 
-                if(!voiceChannelPlayer.getPlayerData().isAlive()) {
-                  VoiceChannel deadVoiceChannel = guild.getVoiceChannelById(idDeadPlayer);
-                  guild.moveVoiceMember(member, deadVoiceChannel).queue();
-                  
-                  voiceChannelPlayer.setActualVoiceChannelId(idDeadPlayer);
-                  member.mute(false).queue();
-                  jda.addCall();
-                  playersAlreadyTreated.add(player);
-                }else {
-                  VoiceChannel emptyVoiceChannel = getEmptyVoiceChannel(guild);
-
-                  guild.moveVoiceMember(member, emptyVoiceChannel).queue();
-                  jda.addCall();
-                  voiceChannelPlayer.setActualVoiceChannelId(emptyVoiceChannel.getIdLong());
-                  playersAlreadyTreated.add(player);
-                }
+            if(voiceChannel != null){
+              if(voiceRequest.isNeedToBeAlone() && isPlayerAlone(position)
+                  || voiceRequest.isNeedToBeAlone() && !isPlayerAlone(position)) {
+                aviableVoiceJda.getBotVoiceManager().loadAndPlay(voiceRequest.getMusicToPlay(), voiceChannel);
               }
-            }else {
-              long voiceChannelId = getVoiceMostPopulatedChannel(playersInTheSameChannel);
+            }
+          }
+        }
+      }
+    }
+  }
 
-              for(PlayerVoicePosition playerToMove : playersInTheSameChannel) {
-                if(playerToMove.getActualVoiceChannelId() != voiceChannelId) {
-                  JdaWithRateLimit jda = getAvaibleJda();
-                  Guild guild = getAvaibleGuild(jda);
-                  Member member = guild.getMemberById(playerToMove.getPlayerData().getAccount().getDiscordId());
+  private void movePlayerWithLink() {
+    for(PlayerData player : GameData.getPlayersInGame()) {
 
-                  try {
-                    if(!playerToMove.getPlayerData().isAlive()) {
-                      member.mute(true).queue();
-                    }
-                    guild.moveVoiceMember(member, guild.getVoiceChannelById(voiceChannelId)).queue();
-                    playerToMove.setActualVoiceChannelId(voiceChannelId);
-                  }catch(IllegalStateException e) {
-                    logger.error("Impossible de bouger quelqu'un qui n'est pas connecté", e);
-                    playerToMove.getPlayerData().setDiscordVoiceConnected(false);
+      if(!playersAlreadyTreated.contains(player) && player.isConnected()) {
+        PlayerVoicePosition voiceChannelPlayer = getPlayerVoicePosition(player.getAccount().getDiscordId());
+
+        if(voiceChannelPlayer != null) {
+          List<PlayerVoicePosition> playersInTheSameChannel = getPlayersNeededInTheChannel(new ArrayList<>(), voiceChannelPlayer);
+
+          if(playersInTheSameChannel.size() == 1) {
+            if(!isPlayerAlone(voiceChannelPlayer)) {
+              JdaWithRateLimit jda = getAvaibleJda();
+              Guild guild = getGuild(jda);
+              Member member = guild.getMemberById(player.getAccount().getDiscordId());
+
+              if(!voiceChannelPlayer.getPlayerData().isAlive()) {
+                VoiceChannel deadVoiceChannel = guild.getVoiceChannelById(idDeadPlayer);
+                guild.moveVoiceMember(member, deadVoiceChannel).queue();
+
+                voiceChannelPlayer.setActualVoiceChannelId(idDeadPlayer);
+                member.mute(false).queue();
+                jda.addCall();
+                playersAlreadyTreated.add(player);
+              }else {
+                VoiceChannel emptyVoiceChannel = getEmptyVoiceChannel(guild);
+
+                guild.moveVoiceMember(member, emptyVoiceChannel).queue();
+                jda.addCall();
+                voiceChannelPlayer.setActualVoiceChannelId(emptyVoiceChannel.getIdLong());
+                playersAlreadyTreated.add(player);
+              }
+            }
+          }else {
+            long voiceChannelId = getVoiceMostPopulatedChannel(playersInTheSameChannel);
+
+            for(PlayerVoicePosition playerToMove : playersInTheSameChannel) {
+              if(playerToMove.getActualVoiceChannelId() != voiceChannelId) {
+                JdaWithRateLimit jda = getAvaibleJda();
+                Guild guild = getGuild(jda);
+                Member member = guild.getMemberById(playerToMove.getPlayerData().getAccount().getDiscordId());
+
+                try {
+                  if(!playerToMove.getPlayerData().isAlive()) {
+                    member.mute(true).queue();
                   }
-                  jda.addCall();
-                  playersAlreadyTreated.add(playerToMove.getPlayerData());
+                  guild.moveVoiceMember(member, guild.getVoiceChannelById(voiceChannelId)).queue();
+                  playerToMove.setActualVoiceChannelId(voiceChannelId);
+                }catch(IllegalStateException e) {
+                  logger.error("Impossible de bouger quelqu'un qui n'est pas connecté", e);
+                  playerToMove.getPlayerData().setDiscordVoiceConnected(false);
                 }
+                jda.addCall();
+                playersAlreadyTreated.add(playerToMove.getPlayerData());
               }
             }
           }
@@ -111,7 +143,7 @@ public class VocalSystemWorker implements Runnable {
     return true;
   }
 
-  private Guild getAvaibleGuild(JdaWithRateLimit jda) {
+  private Guild getGuild(JdaWithRateLimit jda) {
     return jda.getJda().getGuildById(GameData.getLobby().getGuild().getIdLong());
   }
 
@@ -257,6 +289,16 @@ public class VocalSystemWorker implements Runnable {
     }
   }
 
+  public static List<JdaWithRateLimit> getAviableVoiceJda() {
+    List<JdaWithRateLimit> jdaAvaible = new ArrayList<>();
+    for(JdaWithRateLimit jda : jdaWorkers) {
+      if(jda.getBotVoiceManager().getMusicManager().player.getPlayingTrack() != null) {
+        jdaAvaible.add(jda);
+      }
+    }
+    return jdaAvaible;
+  }
+
   public static long getIdDeadPlayer() {
     return idDeadPlayer;
   }
@@ -267,6 +309,10 @@ public class VocalSystemWorker implements Runnable {
 
   public static List<JdaWithRateLimit> getJdaWorkers() {
     return jdaWorkers;
+  }
+
+  public static LinkedBlockingQueue<VoiceRequest> getVoiceRequests() {
+    return voiceRequests;
   }
 
 }

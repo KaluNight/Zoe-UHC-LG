@@ -19,8 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jagrosh.jdautilities.command.CommandClientBuilder;
-
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
+import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
+import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import ch.kalunight.uhclg.discord.DiscordEventListener;
+import ch.kalunight.uhclg.discord.audio.BotVoiceManager;
+import ch.kalunight.uhclg.discord.audio.TrackScheduler;
 import ch.kalunight.uhclg.discord.commands.DefineLobbyTextCommand;
 import ch.kalunight.uhclg.discord.commands.DefineLobbyVocalCommand;
 import ch.kalunight.uhclg.discord.commands.LinkCommand;
@@ -142,6 +147,19 @@ public class ZoePluginMaster extends JavaPlugin {
       } catch (LoginException e) {
         logger.error("Issue when loading Discord !", e);
       }
+    }
+    
+    for(JdaWithRateLimit jdaWithRateLimit : VocalSystemWorker.getJdaWorkers()) {
+      
+      AudioPlayerManager playerManager = new DefaultAudioPlayerManager();
+      AudioSourceManagers.registerRemoteSources(playerManager);
+      AudioSourceManagers.registerLocalSource(playerManager);
+      AudioPlayer player = playerManager.createPlayer();
+      TrackScheduler trackScheduler = new TrackScheduler(player);
+      player.addListener(trackScheduler);
+      
+      BotVoiceManager voiceManager = new BotVoiceManager();
+      jdaWithRateLimit.setBotVoiceManager(voiceManager);
     }
   }
 

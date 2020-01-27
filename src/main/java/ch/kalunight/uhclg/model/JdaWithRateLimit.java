@@ -1,11 +1,13 @@
 package ch.kalunight.uhclg.model;
 
 import java.time.Duration;
-import java.time.LocalDateTime;import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
+import ch.kalunight.uhclg.discord.audio.BotVoiceManager;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 
 public class JdaWithRateLimit {
   
@@ -15,10 +17,19 @@ public class JdaWithRateLimit {
   
   private JDA jda;
   
+  private BotVoiceManager botVoiceManager;
+  
   private List<LocalDateTime> callsDate = Collections.synchronizedList(new ArrayList<>());
   
   public JdaWithRateLimit(JDA jda) {
     this.jda = jda;
+  }
+  
+  public void defineGuildVoiceHandler(Guild guild) {
+    if(!guild.getAudioManager().getSendingHandler().equals(botVoiceManager.getMusicManager().getSendHandler())){
+      guild.getAudioManager().setSendingHandler(botVoiceManager.getMusicManager().getSendHandler());
+      botVoiceManager.setAudioManager(guild.getAudioManager());
+    }
   }
   
   public void addCall() {
@@ -42,5 +53,12 @@ public class JdaWithRateLimit {
   public JDA getJda() {
     return jda;
   }
-  
+
+  public BotVoiceManager getBotVoiceManager() {
+    return botVoiceManager;
+  }
+
+  public void setBotVoiceManager(BotVoiceManager botVoiceManager) {
+    this.botVoiceManager = botVoiceManager;
+  }
 }
