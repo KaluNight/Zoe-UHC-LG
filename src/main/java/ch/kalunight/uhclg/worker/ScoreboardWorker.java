@@ -107,6 +107,13 @@ public class ScoreboardWorker implements Runnable {
 
   private void defineInGameScoreBoard() {
 
+    String actualDayStatus = getActualDayStatusScore();
+    String playerAlive = getPlayerAliveScore();
+    String villagerAlive = getVillagerAliveScore();
+    String wolfsAlive = getWolfsAliveScore();
+    String specialAlive = getSpecialAliveScore();
+    String groupSize = getGroupMaxScore();
+
     for(PlayerData player : GameData.getPlayersInGame()) {
 
       if(!player.isConnected()) {
@@ -123,69 +130,84 @@ public class ScoreboardWorker implements Runnable {
       }
 
       UUID playerUUID = player.getAccount().getPlayerUUID();
-      
+
       Objective objective = inGameScoreBoard.getObjective(IN_GAME_OBJECTIVE_ID);
       objective.setDisplayName("Loup Garou - UHC | " + GameWorker.getChronoString());
 
       if(joueurRestant.get(playerUUID) == null) {
-        Score dayStatusScore = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
+        Score dayStatusScore = objective.getScore(actualDayStatus);
         dayStatusScore.setScore(10);
         dayStatus.put(playerUUID, dayStatusScore.getEntry());
 
-        Score joueurRestantScore = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
+        Score joueurRestantScore = objective.getScore(playerAlive);
         joueurRestantScore.setScore(9);
         joueurRestant.put(playerUUID, joueurRestantScore.getEntry());
 
-        Score villageoisRestantScore = objective.getScore("Villageois : " + GameData.getVillagerAlive());
+        Score villageoisRestantScore = objective.getScore(villagerAlive);
         villageoisRestantScore.setScore(6);
         villageoisRestant.put(playerUUID, villageoisRestantScore.getEntry());
 
-        Score loupGarouRestantScore = objective.getScore("Loups : " + GameData.getWolfAlive());
+        Score loupGarouRestantScore = objective.getScore(wolfsAlive);
         loupGarouRestantScore.setScore(5);
         loupGarouRestant.put(playerUUID, loupGarouRestantScore.getEntry());
 
-        Score specialRestantScore = objective.getScore("Specials : " + GameData.getSpecialAlive());
+        Score specialRestantScore = objective.getScore(specialAlive);
         specialRestantScore.setScore(4);
         specialRestant.put(playerUUID, specialRestantScore.getEntry());
 
-        Score groupMaxScore = objective.getScore("Groupe maximal : " 
-            + GameData.getGroupSize());
+        Score groupMaxScore = objective.getScore(groupSize);
         groupMaxScore.setScore(2);
         groupMax.put(playerUUID, groupMaxScore.getEntry());
 
       }else {
-        //TODO Check if the text is the same before change
-        
-        inGameScoreBoard.resetScores(dayStatus.get(playerUUID));
-        Score dayStatusScore = objective.getScore("Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName());
-        dayStatusScore.setScore(10);
-        dayStatus.put(playerUUID, dayStatusScore.getEntry());
-        
-        inGameScoreBoard.resetScores(joueurRestant.get(playerUUID));
-        Score joueurRestantScore = objective.getScore("Joueurs restant : " + GameData.getPlayerAlive());
-        joueurRestantScore.setScore(9);
-        joueurRestant.put(playerUUID, joueurRestantScore.getEntry());
-        
-        inGameScoreBoard.resetScores(villageoisRestant.get(playerUUID));
-        Score villageoisRestantScore = objective.getScore("Villageois : " + GameData.getVillagerAlive());
-        villageoisRestantScore.setScore(6);
-        villageoisRestant.put(playerUUID, villageoisRestantScore.getEntry());
 
-        inGameScoreBoard.resetScores(loupGarouRestant.get(playerUUID));
-        Score loupGarouRestantScore = objective.getScore("Loups : " + GameData.getWolfAlive());
-        loupGarouRestantScore.setScore(5);
-        loupGarouRestant.put(playerUUID, loupGarouRestantScore.getEntry());
+        String dayStatusPlayer = dayStatus.get(playerUUID);
+        if(!dayStatusPlayer.equals(actualDayStatus)) {
+          inGameScoreBoard.resetScores(dayStatusPlayer);
+          Score dayStatusScore = objective.getScore(actualDayStatus);
+          dayStatusScore.setScore(10);
+          dayStatus.put(playerUUID, actualDayStatus);
+        }
 
-        inGameScoreBoard.resetScores(specialRestant.get(playerUUID));
-        Score specialRestantScore = objective.getScore("Spéciaux : " + GameData.getSpecialAlive());
-        specialRestantScore.setScore(4);
-        specialRestant.put(playerUUID, specialRestantScore.getEntry());
+        String joueurRestantPlayer = joueurRestant.get(playerUUID);
+        if(!joueurRestantPlayer.equals(playerAlive)) {
+          inGameScoreBoard.resetScores(joueurRestantPlayer);
+          Score joueurRestantScore = objective.getScore(playerAlive);
+          joueurRestantScore.setScore(9);
+          joueurRestant.put(playerUUID, playerAlive);
+        }
 
-        inGameScoreBoard.resetScores(groupMax.get(playerUUID));
-        Score groupMaxScore = objective.getScore("Taille groupe max : " 
-            + GameData.getGroupSize());
-        groupMaxScore.setScore(2);
-        groupMax.put(playerUUID, groupMaxScore.getEntry());
+        String villageoisRestantPlayer = villageoisRestant.get(playerUUID);
+        if(!villageoisRestantPlayer.equals(villagerAlive)) {
+          inGameScoreBoard.resetScores(villageoisRestantPlayer);
+          Score villageoisRestantScore = objective.getScore(villagerAlive);
+          villageoisRestantScore.setScore(6);
+          villageoisRestant.put(playerUUID, villagerAlive);
+        }
+
+        String loupGarouRestantPlayer = loupGarouRestant.get(playerUUID);
+        if(!loupGarouRestantPlayer.equals(wolfsAlive)) {
+          inGameScoreBoard.resetScores(loupGarouRestantPlayer);
+          Score loupGarouRestantScore = objective.getScore(wolfsAlive);
+          loupGarouRestantScore.setScore(5);
+          loupGarouRestant.put(playerUUID, wolfsAlive);
+        }
+
+        String specialRestantPlayer = specialRestant.get(playerUUID);
+        if(!specialRestantPlayer.equals(specialAlive)) {
+          inGameScoreBoard.resetScores(specialRestantPlayer);
+          Score specialRestantScore = objective.getScore(specialAlive);
+          specialRestantScore.setScore(4);
+          specialRestant.put(playerUUID, specialAlive);
+        }
+
+        String groupMaxPlayer = groupMax.get(playerUUID);
+        if(!groupMaxPlayer.equals(groupSize)) {
+          inGameScoreBoard.resetScores(groupMaxPlayer);
+          Score groupMaxScore = objective.getScore(groupSize);
+          groupMaxScore.setScore(2);
+          groupMax.put(playerUUID, groupSize);
+        }
       }
 
       objective.getScore("---------------").setScore(3);
@@ -214,5 +236,29 @@ public class ScoreboardWorker implements Runnable {
       scorePostions.put(player.getAccount().getPlayerUUID(), positionText);
       inGameScoreboards.put(player.getAccount().getPlayerUUID(), inGameScoreBoard);
     }
+  }
+
+  private String getGroupMaxScore() {
+    return "Taille groupe max : " + GameData.getGroupSize();
+  }
+
+  private String getSpecialAliveScore() {
+    return "Spéciaux : " + GameData.getSpecialAlive();
+  }
+
+  private String getWolfsAliveScore() {
+    return "Loups : " + GameData.getWolfAlive();
+  }
+
+  private String getVillagerAliveScore() {
+    return "Villageois : " + GameData.getVillagerAlive();
+  }
+
+  private String getPlayerAliveScore() {
+    return "Joueurs restant : " + GameData.getPlayerAlive();
+  }
+
+  private String getActualDayStatusScore() {
+    return "Jour " + GameWorker.getActualDayNumber() + " | " + GameWorker.getTimeStatus().getName();
   }
 }
