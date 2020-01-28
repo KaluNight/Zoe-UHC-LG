@@ -4,19 +4,8 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.GameRule;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.WorldBorder;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-import org.bukkit.potion.PotionType;
-
 import com.google.common.base.Stopwatch;
 
 import ch.kalunight.uhclg.GameData;
@@ -30,7 +19,6 @@ import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.model.TimeStatus;
 import ch.kalunight.uhclg.model.VoiceRequest;
 import ch.kalunight.uhclg.model.role.RoleImpl;
-import ch.kalunight.uhclg.util.PotionUtil;
 
 public class GameWorker implements Runnable {
 
