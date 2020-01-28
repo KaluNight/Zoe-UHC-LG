@@ -45,7 +45,10 @@ public class EnfantSauvage implements RoleImpl {
 
   @Override
   public void givePotionEffect(PlayerData player, TimeStatus time) {
-    //TODO Implement model effect
+    if(model != null && !model.isAlive()) {
+      RoleImpl.giveWolfsEffects(player, time);
+      model.getRole().givePotionEffect(player, time);
+    }
   }
 
   public PlayerData getModel() {

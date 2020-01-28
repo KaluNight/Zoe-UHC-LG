@@ -9,7 +9,9 @@ import ch.kalunight.uhclg.util.PotionUtil;
 public class Ancien implements RoleImpl {
 
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "ancien.wav");
-  
+
+  private boolean hasBeenSaved = false;
+
   @Override
   public Role getRoleEnum() {
     return Role.ANCIEN;
@@ -43,7 +45,17 @@ public class Ancien implements RoleImpl {
 
   @Override
   public void givePotionEffect(PlayerData player, TimeStatus time) {
-    PotionUtil.giveResistance(player);
+    if(hasBeenSaved) {
+      PotionUtil.giveResistance(player);
+    }
+  }
+
+  public boolean isHasBeenSaved() {
+    return hasBeenSaved;
+  }
+
+  public void setHasBeenSaved(boolean hasBeenSaved) {
+    this.hasBeenSaved = hasBeenSaved;
   }
 
 }

@@ -8,6 +8,7 @@ import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.role.Cupidon;
 import ch.kalunight.uhclg.worker.GameWorker;
 
 public class LgLove implements CommandExecutor {
@@ -37,7 +38,7 @@ public class LgLove implements CommandExecutor {
       return true;
     }
     
-    if(playerSender.getRole().equals(Role.CUPIDON) && GameData.isCupidonUseHisPower()) {
+    if(playerSender.getRole() instanceof Cupidon && !((Cupidon) playerSender.getRole()).isPowerUsed()) {
       sender.sendMessage("Vous avez déjà utilisé votre pouvoir !");
       return true;
     }
@@ -73,7 +74,7 @@ public class LgLove implements CommandExecutor {
       return true;
     }
     
-    GameData.setCupidonUseHisPower(true);
+    ((Cupidon) playerSender.getRole()).setPowerUsed(true);
 
     loverOne.setInLove(true);
     loverTwo.setInLove(true);

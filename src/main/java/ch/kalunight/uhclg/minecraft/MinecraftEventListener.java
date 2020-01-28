@@ -29,10 +29,15 @@ import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
+import ch.kalunight.uhclg.model.role.Ancien;
+import ch.kalunight.uhclg.model.role.EnfantSauvage;
+import ch.kalunight.uhclg.model.role.GrandMereLoup;
+import ch.kalunight.uhclg.model.role.LoupGarouAmnesique;
 import ch.kalunight.uhclg.util.DeathUtil;
 import ch.kalunight.uhclg.util.LocationUtil;
 import ch.kalunight.uhclg.util.LoverUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
+import ch.kalunight.uhclg.util.RoleUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
 import ch.kalunight.uhclg.worker.LoveKillerWorker;
 import ch.kalunight.uhclg.worker.SpectatorWorker;
@@ -88,22 +93,22 @@ public class MinecraftEventListener implements Listener {
       if(playerData.isInLove()) {
 
         PlayerData otherLover = LoverUtil.getOtherLover(playerData.getAccount().getPlayerUUID());
-        
+
         if(otherLover != null && otherLover.isAlive()) {
-          
+
           otherLover.getAccount().getPlayer().sendMessage("Votre moitié vient de mourir, vous ne pouvez pas supporter cette perte. "
               + "Votre âme vous quittera dans 30 secondes. "
               + "Dans un dernier accès de rage, votre force et votre rapidité se voient augmentés.");
-          
+
           otherLover.getAccount().getPlayer().addPotionEffect(PotionUtil.SPEED);
           otherLover.getAccount().getPlayer().addPotionEffect(PotionUtil.STRENGTH);
           otherLover.getAccount().getPlayer().playSound(otherLover.getAccount().getPlayer().getLocation(), Sound.MUSIC_END, 1, 1);
-          
+
           LoveKillerWorker loveKillerWorker = new LoveKillerWorker(otherLover);
           ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), loveKillerWorker, DeathUtil.DEATH_TIME_IN_TICKS);
         }
       }
-      
+
       event.setDeathMessage(player.getName() + " a été tué et était un " + playerData.getRole().getName());
       playerData.setAlive(false);
 
@@ -142,7 +147,7 @@ public class MinecraftEventListener implements Listener {
         }else if((player.getRole().getRoleEnum().getClan().equals(RoleClan.VILLAGE)) && !player.isInfected()) {
           villageList.add(player);
         }
-        
+
         if(player.isInLove()) {
           loverList.add(player);
         }
@@ -161,30 +166,20 @@ public class MinecraftEventListener implements Listener {
   }
 
   private void makeRoleEffect(PlayerData playerKilled) {
-    if(playerKilled.equals(GameData.getEnfantSauvageModel())) {
-      PlayerData enfantSauvage = null;
 
-      for(PlayerData player : GameData.getPlayersInGame()) {
-        if(player.getRole().getRoleEnum().equals(Role.ENFANT_SAUVAGE)) {
-          enfantSauvage = player;
-        }
-      }
+    List<PlayerData> enfantsSauvage = RoleUtil.getPlayerByRole(GameData.getPlayersInGame(), Role.ENFANT_SAUVAGE);
 
-      if(enfantSauvage != null && enfantSauvage.isAlive()) {
-        enfantSauvage.getAccount().getPlayer().sendMessage("Votre modèle vient de mourir, vous êtes donc désormais un loup garou ! "
+    for(PlayerData enfantSauvage : enfantsSauvage) {
+
+      EnfantSauvage enfantRole = (EnfantSauvage) enfantSauvage.getRole();
+
+      if(enfantSauvage.isAlive() && enfantRole.getModel().getAccount().getPlayerUUID().equals(playerKilled.getAccount().getPlayerUUID())) {
+        enfantSauvage.getAccount().getPlayer().sendMessage("Votre modèle vient de mourir, vous évoluez en véritable loup garou ! "
             + "Vous optenez également tous les bonus de votre modèle qui était " + playerKilled.getRole().getName());
-        GameData.setEnfantSauvageBuffVole(playerKilled.getRole().getRoleEnum());
       }
     }
   }
-
-  private boolean isSavior(PlayerData playerData) {
-    if(playerData.getRole().getRoleEnum().equals(Role.SORCIERE) || playerData.getRole().getRoleEnum().equals(Role.INFECT_PERE_DES_LOUPS)) {
-      return true;
-    }
-    return false;
-  }
-
+  
   private boolean playerCanBeSaved(PlayerData playerToBeSaved) {
     for(PlayerData playerCheckRole : GameData.getPlayersInGame()) {
       if((playerCheckRole.getRole().getRoleEnum().equals(Role.SORCIERE) || playerCheckRole.getRole().getRoleEnum().equals(Role.INFECT_PERE_DES_LOUPS)) && playerCheckRole.isAlive()
@@ -206,7 +201,7 @@ public class MinecraftEventListener implements Listener {
   }
 
   private void reviveOldVillager(PlayerData playerData, RoleClan killer) {
-    GameData.setOldVillagerHasRespawn(true);
+    ((Ancien) playerData.getRole()).setHasBeenSaved(true);
 
     List<Location> locationsOfEveryone = new ArrayList<>();
 
@@ -243,8 +238,10 @@ public class MinecraftEventListener implements Listener {
     PlayerData playerData = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
     if(playerData != null && playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
-      if(playerData.getRole().getRoleEnum().equals(Role.ANCIEN) && !GameData.isOldVillagerHasRespawn()) {
+      if(playerData.getRole() instanceof Ancien && !((Ancien) playerData.getRole()).isHasBeenSaved()) {
         PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
+
+        e.setDamage(0);
 
         if(damager != null) {
           reviveOldVillager(playerData, damager.getRole().getRoleEnum().getClan());
@@ -257,7 +254,7 @@ public class MinecraftEventListener implements Listener {
 
     if(playerData != null && playerData.isAlive()) {
       if(playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
-        
+
         if(playerCanBeSaved(playerData)) {
           KillerWorker killerWorker = new KillerWorker(playerData, DeathUtil.getAviableSavior(new ArrayList<>()));
           ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), killerWorker, DeathUtil.DEATH_TIME_IN_TICKS);
@@ -279,31 +276,29 @@ public class MinecraftEventListener implements Listener {
       }
     }
 
-    if(!GameData.isGrandMereLoupReveal() && e.getCause().equals(DamageCause.PROJECTILE) && e.getDamager() instanceof Arrow) {
+    if(e.getCause().equals(DamageCause.PROJECTILE) && e.getDamager() instanceof Arrow) {
       Arrow a = (Arrow) e.getDamager();
       if(a.getShooter() instanceof Player && e.getEntity() instanceof Player) {
         PlayerData playerShooted = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
-        if(playerShooted != null) {
-          if(playerShooted.getRole().getRoleEnum().equals(Role.GRAND_MERE_LOUP)) {
-            GameData.setGrandMereLoupReveal(true);
-          }
+        if(playerShooted != null && playerShooted.getRole() instanceof GrandMereLoup) {
+          ((GrandMereLoup) playerShooted.getRole()).setFound(true);
         }
+
       }
     }
 
-    if(!GameData.isLoupAmnesiqueFound()) {
-      PlayerData potentionLoupAmnesique = GameData.getPlayerInGame(e.getEntity().getUniqueId());
+    PlayerData potentionLoupAmnesique = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
-      if(potentionLoupAmnesique != null && potentionLoupAmnesique.getRole().getRoleEnum().equals(Role.LOUP_GAROU_AMNESIQUE)) {
-        PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
+    if(potentionLoupAmnesique != null && potentionLoupAmnesique.getRole() instanceof LoupGarouAmnesique) {
+      PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
 
-        if(damager != null && damager.isAlive() && damager.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS)) {
-          GameData.setLoupAmnesiqueFound(true);
+      if(damager != null && damager.isAlive() && damager.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS)) {
+        ((LoupGarouAmnesique) potentionLoupAmnesique.getRole()).setHasBeenFound(true);
 
-          potentionLoupAmnesique.getAccount().getPlayer()
-          .sendMessage("Vous êtes un LOUP GAROU AMNESIQUE ! PREVENEZ VOS ALLIÉS LOUPS !");
-        }
+        potentionLoupAmnesique.getAccount().getPlayer()
+        .sendMessage("Vous êtes un LOUP GAROU AMNESIQUE ! PREVENEZ VOS ALLIÉS LOUPS !");
+        potentionLoupAmnesique.getAccount().getPlayer().playSound(potentionLoupAmnesique.getAccount().getPlayer().getLocation(), Sound.ENTITY_WOLF_HOWL, 100, 100);
       }
     }
   }

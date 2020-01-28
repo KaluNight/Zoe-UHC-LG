@@ -13,6 +13,8 @@ public class Cupidon implements RoleImpl {
 
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "cupidon.wav");
   
+  private boolean powerUsed = false;
+  
   @Override
   public Role getRoleEnum() {
     return Role.CUPIDON;
@@ -58,6 +60,14 @@ public class Cupidon implements RoleImpl {
   @Override
   public void givePotionEffect(PlayerData player, TimeStatus time) {
     //No effect
+  }
+
+  public boolean isPowerUsed() {
+    return powerUsed;
+  }
+
+  public void setPowerUsed(boolean powerUsed) {
+    this.powerUsed = powerUsed;
   }
 
 }
