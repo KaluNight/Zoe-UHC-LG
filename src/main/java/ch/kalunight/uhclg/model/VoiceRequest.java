@@ -1,7 +1,5 @@
 package ch.kalunight.uhclg.model;
 
-import java.io.File;
-
 public class VoiceRequest {
 
   private long guildId;

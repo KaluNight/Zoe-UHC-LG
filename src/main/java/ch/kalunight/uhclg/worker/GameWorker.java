@@ -1,6 +1,5 @@
 package ch.kalunight.uhclg.worker;
 
-import java.io.File;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 

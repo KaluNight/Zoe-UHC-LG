@@ -27,7 +27,7 @@ public enum Role {
   PETIT_LOUP_GAROU(RoleClan.WOLFS, "Vilain Petit Loup", new File(Role.SOUNDS_FOLDER + "petit_loup_garou.wav")),
   GRAND_MERE_LOUP(RoleClan.WOLFS, "Grand-Mère Loup", new File(Role.SOUNDS_FOLDER + "grand_mere_loup.wav"));
 
-  private static final String SOUNDS_FOLDER = "sounds/";
+  public static final String SOUNDS_FOLDER = "sounds/";
   private static final List<Role> VALUES = Collections.unmodifiableList(Arrays.asList(values()));
   private static final int SIZE = VALUES.size();
   private static final Random RANDOM = new Random();
@@ -66,7 +66,7 @@ public enum Role {
         return VILLAGEOIS.getDescription();
       }
     case LOUP_GAROU_BLANC:
-      return "Loup-Garou Blanc. il a les mêmes pouvoir que les loups mais il doit gagner seul, il possède 15 coeurs contrairement aux autres joueurs.";
+      return "Loup-Garou Blanc : il a les mêmes pouvoir que les loups mais il doit gagner seul, il possède 15 coeurs contrairement aux autres joueurs.";
     case PETITE_FILLE:
       return "Petite Fille : elle reçoit l’effet night vision et invisibilité et faiblesse 1 durant la nuit. Elle reçoit aussi 5 TNT.";
     case PETIT_LOUP_GAROU:

@@ -1,5 +1,6 @@
 package ch.kalunight.uhclg.model.role;
 
+import java.io.File;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -11,6 +12,8 @@ import ch.kalunight.uhclg.util.PotionUtil;
 
 public class Assassin implements RoleImpl {
 
+  private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "assassin.wav");
+  
   @Override
   public String getName() {
     return "Assassin";
@@ -22,7 +25,7 @@ public class Assassin implements RoleImpl {
   }
 
   @Override
-  public void giveItem(PlayerData player) {
+  public void giveRoleEffectAndItem(PlayerData player) {
     ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
     ItemMeta bookMeta = book.getItemMeta();
     bookMeta.addEnchant(Enchantment.DAMAGE_ALL, 3, true);
@@ -50,15 +53,18 @@ public class Assassin implements RoleImpl {
   }
 
   @Override
-  public String getVoiceFile() {
-    // TODO Auto-generated method stub
-    return null;
+  public File getVoiceFile() {
+    return annonceVoiceFile;
   }
 
   @Override
   public Role getRole() {
-    // TODO Auto-generated method stub
-    return null;
+    return Role.ASSASSIN;
+  }
+
+  @Override
+  public String getVoicePath() {
+    return annonceVoiceFile.getAbsolutePath();
   }
 
 }
