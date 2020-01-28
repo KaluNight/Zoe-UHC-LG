@@ -68,7 +68,8 @@ public class LgFlairer implements CommandExecutor {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est innocent.");
     }else if(tracked.getRole().equals(Role.LOUP_GAROU_AMNESIQUE) && !GameData.isLoupAmnesiqueFound()) {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est innocent.");
-    }else if(tracked.getRole().getClan().equals(RoleClan.VILLAGE) || tracked.getRole().getClan().equals(RoleClan.SPECIAL)) {
+    }else if(tracked.getRole().getRoleEnum().getClan().equals(RoleClan.VILLAGE) 
+        || tracked.getRole().getRoleEnum().getClan().equals(RoleClan.SPECIAL)) {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est innocent.");
     }else {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est coupable !");

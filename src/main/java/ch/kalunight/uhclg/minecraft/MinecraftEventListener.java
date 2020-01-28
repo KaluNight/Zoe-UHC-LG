@@ -4,8 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
-
 import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -137,11 +135,11 @@ public class MinecraftEventListener implements Listener {
 
     for(PlayerData player : GameData.getPlayersInGame()) {
       if(player.isAlive()) {
-        if((player.getRole().getClan().equals(RoleClan.SPECIAL) || player.getRole().equals(Role.LOUP_GAROU_BLANC)) && !player.isInfected()) {
+        if((player.getRole().getRoleEnum().getClan().equals(RoleClan.SPECIAL) || player.getRole().getRoleEnum().equals(Role.LOUP_GAROU_BLANC)) && !player.isInfected()) {
           specialList.add(player);
-        }else if(player.getRole().getClan().equals(RoleClan.WOLFS) || player.isInfected()) {
+        }else if(player.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS) || player.isInfected()) {
           wolfsList.add(player);
-        }else if((player.getRole().getClan().equals(RoleClan.VILLAGE)) && !player.isInfected()) {
+        }else if((player.getRole().getRoleEnum().getClan().equals(RoleClan.VILLAGE)) && !player.isInfected()) {
           villageList.add(player);
         }
         
@@ -167,7 +165,7 @@ public class MinecraftEventListener implements Listener {
       PlayerData enfantSauvage = null;
 
       for(PlayerData player : GameData.getPlayersInGame()) {
-        if(player.getRole().equals(Role.ENFANT_SAUVAGE)) {
+        if(player.getRole().getRoleEnum().equals(Role.ENFANT_SAUVAGE)) {
           enfantSauvage = player;
         }
       }
@@ -175,13 +173,13 @@ public class MinecraftEventListener implements Listener {
       if(enfantSauvage != null && enfantSauvage.isAlive()) {
         enfantSauvage.getAccount().getPlayer().sendMessage("Votre modèle vient de mourir, vous êtes donc désormais un loup garou ! "
             + "Vous optenez également tous les bonus de votre modèle qui était " + playerKilled.getRole().getName());
-        GameData.setEnfantSauvageBuffVole(playerKilled.getRole());
+        GameData.setEnfantSauvageBuffVole(playerKilled.getRole().getRoleEnum());
       }
     }
   }
 
   private boolean isSavior(PlayerData playerData) {
-    if(playerData.getRole().equals(Role.SORCIERE) || playerData.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) {
+    if(playerData.getRole().getRoleEnum().equals(Role.SORCIERE) || playerData.getRole().getRoleEnum().equals(Role.INFECT_PERE_DES_LOUPS)) {
       return true;
     }
     return false;
@@ -189,7 +187,7 @@ public class MinecraftEventListener implements Listener {
 
   private boolean playerCanBeSaved(PlayerData playerToBeSaved) {
     for(PlayerData playerCheckRole : GameData.getPlayersInGame()) {
-      if((playerCheckRole.getRole().equals(Role.SORCIERE) || playerCheckRole.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) && playerCheckRole.isAlive()
+      if((playerCheckRole.getRole().getRoleEnum().equals(Role.SORCIERE) || playerCheckRole.getRole().getRoleEnum().equals(Role.INFECT_PERE_DES_LOUPS)) && playerCheckRole.isAlive()
           && !playerToBeSaved.getAccount().getPlayerUUID().equals(playerCheckRole.getAccount().getPlayerUUID()) && playerToBeSaved.isAlive()) {
         return true;
       }
@@ -245,11 +243,11 @@ public class MinecraftEventListener implements Listener {
     PlayerData playerData = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
     if(playerData != null && playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
-      if(playerData.getRole().equals(Role.ANCIEN) && !GameData.isOldVillagerHasRespawn()) {
+      if(playerData.getRole().getRoleEnum().equals(Role.ANCIEN) && !GameData.isOldVillagerHasRespawn()) {
         PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
 
         if(damager != null) {
-          reviveOldVillager(playerData, damager.getRole().getClan());
+          reviveOldVillager(playerData, damager.getRole().getRoleEnum().getClan());
         }else {
           reviveOldVillager(playerData, RoleClan.WOLFS);
         }
@@ -287,7 +285,7 @@ public class MinecraftEventListener implements Listener {
         PlayerData playerShooted = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
         if(playerShooted != null) {
-          if(playerShooted.getRole().equals(Role.GRAND_MERE_LOUP)) {
+          if(playerShooted.getRole().getRoleEnum().equals(Role.GRAND_MERE_LOUP)) {
             GameData.setGrandMereLoupReveal(true);
           }
         }
@@ -297,10 +295,10 @@ public class MinecraftEventListener implements Listener {
     if(!GameData.isLoupAmnesiqueFound()) {
       PlayerData potentionLoupAmnesique = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
-      if(potentionLoupAmnesique != null && potentionLoupAmnesique.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {
+      if(potentionLoupAmnesique != null && potentionLoupAmnesique.getRole().getRoleEnum().equals(Role.LOUP_GAROU_AMNESIQUE)) {
         PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
 
-        if(damager != null && damager.isAlive() && damager.getRole().getClan().equals(RoleClan.WOLFS)) {
+        if(damager != null && damager.isAlive() && damager.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS)) {
           GameData.setLoupAmnesiqueFound(true);
 
           potentionLoupAmnesique.getAccount().getPlayer()

@@ -12,7 +12,7 @@ public class EnfantSauvage implements RoleImpl {
   private PlayerData model;
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.ENFANT_SAUVAGE;
   }
 

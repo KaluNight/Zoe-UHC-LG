@@ -22,6 +22,7 @@ import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.LinkedDiscordAccount;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.role.RoleImpl;
 import ch.kalunight.uhclg.util.LocationUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
 import ch.kalunight.uhclg.worker.GameWorker;
@@ -174,7 +175,9 @@ public class LgStart implements CommandExecutor {
       LinkedDiscordAccount account = GameData.getPlayersRegistered().get(i);
 
       PlayerData playerInGame = new PlayerData(account);
-      playerInGame.setRole(role);
+      
+      RoleImpl roleImpl = RoleImpl.getRole(role);
+      playerInGame.setRole(roleImpl);
 
       GameData.getPlayersInGame().add(playerInGame);
     }

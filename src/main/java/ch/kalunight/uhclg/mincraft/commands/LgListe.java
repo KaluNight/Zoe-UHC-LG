@@ -33,7 +33,7 @@ public class LgListe implements CommandExecutor {
       }
     }
     
-    if(playerSender == null || (!playerSender.getRole().getClan().equals(RoleClan.WOLFS) && !playerSender.isInfected())) {
+    if(playerSender == null || (!playerSender.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS) && !playerSender.isInfected())) {
       sender.sendMessage("Vous n'êtes pas un loup garou !");
       return true;
     }
@@ -47,7 +47,7 @@ public class LgListe implements CommandExecutor {
     StringBuilder wolfsList = new StringBuilder("Liste des loups :\n");
     
     for(PlayerData player : GameData.getPlayersInGame()) {
-      if(player.getRole().getClan().equals(RoleClan.WOLFS)) {
+      if(player.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS)) {
         if(player.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {
           if(GameData.isLoupAmnesiqueFound()) {
             wolfsList.append(player.getAccount().getPlayer().getName() + "\n");

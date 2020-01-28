@@ -14,7 +14,7 @@ public class Cupidon implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "cupidon.wav");
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.CUPIDON;
   }
 

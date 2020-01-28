@@ -8,12 +8,12 @@ import ch.kalunight.uhclg.util.PotionUtil;
 
 public class LoupGarouAmnesique implements RoleImpl {
 
-  private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "loup_garou_amnesique.wav");
+  private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "villageois.wav");
 
   private boolean hasBeenFound = false;
 
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.LOUP_GAROU_AMNESIQUE;
   }
 
@@ -34,7 +34,7 @@ public class LoupGarouAmnesique implements RoleImpl {
           + "rôle loup-garou. Ses bonus de loup lui apparaissent donc et il reçoit la liste complète des pseudos des loups.";
     }
 
-    return "Villageois DESCRIPTION";
+    return RoleImpl.getRole(Role.VILLAGEOIS).getDescription();
   }
 
   @Override

@@ -15,7 +15,7 @@ public class Sorciere implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "sorciere.wav");
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.SORCIERE;
   }
 

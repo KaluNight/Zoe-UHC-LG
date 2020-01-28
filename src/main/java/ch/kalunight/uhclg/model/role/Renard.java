@@ -11,7 +11,7 @@ public class Renard implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "renard.wav");
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.RENARD;
   }
 

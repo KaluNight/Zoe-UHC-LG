@@ -58,7 +58,7 @@ public class Assassin implements RoleImpl {
   }
 
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.ASSASSIN;
   }
 

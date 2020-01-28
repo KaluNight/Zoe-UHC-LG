@@ -86,7 +86,7 @@ public class GameData {
   public static int getWolfAlive() {
     int wolfAlive = 0;
     for(PlayerData player : playersInGame) {
-      if(player.getRole().getClan().equals(RoleClan.WOLFS) && player.isAlive()) {
+      if(player.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS) && player.isAlive()) {
         wolfAlive++;
       }
     }
@@ -96,7 +96,7 @@ public class GameData {
   public static int getVillagerAlive() {
     int villagersAlive = 0;
     for(PlayerData player : playersInGame) {
-      if(player.getRole().getClan().equals(RoleClan.VILLAGE) && player.isAlive()) {
+      if(player.getRole().getRoleEnum().getClan().equals(RoleClan.VILLAGE) && player.isAlive()) {
         villagersAlive++;
       }
     }
@@ -106,7 +106,7 @@ public class GameData {
   public static int getSpecialAlive() {
     int specialAlive = 0;
     for(PlayerData player : playersInGame) {
-      if(player.getRole().getClan().equals(RoleClan.SPECIAL) && player.isAlive()) {
+      if(player.getRole().getRoleEnum().getClan().equals(RoleClan.SPECIAL) && player.isAlive()) {
         specialAlive++;
       }
     }

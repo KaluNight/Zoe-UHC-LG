@@ -11,7 +11,7 @@ public class Ancien implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "ancien.wav");
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.ANCIEN;
   }
 

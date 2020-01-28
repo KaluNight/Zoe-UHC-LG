@@ -1,12 +1,13 @@
 package ch.kalunight.uhclg.model;
 
 import org.bukkit.scoreboard.Scoreboard;
+import ch.kalunight.uhclg.model.role.RoleImpl;
 
 public class PlayerData {
   
   private LinkedDiscordAccount account;
   
-  private Role role;
+  private RoleImpl role;
   
   private boolean infected;
   
@@ -35,11 +36,11 @@ public class PlayerData {
     this.account = account;
   }
 
-  public Role getRole() {
+  public RoleImpl getRole() {
     return role;
   }
 
-  public void setRole(Role role) {
+  public void setRole(RoleImpl role) {
     this.role = role;
   }
 

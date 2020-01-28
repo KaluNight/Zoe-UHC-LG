@@ -10,7 +10,7 @@ public class Villageois implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "villageois.wav");
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.VILLAGEOIS;
   }
 

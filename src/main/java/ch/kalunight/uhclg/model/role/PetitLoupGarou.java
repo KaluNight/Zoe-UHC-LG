@@ -11,7 +11,7 @@ public class PetitLoupGarou implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "petit_loup_garou.wav");
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.PETIT_LOUP_GAROU;
   }
 

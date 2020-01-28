@@ -13,7 +13,7 @@ public class Voyante implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "voyante.wav");
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.VOYANTE;
   }
 

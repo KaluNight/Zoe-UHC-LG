@@ -10,7 +10,7 @@ public class LoupGarou implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "loup_garou.wav");
 
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.LOUP_GAROU;
   }
 

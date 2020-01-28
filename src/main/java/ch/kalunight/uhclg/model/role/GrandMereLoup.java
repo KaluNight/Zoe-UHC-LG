@@ -10,7 +10,7 @@ public class GrandMereLoup implements RoleImpl {
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "grand_mere_loup.wav");
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.GRAND_MERE_LOUP;
   }
 

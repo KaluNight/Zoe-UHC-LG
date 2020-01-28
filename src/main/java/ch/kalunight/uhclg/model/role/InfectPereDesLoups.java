@@ -12,7 +12,7 @@ public class InfectPereDesLoups implements RoleImpl {
   private boolean playerHasBeenSaved = false;
   
   @Override
-  public Role getRole() {
+  public Role getRoleEnum() {
     return Role.INFECT_PERE_DES_LOUPS;
   }
 

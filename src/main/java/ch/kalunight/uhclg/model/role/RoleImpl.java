@@ -8,7 +8,7 @@ import ch.kalunight.uhclg.util.PotionUtil;
 
 public interface RoleImpl {
   
-  public Role getRole();
+  public Role getRoleEnum();
   
   public String getName();
   
@@ -21,6 +21,12 @@ public interface RoleImpl {
   public void giveRoleEffectAndItem(PlayerData player);
   
   public void givePotionEffect(PlayerData player, TimeStatus time);
+  
+  public static void giveEffectInfected(PlayerData player, TimeStatus time) {
+    if(player.isInfected()) {
+      giveWolfsEffects(player, time);
+    }
+  }
   
   public static void giveWolfsEffects(PlayerData player, TimeStatus time) {
     if(time.equals(TimeStatus.NIGHT)) {

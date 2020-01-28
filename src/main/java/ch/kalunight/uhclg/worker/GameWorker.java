@@ -29,6 +29,7 @@ import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.model.TimeStatus;
 import ch.kalunight.uhclg.model.VoiceRequest;
+import ch.kalunight.uhclg.model.role.RoleImpl;
 import ch.kalunight.uhclg.util.PotionUtil;
 
 public class GameWorker implements Runnable {
@@ -74,117 +75,8 @@ public class GameWorker implements Runnable {
   private void givePlayerEffect() {
     for(PlayerData player : GameData.getPlayersInGame()) {
       if(player.isAlive() && player.isConnected()) {
-
-        if(player.getRole().getClan().equals(RoleClan.WOLFS) || player.isInfected()) {
-          if(timeStatus.equals(TimeStatus.NIGHT)) {
-            if(player.getRole().equals(Role.ENFANT_SAUVAGE)) {
-              if(GameData.getEnfantSauvageBuffVole() != null) {
-                PotionUtil.giveNightVision(player);
-                PotionUtil.giveIncreaseDamage(player);
-              }
-            }else {
-              PotionUtil.giveNightVision(player);
-              PotionUtil.giveIncreaseDamage(player);
-            }
-          } else {
-            PotionUtil.clearNightVision(player);
-            PotionUtil.clearIncreaseDamage(player);
-          }
-        }
-
-        switch (player.getRole()) {
-        case ANCIEN:
-          PotionUtil.giveResistance(player);
-          break;
-        case ASSASSIN:
-
-          break;
-        case CUPIDON:
-          break;
-        case ENFANT_SAUVAGE:
-          getEnfantSauvageBuff(player);
-          break;
-        case GRAND_MERE_LOUP:
-          break;
-        case INFECT_PERE_DES_LOUPS:
-          break;
-        case LOUP_GAROU:
-          break;
-        case LOUP_GAROU_AMNESIQUE:
-          break;
-        case LOUP_GAROU_BLANC:
-          break;
-        case PETITE_FILLE:
-          if(timeStatus.equals(TimeStatus.NIGHT)) {
-            PotionUtil.giveWeakness(player);
-            PotionUtil.giveInvisiblity(player);
-            PotionUtil.giveNightVision(player);
-          }else {
-            PotionUtil.clearWeakness(player);
-            PotionUtil.clearInvisibility(player);
-            PotionUtil.clearNightVision(player);
-          }
-          break;
-        case PETIT_LOUP_GAROU:
-          if(timeStatus.equals(TimeStatus.NIGHT)) {
-            PotionUtil.giveSpeed(player);
-          }else {
-            PotionUtil.clearSpeed(player);
-          }
-          break;
-        case RENARD:
-          break;
-        case SORCIERE:
-          break;
-        case VILLAGEOIS:
-          break;
-        case VOYANTE:
-          PotionUtil.giveNightVision(player);
-          break;
-        default:
-          break;
-        }
-      }
-    }
-  }
-
-  private void getEnfantSauvageBuff(PlayerData player) {
-    if(GameData.getEnfantSauvageBuffVole() != null) {
-
-      switch(GameData.getEnfantSauvageBuffVole()) {
-      case PETITE_FILLE:
-        if(timeStatus.equals(TimeStatus.NIGHT)) {
-          PotionUtil.giveWeakness(player);
-          PotionUtil.giveInvisiblity(player);
-          PotionUtil.giveNightVision(player);
-        }else {
-          PotionUtil.clearWeakness(player);
-          PotionUtil.clearInvisibility(player);
-          PotionUtil.clearNightVision(player);
-        }
-        break;
-      case VOYANTE:
-        PotionUtil.giveNightVision(player);
-        break;
-      case PETIT_LOUP_GAROU:
-        if(timeStatus.equals(TimeStatus.NIGHT)) {
-          PotionUtil.giveSpeed(player);
-        }else {
-          PotionUtil.clearSpeed(player);
-        }
-        break;
-      case ASSASSIN:
-        if(timeStatus.equals(TimeStatus.DAY)) {
-          PotionUtil.giveIncreaseDamage(player);
-        }else {
-          PotionUtil.clearIncreaseDamage(player);
-        }
-        break;
-      case ANCIEN:
-        PotionUtil.giveResistance(player);
-        break;
-      default:
-        break;
+        player.getRole().givePotionEffect(player, timeStatus);
+        RoleImpl.giveEffectInfected(player, timeStatus);
       }
     }
   }
@@ -270,107 +162,22 @@ public class GameWorker implements Runnable {
 
   private void giveStuffOfRole() {
     for(PlayerData playerData : GameData.getPlayersInGame()) {
-      switch(playerData.getRole()) {
-      case ANCIEN:
-        break;
-      case ASSASSIN:
-        ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        ItemMeta bookMeta = book.getItemMeta();
-        bookMeta.addEnchant(Enchantment.DAMAGE_ALL, 3, true);
-        book.setItemMeta(bookMeta);
-        playerData.getAccount().getPlayer().getInventory().addItem(book);
-        book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        bookMeta = book.getItemMeta();
-        bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 3, true);
-        book.setItemMeta(bookMeta);
-        playerData.getAccount().getPlayer().getInventory().addItem(book);
-        book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        bookMeta = book.getItemMeta();
-        bookMeta.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 3, true);
-        book.setItemMeta(bookMeta);
-        playerData.getAccount().getPlayer().getInventory().addItem(book);
-        break;
-      case CUPIDON:
-        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.STRING, 3));
-        book = new ItemStack(Material.ENCHANTED_BOOK, 1);
-        bookMeta = book.getItemMeta();
-        bookMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 0, true);
-        bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
-        book.setItemMeta(bookMeta);
-        playerData.getAccount().getPlayer().getInventory().addItem(book);
-
-        ItemStack arrows = new ItemStack(Material.ARROW, 64);
-        playerData.getAccount().getPlayer().getInventory().addItem(arrows);
-        break;
-      case ENFANT_SAUVAGE:
-        break;
-      case GRAND_MERE_LOUP:
-        break;
-      case INFECT_PERE_DES_LOUPS:
-        break;
-      case LOUP_GAROU_AMNESIQUE:
-        break;
-      case LOUP_GAROU_BLANC:
-        playerData.getAccount().getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(30);
-        playerData.getAccount().getPlayer().setHealth(playerData.getAccount().getPlayer().getAttribute(Attribute.GENERIC_MAX_HEALTH).getBaseValue());
-        break;
-      case PETITE_FILLE:
-        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.TNT, 5));
-        break;
-      case PETIT_LOUP_GAROU:
-        break;
-      case RENARD:
-        playerData.getAccount().getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 999999, 0, false, false, true));
-        break;
-      case SORCIERE:
-
-        ItemStack potion = new ItemStack(Material.POTION, 1);
-        PotionMeta meta = (PotionMeta) potion.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.REGEN));
-        potion.setItemMeta(meta);
-        playerData.getAccount().getPlayer().getInventory().addItem(potion);
-
-        potion = new ItemStack(Material.SPLASH_POTION, 3);
-        meta = (PotionMeta) potion.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.INSTANT_DAMAGE));
-        potion.setItemMeta(meta);
-        playerData.getAccount().getPlayer().getInventory().addItem(potion);
-
-        potion = new ItemStack(Material.SPLASH_POTION, 3);
-        meta = (PotionMeta) potion.getItemMeta();
-        meta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
-        potion.setItemMeta(meta);
-        playerData.getAccount().getPlayer().getInventory().addItem(potion);
-        break;
-      case VILLAGEOIS:
-        break;
-      case VOYANTE:
-        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.OBSIDIAN, 4));
-        playerData.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.BOOKSHELF, 4));
-        break;
-      default:
-        break;
-      }
+      playerData.getRole().giveRoleEffectAndItem(playerData);
     }
   }
 
   private void sayRoleToPlayer() {
     for(PlayerData player : GameData.getPlayersInGame()) {
-      Role role = player.getRole();
+      RoleImpl role = player.getRole();
 
-      if(player.getRole().equals(Role.LOUP_GAROU_AMNESIQUE) && !GameData.isLoupAmnesiqueFound()) {
-        player.getAccount().getPlayer().sendMessage("Votre rôle : Villageois");
-        
-        VocalSystemWorker.getVoiceRequests().add(new VoiceRequest(GameData.getLobby().getGuild().getIdLong(),
-            player.getAccount().getDiscordId(), Role.VILLAGEOIS.getVoiceFile().getAbsolutePath(), true));
-      }else {
-        player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
-        
-        VocalSystemWorker.getVoiceRequests().add(new VoiceRequest(GameData.getLobby().getGuild().getIdLong(),
-            player.getAccount().getDiscordId(), role.getVoiceFile().getAbsolutePath(), true));
-      }
+      player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
+
+      VocalSystemWorker.getVoiceRequests().add(new VoiceRequest(GameData.getLobby().getGuild().getIdLong(),
+          player.getAccount().getDiscordId(), role.getVoiceFile().getAbsolutePath(), true));
+
       player.getAccount().getPlayer().sendMessage("Description : " + role.getDescription());
-      if(player.getRole().getClan().equals(RoleClan.WOLFS) && !player.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {
+      if(player.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS) 
+          && !player.getRole().getRoleEnum().equals(Role.LOUP_GAROU_AMNESIQUE)) {
         player.getAccount().getPlayer().sendMessage(LgListe.getListWolfs());
       }
     }
