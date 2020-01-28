@@ -29,7 +29,6 @@ import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.model.TimeStatus;
 import ch.kalunight.uhclg.model.VoiceRequest;
-import ch.kalunight.uhclg.util.LoverUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
 
 public class GameWorker implements Runnable {
@@ -80,29 +79,25 @@ public class GameWorker implements Runnable {
           if(timeStatus.equals(TimeStatus.NIGHT)) {
             if(player.getRole().equals(Role.ENFANT_SAUVAGE)) {
               if(GameData.getEnfantSauvageBuffVole() != null) {
-                giveNightVision(player);
-                givePower(player);
+                PotionUtil.giveNightVision(player);
+                PotionUtil.giveIncreaseDamage(player);
               }
             }else {
-              giveNightVision(player);
-              givePower(player);
+              PotionUtil.giveNightVision(player);
+              PotionUtil.giveIncreaseDamage(player);
             }
           } else {
-            clearNightVision(player);
-            clearPower(player);
+            PotionUtil.clearNightVision(player);
+            PotionUtil.clearIncreaseDamage(player);
           }
         }
 
         switch (player.getRole()) {
         case ANCIEN:
-          giveResistance(player);
+          PotionUtil.giveResistance(player);
           break;
         case ASSASSIN:
-          if(timeStatus.equals(TimeStatus.DAY)) {
-            givePower(player);
-          }else {
-            clearPower(player);
-          }
+
           break;
         case CUPIDON:
           break;
@@ -121,20 +116,20 @@ public class GameWorker implements Runnable {
           break;
         case PETITE_FILLE:
           if(timeStatus.equals(TimeStatus.NIGHT)) {
-            giveWeakness(player);
-            giveInvisiblity(player);
-            giveNightVision(player);
+            PotionUtil.giveWeakness(player);
+            PotionUtil.giveInvisiblity(player);
+            PotionUtil.giveNightVision(player);
           }else {
-            clearWeakness(player);
-            clearInvisibility(player);
-            clearNightVision(player);
+            PotionUtil.clearWeakness(player);
+            PotionUtil.clearInvisibility(player);
+            PotionUtil.clearNightVision(player);
           }
           break;
         case PETIT_LOUP_GAROU:
           if(timeStatus.equals(TimeStatus.NIGHT)) {
-            giveSpeed(player);
+            PotionUtil.giveSpeed(player);
           }else {
-            clearSpeed(player);
+            PotionUtil.clearSpeed(player);
           }
           break;
         case RENARD:
@@ -144,163 +139,12 @@ public class GameWorker implements Runnable {
         case VILLAGEOIS:
           break;
         case VOYANTE:
-          giveNightVision(player);
+          PotionUtil.giveNightVision(player);
           break;
         default:
           break;
         }
       }
-    }
-  }
-
-  private void giveResistance(PlayerData player) {
-    PotionEffect resistance = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.DAMAGE_RESISTANCE)) {
-        resistance = potionEffect;
-      }
-    }
-
-    if(resistance == null) {
-      player.getAccount().getPlayer().addPotionEffect(PotionUtil.RESISTANCE);
-    }
-  }
-
-  private void clearSpeed(PlayerData player) {
-    PotionEffect speed = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.SPEED)) {
-        speed = potionEffect;
-      }
-    }
-
-    if(LoverUtil.isLoverAndOtherLoverDead(player)) {
-      return;
-    }
-
-    if(speed != null) {
-      player.getAccount().getPlayer().removePotionEffect(PotionEffectType.SPEED);
-    }
-  }
-
-  private void giveSpeed(PlayerData player) {
-    PotionEffect speed = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.SPEED)) {
-        speed = potionEffect;
-      }
-    }
-
-    if(speed == null) {
-      player.getAccount().getPlayer().addPotionEffect(PotionUtil.SPEED);
-    }
-  }
-
-  private void clearWeakness(PlayerData player) {
-    PotionEffect weakness = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.WEAKNESS)) {
-        weakness = potionEffect;
-      }
-    }
-    
-    if(weakness != null) {
-      player.getAccount().getPlayer().removePotionEffect(PotionEffectType.WEAKNESS);
-    }
-  }
-
-  private void giveWeakness(PlayerData player) {
-    PotionEffect weakness = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.WEAKNESS)) {
-        weakness = potionEffect;
-      }
-    }
-
-    if(weakness == null) {
-      player.getAccount().getPlayer().addPotionEffect(PotionUtil.WEAKNESS);
-    }
-  }
-
-  private void clearPower(PlayerData player) {
-    PotionEffect power = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.INCREASE_DAMAGE)) {
-        power = potionEffect;
-      }
-    }
-
-    if(LoverUtil.isLoverAndOtherLoverDead(player)) {
-      return;
-    }
-    
-    if(power != null) {
-      player.getAccount().getPlayer().removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
-    }
-  }
-
-  private void givePower(PlayerData player) {
-    PotionEffect power = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.INCREASE_DAMAGE)) {
-        power = potionEffect;
-      }
-    }
-
-    if(power == null) {
-      player.getAccount().getPlayer().addPotionEffect(PotionUtil.STRENGTH);
-    }
-  }
-
-  private void clearInvisibility(PlayerData player) {
-    PotionEffect nightVision = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.INVISIBILITY)) {
-        nightVision = potionEffect;
-      }
-    }
-
-    if(nightVision != null) {
-      player.getAccount().getPlayer().removePotionEffect(PotionEffectType.INVISIBILITY);
-    }
-  }
-
-  private void giveInvisiblity(PlayerData player) {
-    PotionEffect nightVision = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.INVISIBILITY)) {
-        nightVision = potionEffect;
-      }
-    }
-
-    if(nightVision == null) {
-      player.getAccount().getPlayer().addPotionEffect(PotionUtil.INVISIBILITY);
-    }
-  }
-
-  private void clearNightVision(PlayerData player) {
-    PotionEffect nightVision = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)) {
-        nightVision = potionEffect;
-      }
-    }
-
-    if(nightVision != null) {
-      player.getAccount().getPlayer().removePotionEffect(PotionEffectType.NIGHT_VISION);
-    }
-  }
-
-  private void giveNightVision(PlayerData player) {
-    PotionEffect nightVision = null;
-    for(PotionEffect potionEffect : player.getAccount().getPlayer().getActivePotionEffects()) {
-      if(potionEffect.getType().equals(PotionEffectType.NIGHT_VISION)) {
-        nightVision = potionEffect;
-      }
-    }
-
-    if(nightVision == null) {
-      player.getAccount().getPlayer().addPotionEffect(PotionUtil.NIGHT_VISION);
     }
   }
 
@@ -310,34 +154,34 @@ public class GameWorker implements Runnable {
       switch(GameData.getEnfantSauvageBuffVole()) {
       case PETITE_FILLE:
         if(timeStatus.equals(TimeStatus.NIGHT)) {
-          giveWeakness(player);
-          giveInvisiblity(player);
-          giveNightVision(player);
+          PotionUtil.giveWeakness(player);
+          PotionUtil.giveInvisiblity(player);
+          PotionUtil.giveNightVision(player);
         }else {
-          clearWeakness(player);
-          clearInvisibility(player);
-          clearNightVision(player);
+          PotionUtil.clearWeakness(player);
+          PotionUtil.clearInvisibility(player);
+          PotionUtil.clearNightVision(player);
         }
         break;
       case VOYANTE:
-        giveNightVision(player);
+        PotionUtil.giveNightVision(player);
         break;
       case PETIT_LOUP_GAROU:
         if(timeStatus.equals(TimeStatus.NIGHT)) {
-          giveSpeed(player);
+          PotionUtil.giveSpeed(player);
         }else {
-          clearSpeed(player);
+          PotionUtil.clearSpeed(player);
         }
         break;
       case ASSASSIN:
         if(timeStatus.equals(TimeStatus.DAY)) {
-          givePower(player);
+          PotionUtil.giveIncreaseDamage(player);
         }else {
-          clearPower(player);
+          PotionUtil.clearIncreaseDamage(player);
         }
         break;
       case ANCIEN:
-        giveResistance(player);
+        PotionUtil.giveResistance(player);
         break;
       default:
         break;
