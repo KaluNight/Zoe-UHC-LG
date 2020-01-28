@@ -9,6 +9,8 @@ public class GrandMereLoup implements RoleImpl {
 
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "grand_mere_loup.wav");
   
+  private boolean found = false;
+  
   @Override
   public Role getRoleEnum() {
     return Role.GRAND_MERE_LOUP;
@@ -47,5 +49,13 @@ public class GrandMereLoup implements RoleImpl {
     if(time.equals(TimeStatus.NIGHT)) {
       RoleImpl.giveWolfsEffects(player, time);
     }
+  }
+
+  public boolean isFound() {
+    return found;
+  }
+
+  public void setFound(boolean found) {
+    this.found = found;
   }
 }

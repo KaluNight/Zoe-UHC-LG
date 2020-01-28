@@ -9,6 +9,7 @@ import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
+import ch.kalunight.uhclg.model.role.GrandMereLoup;
 import ch.kalunight.uhclg.worker.GameWorker;
 
 public class LgFlairer implements CommandExecutor {
@@ -64,9 +65,10 @@ public class LgFlairer implements CommandExecutor {
       return true;
     }
     
-    if(tracked.getRole().equals(Role.GRAND_MERE_LOUP) && !GameData.isGrandMereLoupReveal()) {
+    if(tracked.getRole().getRoleEnum().equals(Role.GRAND_MERE_LOUP) && 
+        !((GrandMereLoup) tracked.getRole()).isFound()) {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est innocent.");
-    }else if(tracked.getRole().equals(Role.LOUP_GAROU_AMNESIQUE) && !GameData.isLoupAmnesiqueFound()) {
+    }else if(tracked.getRole().getRoleEnum().equals(Role.LOUP_GAROU_AMNESIQUE) && !GameData.isLoupAmnesiqueFound()) {
       sender.sendMessage(tracked.getAccount().getPlayer().getDisplayName() + " est innocent.");
     }else if(tracked.getRole().getRoleEnum().getClan().equals(RoleClan.VILLAGE) 
         || tracked.getRole().getRoleEnum().getClan().equals(RoleClan.SPECIAL)) {

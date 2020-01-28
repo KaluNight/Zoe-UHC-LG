@@ -136,7 +136,7 @@ public class GameWorker implements Runnable {
     PlayerData voyante = null;
 
     for(PlayerData player : GameData.getPlayersInGame()) {
-      if(player.getRole().equals(Role.VOYANTE)) {
+      if(player.getRole().getRoleEnum().equals(Role.VOYANTE)) {
         voyante = player;
       }
     }
