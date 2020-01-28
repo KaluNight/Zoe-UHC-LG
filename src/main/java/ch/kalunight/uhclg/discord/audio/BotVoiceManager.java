@@ -1,6 +1,5 @@
 package ch.kalunight.uhclg.discord.audio;
 
-import java.io.File;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;

@@ -32,4 +32,41 @@ public interface RoleImpl {
     }
   }
   
+  public static RoleImpl getRole(Role role) {
+    switch(role) {
+      case ANCIEN:
+        return new Ancien();
+      case ASSASSIN:
+        return new Assassin();
+      case CUPIDON:
+        return new Cupidon();
+      case ENFANT_SAUVAGE:
+        return new EnfantSauvage();
+      case GRAND_MERE_LOUP:
+        return new GrandMereLoup();
+      case INFECT_PERE_DES_LOUPS:
+        return new InfectPereDesLoups();
+      case LOUP_GAROU:
+        return new LoupGarou();
+      case LOUP_GAROU_AMNESIQUE:
+        return new LoupGarouAmnesique();
+      case LOUP_GAROU_BLANC:
+        return new LoupGarouBlanc();
+      case PETITE_FILLE:
+        return new PetiteFille();
+      case PETIT_LOUP_GAROU:
+        return new PetitLoupGarou();
+      case RENARD:
+        return new Renard();
+      case SORCIERE:
+        return new Sorciere();
+      case VILLAGEOIS:
+        return new Villageois();
+      case VOYANTE:
+        return new Voyante();
+      default:
+        return null;
+    }
+  }
+  
 }
