@@ -1,5 +1,6 @@
 package ch.kalunight.uhclg.worker;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -34,8 +35,8 @@ import ch.kalunight.uhclg.util.PotionUtil;
 public class GameWorker implements Runnable {
 
   private static final int DAY_DURATION = 24000;
-  private static final Duration DAY1_DURATION = Duration.ofMinutes(20);
-  private static final Duration DAY2_DURATION = Duration.ofMinutes(10);
+  private static final Duration DAY1_DURATION = Duration.ofMinutes(1);
+  private static final Duration DAY2_DURATION = Duration.ofMinutes(1);
   private static final Duration PVP_START_DURATION = Duration.ofMinutes(30);
 
   private static final int START_OF_DAY = 0;
@@ -362,12 +363,12 @@ public class GameWorker implements Runnable {
         player.getAccount().getPlayer().sendMessage("Votre rôle : Villageois");
         
         VocalSystemWorker.getVoiceRequests().add(new VoiceRequest(GameData.getLobby().getGuild().getIdLong(),
-            player.getAccount().getDiscordId(), Role.VILLAGEOIS.getVoiceFile(), true));
+            player.getAccount().getDiscordId(), Role.VILLAGEOIS.getVoiceFile().getAbsolutePath(), true));
       }else {
         player.getAccount().getPlayer().sendMessage("Votre rôle : " + role.getName());
         
         VocalSystemWorker.getVoiceRequests().add(new VoiceRequest(GameData.getLobby().getGuild().getIdLong(),
-            player.getAccount().getDiscordId(), player.getRole().getVoiceFile(), true));
+            player.getAccount().getDiscordId(), role.getVoiceFile().getAbsolutePath(), true));
       }
       player.getAccount().getPlayer().sendMessage("Description : " + role.getDescription());
       if(player.getRole().getClan().equals(RoleClan.WOLFS) && !player.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {

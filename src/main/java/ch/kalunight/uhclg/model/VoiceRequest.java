@@ -6,13 +6,13 @@ public class VoiceRequest {
 
   private long guildId;
   private long userId;
-  private File musicToPlayer;
+  private String musicToPlayURL;
   private boolean needToBeAlone;
   
-  public VoiceRequest(long guildId, long userId, File musicToPlayer, boolean needToBeAlone){
+  public VoiceRequest(long guildId, long userId, String musicToPlayURL, boolean needToBeAlone){
     this.guildId = guildId;
     this.userId = userId;
-    this.musicToPlayer = musicToPlayer;
+    this.musicToPlayURL = musicToPlayURL;
     this.needToBeAlone = needToBeAlone;
   }
 
@@ -24,12 +24,12 @@ public class VoiceRequest {
     this.guildId = guildId;
   }
 
-  public File getMusicToPlay() {
-    return musicToPlayer;
+  public String getMusicToPlay() {
+    return musicToPlayURL;
   }
 
-  public void setMusicToPlayer(File musicToPlayer) {
-    this.musicToPlayer = musicToPlayer;
+  public void setMusicToPlayer(String musicToPlayURL) {
+    this.musicToPlayURL = musicToPlayURL;
   }
 
   public boolean isNeedToBeAlone() {
