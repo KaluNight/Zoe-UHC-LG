@@ -10,7 +10,7 @@ import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.TimeStatus;
 
-public class Sorciere implements RoleImpl {
+public class Sorciere extends SaviorRole implements RoleImpl {
 
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "sorciere.wav");
   

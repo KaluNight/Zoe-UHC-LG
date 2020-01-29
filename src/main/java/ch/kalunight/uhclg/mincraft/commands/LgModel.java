@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.PlayerData;
-import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.role.EnfantSauvage;
 import ch.kalunight.uhclg.worker.GameWorker;
 
 public class LgModel implements CommandExecutor {
@@ -16,18 +16,20 @@ public class LgModel implements CommandExecutor {
     
     PlayerData enfantSauvage = null;
     for(PlayerData player : GameData.getPlayersInGame()) {
-      if(player.getRole().equals(Role.ENFANT_SAUVAGE)) {
+      if(player.getAccount().getPlayer().getName().equals(sender.getName())) {
         enfantSauvage = player;
       }
     }
     
-    if(enfantSauvage == null || !enfantSauvage.getAccount().getPlayer().getName().equals(sender.getName())) {
-      sender.sendMessage("Vous n'êtes pas l'enfant sauvage !");
+    if(enfantSauvage == null || !(enfantSauvage.getRole() instanceof EnfantSauvage)) {
+      sender.sendMessage("Vous n'êtes pas un enfant sauvage !");
       return true;
     }
     
-    if(GameData.getEnfantSauvageModel() != null) {
-      sender.sendMessage("Vous avez déjà défini " + GameData.getEnfantSauvageModel().getAccount().getPlayer().getName() + " comme modèle.");
+    EnfantSauvage enfantSauvageRole = (EnfantSauvage) enfantSauvage.getRole();
+    
+    if(enfantSauvageRole.getModel() != null) {
+      sender.sendMessage("Vous avez déjà défini " + enfantSauvageRole.getModel().getAccount().getPlayer().getName() + " comme modèle.");
       return true;
     }
     
@@ -54,7 +56,7 @@ public class LgModel implements CommandExecutor {
       return true;
     }
     
-    GameData.setEnfantSauvageModel(model);
+    enfantSauvageRole.setModel(model);
     sender.sendMessage("Vous avez selectionné " + model.getAccount().getPlayer().getName() + " comme modèle !");
     
     return true;

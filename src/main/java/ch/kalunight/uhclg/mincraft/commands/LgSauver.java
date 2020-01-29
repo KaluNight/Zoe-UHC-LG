@@ -8,7 +8,7 @@ import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.minecraft.MinecraftEventListener;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
-import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.role.SaviorRole;
 import ch.kalunight.uhclg.worker.GameWorker;
 import ch.kalunight.uhclg.worker.KillerWorker;
 
@@ -34,18 +34,12 @@ public class LgSauver implements CommandExecutor {
       }
     }
     
-    if(playerSender == null || !(playerSender.getRole().equals(Role.SORCIERE) 
-        || playerSender.getRole().equals(Role.INFECT_PERE_DES_LOUPS))) {
+    if(playerSender == null || !(playerSender.getRole() instanceof SaviorRole)) {
       sender.sendMessage("Vous n'êtes pas un infect père des loups ou une sorcière !");
       return true;
     }
     
-    if(playerSender.getRole().equals(Role.SORCIERE) && GameData.isSorcierePowerUsed()) {
-      sender.sendMessage("Vous avez déjà utilisé votre pouvoir !");
-      return true;
-    }
-    
-    if(playerSender.getRole().equals(Role.INFECT_PERE_DES_LOUPS) && GameData.isFatherWolfPowerUsed()) {
+    if(((SaviorRole) playerSender.getRole()).isPlayerSaved()) {
       sender.sendMessage("Vous avez déjà utilisé votre pouvoir !");
       return true;
     }
@@ -81,12 +75,7 @@ public class LgSauver implements CommandExecutor {
     }
     
     killerWorker.setHasBeenSaved(true);
-    
-    if(playerSender.getRole().equals(Role.SORCIERE)) {
-      GameData.setSorcierePowerUsed(true);
-    }else {
-      GameData.setFatherWolfPowerUsed(true);
-    }
+    ((SaviorRole) playerSender.getRole()).setPlayerSaved(true);
     
     playerSender.getAccount().getPlayer().sendMessage("Vous avez bien sauvé le joueur " + playerToSave.getAccount().getPlayer().getName() + " !");
     

@@ -5,7 +5,7 @@ import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.TimeStatus;
 
-public class InfectPereDesLoups implements RoleImpl {
+public class InfectPereDesLoups extends SaviorRole implements RoleImpl {
 
   private static final File annonceVoiceFile = new File(Role.SOUNDS_FOLDER + "infect_loup.wav");
   
