@@ -8,6 +8,8 @@ import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.role.GrandMereLoup;
+import ch.kalunight.uhclg.model.role.LoupGarouAmnesique;
 import ch.kalunight.uhclg.worker.GameWorker;
 
 public class LgVoir implements CommandExecutor {
@@ -68,14 +70,14 @@ public class LgVoir implements CommandExecutor {
     
     setRoleChecked(true);
     
-    if(playerToCheck.getRole().equals(Role.GRAND_MERE_LOUP)) {
-      if(GameData.isGrandMereLoupReveal()) {
+    if(playerToCheck.getRole() instanceof GrandMereLoup) {
+      if(((GrandMereLoup) playerSender.getRole()).isFound()) {
         sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"" + playerToCheck.getRole().getName() + "\" !");
       }else {
         sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"Villageois\" !");
       }
-    }else if(playerToCheck.getRole().equals(Role.LOUP_GAROU_AMNESIQUE)) {
-      if(GameData.isLoupAmnesiqueFound()) {
+    }else if(playerToCheck.getRole() instanceof LoupGarouAmnesique) {
+      if(((LoupGarouAmnesique) playerToCheck.getRole()).isHasBeenFound()) {
         sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"" + playerToCheck.getRole().getName() + "\" !");
       }else {
         sender.sendMessage("Le rôle de " + playerToCheck.getAccount().getPlayer().getName() + " est \"Villageois\" !");

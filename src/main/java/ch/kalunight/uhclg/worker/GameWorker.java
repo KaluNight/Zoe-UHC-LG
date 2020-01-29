@@ -107,7 +107,7 @@ public class GameWorker implements Runnable {
       }else {
         double newSize = worldBorder.getSize() / 2;
         worldBorder.setSize(newSize, 300);
-        ZoePluginMaster.getMinecraftServer().broadcastMessage("La carte se réduit de " + newSize + " blocs ! ");
+        ZoePluginMaster.getMinecraftServer().broadcastMessage("La carte se réduit de " + (int) newSize + " blocs ! ");
       }
 
     } else {

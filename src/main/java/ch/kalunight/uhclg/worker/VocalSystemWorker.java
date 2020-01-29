@@ -63,8 +63,8 @@ public class VocalSystemWorker implements Runnable {
             VoiceChannel voiceChannel = position.getActualVoiceChannel(guild);
 
             if(voiceChannel != null){
-              if(voiceRequest.isNeedToBeAlone() && isPlayerAlone(position)
-                  || voiceRequest.isNeedToBeAlone() && !isPlayerAlone(position)) {
+              if((voiceRequest.isNeedToBeAlone() && isPlayerAlone(position))
+                  || !voiceRequest.isNeedToBeAlone()) {
                 
                 File file = new File(voiceRequest.getMusicToPlay());
                 if(file.exists()) {

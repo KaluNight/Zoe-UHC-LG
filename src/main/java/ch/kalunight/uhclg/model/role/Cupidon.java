@@ -48,8 +48,8 @@ public class Cupidon implements RoleImpl {
     player.getAccount().getPlayer().getInventory().addItem(new ItemStack(Material.STRING, 3));
     ItemStack book = new ItemStack(Material.ENCHANTED_BOOK, 1);
     ItemMeta bookMeta = book.getItemMeta();
-    bookMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 0, true);
-    bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 1, true);
+    bookMeta.addEnchant(Enchantment.ARROW_KNOCKBACK, 1, true);
+    bookMeta.addEnchant(Enchantment.ARROW_DAMAGE, 2, true);
     book.setItemMeta(bookMeta);
     player.getAccount().getPlayer().getInventory().addItem(book);
 
