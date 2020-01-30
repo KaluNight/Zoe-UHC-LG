@@ -29,3 +29,6 @@ commands:
  lgflairer:
   description: Révèle un joueur près de vous
   usage: /lgflairer nomDuJoueur
+ lgdefinespawn:
+  description: Définit le lobby
+  usage: /lgdefinespawn

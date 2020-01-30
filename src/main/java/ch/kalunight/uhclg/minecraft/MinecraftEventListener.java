@@ -58,6 +58,9 @@ public class MinecraftEventListener implements Listener {
       event.getPlayer().setGameMode(GameMode.ADVENTURE);
 
       event.getPlayer().setInvulnerable(true);
+    }else if(GameData.getGameStatus().equals(GameStatus.WAIT_LOBBY_CREATION)) {
+      event.getPlayer().setGameMode(GameMode.SPECTATOR);
+      
     }else {
       PlayerData playerInGame = GameData.getPlayerInGame(event.getPlayer().getUniqueId());
 

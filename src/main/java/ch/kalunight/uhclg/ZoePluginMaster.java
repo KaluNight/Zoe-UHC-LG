@@ -10,8 +10,6 @@ import java.util.List;
 import javax.security.auth.login.LoginException;
 
 import org.bukkit.GameRule;
-import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,6 +29,7 @@ import ch.kalunight.uhclg.discord.commands.DefineLobbyVocalCommand;
 import ch.kalunight.uhclg.discord.commands.LinkCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkAllCommand;
 import ch.kalunight.uhclg.discord.commands.UnlinkCommand;
+import ch.kalunight.uhclg.mincraft.commands.LgDefineSpawn;
 import ch.kalunight.uhclg.mincraft.commands.LgDescription;
 import ch.kalunight.uhclg.mincraft.commands.LgFlairer;
 import ch.kalunight.uhclg.mincraft.commands.LgListe;
@@ -77,7 +76,7 @@ public class ZoePluginMaster extends JavaPlugin {
 
     setMinecraftServer(getServer());
 
-    GameData.setGameStatus(GameStatus.IN_LOBBY);
+    GameData.setGameStatus(GameStatus.WAIT_LOBBY_CREATION);
 
     CommandClientBuilder client = new CommandClientBuilder();
 
@@ -115,8 +114,7 @@ public class ZoePluginMaster extends JavaPlugin {
     this.getCommand("lglove").setExecutor(new LgLove());
     this.getCommand("lgdesc").setExecutor(new LgDescription());
     this.getCommand("lgflairer").setExecutor(new LgFlairer());
-
-    generateLobby();
+    this.getCommand("lgdefinespawn").setExecutor(new LgDefineSpawn());
     
     defineGameRule();
 
@@ -174,27 +172,6 @@ public class ZoePluginMaster extends JavaPlugin {
     }
 
     return tocken;
-  }
-
-  private void generateLobby() {
-    World world = getMinecraftServer().getWorld("world");
-    
-    GameWorker.setWorld(world);
-    
-    Location spawn = world.getSpawnLocation();
-
-    int spawnSize = 25;
-    int spawnHigh = 200;
-
-    for(int j = 0; j < spawnSize; j++) {
-      for(int i = 0; i < spawnSize; i++) {
-        world.getBlockAt(spawn.getBlockX() + i, spawnHigh, spawn.getBlockY() + j).setType(Material.GLASS);
-      }
-    }
-
-    world.setSpawnLocation(spawn.getBlockX() + (spawnSize / 2), spawnHigh + 1, spawn.getBlockY() + (spawnSize / 2));
-
-    GameData.setLobbyLocation(spawn);
   }
 
   private String getParamWithFile(File file) throws IOException {
