@@ -30,6 +30,7 @@ import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.model.role.Ancien;
+import ch.kalunight.uhclg.model.role.Cupidon;
 import ch.kalunight.uhclg.model.role.EnfantSauvage;
 import ch.kalunight.uhclg.model.role.GrandMereLoup;
 import ch.kalunight.uhclg.model.role.LoupGarouAmnesique;
@@ -38,12 +39,15 @@ import ch.kalunight.uhclg.util.LocationUtil;
 import ch.kalunight.uhclg.util.LoverUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
 import ch.kalunight.uhclg.util.RoleUtil;
+import ch.kalunight.uhclg.util.TitleUtil;
 import ch.kalunight.uhclg.worker.KillerWorker;
 import ch.kalunight.uhclg.worker.LoveKillerWorker;
 import ch.kalunight.uhclg.worker.SpectatorWorker;
 
 public class MinecraftEventListener implements Listener {
 
+  private static final String END_MESSAGE_TITLE = "Fin de partie !";
+  
   private static final int TIME_BEFORE_LIGHTNING_DAMAGE = 3;
 
   private static final List<KillerWorker> killedPlayersWhoCanBeSaved = Collections.synchronizedList(new ArrayList<>());
@@ -151,7 +155,7 @@ public class MinecraftEventListener implements Listener {
           villageList.add(player);
         }
 
-        if(player.isInLove()) {
+        if(player.isInLove() || player.getRole() instanceof Cupidon) {
           loverList.add(player);
         }
       }
@@ -159,12 +163,21 @@ public class MinecraftEventListener implements Listener {
 
     if(!villageList.isEmpty() && wolfsList.isEmpty() && specialList.isEmpty()) {
       ZoePluginMaster.getMinecraftServer().broadcastMessage("Le village gagne !");
+      ZoePluginMaster.getMinecraftServer()
+      .getOnlinePlayers().forEach(e -> TitleUtil.sendTitleToPlayer(e, END_MESSAGE_TITLE, "Le village gagne !", 100));
     }else if(villageList.isEmpty() && !wolfsList.isEmpty() && specialList.isEmpty()) {
       ZoePluginMaster.getMinecraftServer().broadcastMessage("Les loups gagnent !");
+      ZoePluginMaster.getMinecraftServer()
+      .getOnlinePlayers().forEach(e -> TitleUtil.sendTitleToPlayer(e, END_MESSAGE_TITLE, "Les loups gagnent !", 100));
     }else if(villageList.isEmpty() && wolfsList.isEmpty() && specialList.size() == 1) {
-      ZoePluginMaster.getMinecraftServer().broadcastMessage("Un joueur avec un rôle spécial gagne !");
-    }else if(villageList.size() + wolfsList.size() + specialList.size() == 2 && !loverList.isEmpty()) {
-      ZoePluginMaster.getMinecraftServer().broadcastMessage("Les amoureux gagnent !");
+      ZoePluginMaster.getMinecraftServer().broadcastMessage(specialList.get(0).getAccount().getPlayer().getName() + " gagne !");
+      ZoePluginMaster.getMinecraftServer()
+      .getOnlinePlayers().forEach(e -> TitleUtil.sendTitleToPlayer(e, END_MESSAGE_TITLE,
+          specialList.get(0).getAccount().getPlayer().getName() + " gagne !", 100));
+    }else if(villageList.size() + wolfsList.size() + specialList.size() == loverList.size() && !loverList.isEmpty()) {
+      ZoePluginMaster.getMinecraftServer().broadcastMessage("Les amoureux gagnent !\n");
+      ZoePluginMaster.getMinecraftServer()
+      .getOnlinePlayers().forEach(e -> TitleUtil.sendTitleToPlayer(e, END_MESSAGE_TITLE, "Les amoureux gagnent !", 100));
     }
   }
 
@@ -291,17 +304,17 @@ public class MinecraftEventListener implements Listener {
       }
     }
 
-    PlayerData potentionLoupAmnesique = GameData.getPlayerInGame(e.getEntity().getUniqueId());
+    PlayerData potentialLoupAmnesique = GameData.getPlayerInGame(e.getEntity().getUniqueId());
 
-    if(potentionLoupAmnesique != null && potentionLoupAmnesique.getRole() instanceof LoupGarouAmnesique) {
+    if(potentialLoupAmnesique != null && potentialLoupAmnesique.getRole() instanceof LoupGarouAmnesique) {
       PlayerData damager = GameData.getPlayerInGame(e.getDamager().getUniqueId());
 
       if(damager != null && damager.isAlive() && damager.getRole().getRoleEnum().getClan().equals(RoleClan.WOLFS)) {
-        ((LoupGarouAmnesique) potentionLoupAmnesique.getRole()).setHasBeenFound(true);
+        ((LoupGarouAmnesique) potentialLoupAmnesique.getRole()).setHasBeenFound(true);
 
-        potentionLoupAmnesique.getAccount().getPlayer()
+        potentialLoupAmnesique.getAccount().getPlayer()
         .sendMessage("Vous êtes un LOUP GAROU AMNESIQUE ! PREVENEZ VOS ALLIÉS LOUPS !");
-        potentionLoupAmnesique.getAccount().getPlayer().playSound(potentionLoupAmnesique.getAccount().getPlayer().getLocation(), Sound.ENTITY_WOLF_HOWL, 100, 100);
+        potentialLoupAmnesique.getAccount().getPlayer().playSound(potentialLoupAmnesique.getAccount().getPlayer().getLocation(), Sound.ENTITY_WOLF_HOWL, 100, 100);
       }
     }
   }
