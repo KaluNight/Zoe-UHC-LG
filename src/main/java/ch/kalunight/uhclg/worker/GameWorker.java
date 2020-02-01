@@ -18,6 +18,7 @@ import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.model.TimeStatus;
 import ch.kalunight.uhclg.model.VoiceRequest;
+import ch.kalunight.uhclg.model.VoiceStatus;
 import ch.kalunight.uhclg.model.role.RoleImpl;
 
 public class GameWorker implements Runnable {
@@ -155,6 +156,7 @@ public class GameWorker implements Runnable {
   }
 
   private void sayRoleToPlayer() {
+    VocalSystemWorker.setVoiceStatus(VoiceStatus.SOLO_ANNONCEMENT);
     for(PlayerData player : GameData.getPlayersInGame()) {
       RoleImpl role = player.getRole();
 

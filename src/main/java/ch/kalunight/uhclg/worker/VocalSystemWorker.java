@@ -16,6 +16,7 @@ import ch.kalunight.uhclg.model.JdaWithRateLimit;
 import ch.kalunight.uhclg.model.PlayerData;
 import ch.kalunight.uhclg.model.PlayerVoicePosition;
 import ch.kalunight.uhclg.model.VoiceRequest;
+import ch.kalunight.uhclg.model.VoiceStatus;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -39,16 +40,26 @@ public class VocalSystemWorker implements Runnable {
   private static long idDeadPlayer;
 
   private static double voiceDistance = 30d;
+  
+  private static VoiceStatus voiceStatus = VoiceStatus.NORMAL;
 
   @Override
   public void run() {
     playersAlreadyTreated.clear();
 
-    if(GameData.getGameStatus().equals(GameStatus.IN_GAME)) {
+    if(GameData.getGameStatus().equals(GameStatus.IN_GAME) && VoiceStatus.NORMAL.equals(voiceStatus)) {
       refreshPlayerVoiceLink();
       movePlayerWithLink();
     }
 
+    treathVoiceRequest();
+    
+    if(voiceStatus.equals(VoiceStatus.SOLO_ANNONCEMENT) && voiceRequests.isEmpty()) {
+      setVoiceStatus(VoiceStatus.NORMAL);
+    }
+  }
+
+  private void treathVoiceRequest() {
     if(!voiceRequests.isEmpty()) {
       List<JdaWithRateLimit> aviablesVoiceJda = getAviableVoiceJda();
       for(JdaWithRateLimit aviableVoiceJda : aviablesVoiceJda) {
@@ -322,4 +333,11 @@ public class VocalSystemWorker implements Runnable {
     return voiceRequests;
   }
 
+  public static VoiceStatus getVoiceStatus() {
+    return voiceStatus;
+  }
+
+  public static void setVoiceStatus(VoiceStatus voiceStatus) {
+    VocalSystemWorker.voiceStatus = voiceStatus;
+  }
 }
