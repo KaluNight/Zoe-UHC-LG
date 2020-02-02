@@ -109,7 +109,7 @@ public class MinecraftEventListener implements Listener {
 
           otherLover.getAccount().getPlayer().addPotionEffect(PotionUtil.SPEED);
           otherLover.getAccount().getPlayer().addPotionEffect(PotionUtil.STRENGTH);
-          otherLover.getAccount().getPlayer().playSound(otherLover.getAccount().getPlayer().getLocation(), Sound.MUSIC_END, 1, 1);
+          otherLover.getAccount().getPlayer().playSound(otherLover.getAccount().getPlayer().getLocation(), Sound.MUSIC_END, 100, 100);
 
           LoveKillerWorker loveKillerWorker = new LoveKillerWorker(otherLover);
           ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), loveKillerWorker, DeathUtil.DEATH_TIME_IN_TICKS);

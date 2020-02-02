@@ -45,7 +45,7 @@ public enum Role {
     for(int i = 0; i < config.getSpecialVillagersNumber(); i++) {
       Role roleToAdd;
       do {
-        roleToAdd = getRandomVillagerSpecialRole();
+        roleToAdd = getRandomVillagerSpecialRole(config);
       }while(roles.contains(roleToAdd));
       roles.add(roleToAdd);
     }
@@ -65,11 +65,12 @@ public enum Role {
     return roles;
   }
 
-  private static Role getRandomVillagerSpecialRole() {
+  private static Role getRandomVillagerSpecialRole(GameConfig config) {
     Role role;
     do {
       role = VALUES.get(RANDOM.nextInt(SIZE));
-    }while((!role.getClan().equals(RoleClan.VILLAGE) && !role.getClan().equals(RoleClan.SPECIAL)) || role.equals(Role.VILLAGEOIS));
+    }while((!role.getClan().equals(RoleClan.VILLAGE) && !role.getClan().equals(RoleClan.SPECIAL)) || role.equals(Role.VILLAGEOIS) 
+        || (role.equals(Role.CUPIDON) && config.getPlayersNumber() < 10));
 
     return role;
   }
