@@ -7,7 +7,6 @@ import org.bukkit.command.CommandSender;
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
-import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.role.Cupidon;
 import ch.kalunight.uhclg.worker.GameWorker;
 
@@ -33,7 +32,7 @@ public class LgLove implements CommandExecutor {
       }
     }
     
-    if(playerSender == null || !playerSender.getRole().equals(Role.CUPIDON)) {
+    if(playerSender == null || !(playerSender.getRole() instanceof Cupidon)) {
       sender.sendMessage("Vous n'êtes pas cupidon !");
       return true;
     }

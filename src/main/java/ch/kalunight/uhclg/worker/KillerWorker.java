@@ -11,7 +11,7 @@ import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.ZoePluginMaster;
 import ch.kalunight.uhclg.minecraft.MinecraftEventListener;
 import ch.kalunight.uhclg.model.PlayerData;
-import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.role.InfectPereDesLoups;
 import ch.kalunight.uhclg.util.DeathUtil;
 import ch.kalunight.uhclg.util.LocationUtil;
 import ch.kalunight.uhclg.util.PotionUtil;
@@ -36,7 +36,7 @@ public class KillerWorker implements Runnable {
   public void run() {
     
     if(hasBeenSaved) {
-      if(potentialSavior.getRole().equals(Role.INFECT_PERE_DES_LOUPS)) {
+      if(potentialSavior.getRole() instanceof InfectPereDesLoups) {
         playerKilled.setInfected(true);
         playerKilled.getAccount().getPlayer().sendMessage("Vous avez été sauvé par l'infect père des loups garous, vous êtes désomais un loup garou !");
       }else {

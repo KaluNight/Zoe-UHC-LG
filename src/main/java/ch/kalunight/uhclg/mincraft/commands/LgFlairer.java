@@ -7,10 +7,10 @@ import org.bukkit.command.CommandSender;
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.GameStatus;
 import ch.kalunight.uhclg.model.PlayerData;
-import ch.kalunight.uhclg.model.Role;
 import ch.kalunight.uhclg.model.RoleClan;
 import ch.kalunight.uhclg.model.role.GrandMereLoup;
 import ch.kalunight.uhclg.model.role.LoupGarouAmnesique;
+import ch.kalunight.uhclg.model.role.Renard;
 import ch.kalunight.uhclg.worker.GameWorker;
 
 public class LgFlairer implements CommandExecutor {
@@ -37,7 +37,7 @@ public class LgFlairer implements CommandExecutor {
       }
     }
     
-    if(playerSender == null || !playerSender.getRole().equals(Role.RENARD)) {
+    if(playerSender == null || !(playerSender.getRole() instanceof Renard)) {
       sender.sendMessage("Vous n'êtes pas un renard !");
       return true;
     }

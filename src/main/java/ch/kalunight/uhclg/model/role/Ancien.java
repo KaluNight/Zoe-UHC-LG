@@ -24,8 +24,9 @@ public class Ancien implements RoleImpl {
 
   @Override
   public String getDescription() {
-    return "Ancien : Il dispose de l’effet resistance 1, il sera ressuscité (1 seule fois). "
-        + "S’il est tué par un villageois, celui-ci perdra la moitié de sa vie.";
+    return "Ancien : Il sera ressuscité une fois. "
+        + "S’il est tué par un villageois, celui-ci perdra la moitié de sa vie lors de ça réaparition. "
+        + "Après avoir été réssucité, il obtient de manière permanente l'effet résistance.";
   }
 
   @Override

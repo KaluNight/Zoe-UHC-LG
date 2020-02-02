@@ -8,6 +8,7 @@ import org.bukkit.Effect;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.SoundCategory;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.EntityType;
@@ -246,6 +247,8 @@ public class MinecraftEventListener implements Listener {
     playerData.getAccount().getPlayer().setHealth(respawnLife);
     playerData.getAccount().getPlayer().removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
     playerData.getAccount().getPlayer().addPotionEffect(PotionUtil.SPAWN_RESISTANCE);
+    playerData.getAccount().getPlayer().playSound(playerData.getAccount().getPlayer().getLocation(),
+        Sound.ENTITY_ENDERMAN_TELEPORT, SoundCategory.MASTER, 100, 100);
     playerData.getAccount().getPlayer().teleport(location);
   }
 

@@ -4,7 +4,8 @@ import java.util.List;
 
 import ch.kalunight.uhclg.GameData;
 import ch.kalunight.uhclg.model.PlayerData;
-import ch.kalunight.uhclg.model.Role;
+import ch.kalunight.uhclg.model.role.InfectPereDesLoups;
+import ch.kalunight.uhclg.model.role.Sorciere;
 
 public class DeathUtil {
 
@@ -22,7 +23,7 @@ public class DeathUtil {
     boolean containSorciere = false;
 
     for(PlayerData playerData : GameData.getPlayersInGame()) {
-      if(!playerAlreadyAsked.contains(playerData) && playerData.getRole().equals(Role.SORCIERE)) {
+      if(!playerAlreadyAsked.contains(playerData) && playerData.getRole() instanceof Sorciere) {
         containSorciere = true;
         break;
       }
@@ -30,7 +31,7 @@ public class DeathUtil {
 
     for(PlayerData playerData : GameData.getPlayersInGame()) {
       if(!playerAlreadyAsked.contains(playerData)) {
-        if((containSorciere && playerData.getRole().equals(Role.SORCIERE)) || (!containSorciere && playerData.getRole().equals(Role.INFECT_PERE_DES_LOUPS))) {
+        if((containSorciere && playerData.getRole() instanceof Sorciere) || (!containSorciere && playerData.getRole() instanceof InfectPereDesLoups)) {
           return playerData;
         }
       }
