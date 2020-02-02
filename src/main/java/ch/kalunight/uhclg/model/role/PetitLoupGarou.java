@@ -48,6 +48,7 @@ public class PetitLoupGarou implements RoleImpl {
     }else {
       PotionUtil.clearSpeed(player);
     }
+    RoleImpl.giveWolfsEffects(player, time);
   }
 
 }

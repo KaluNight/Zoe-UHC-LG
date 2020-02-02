@@ -24,8 +24,8 @@ import ch.kalunight.uhclg.model.role.RoleImpl;
 public class GameWorker implements Runnable {
 
   private static final int DAY_DURATION = 24000;
-  private static final Duration DAY1_DURATION = Duration.ofMinutes(1);
-  private static final Duration DAY2_DURATION = Duration.ofMinutes(1);
+  private static final Duration DAY1_DURATION = Duration.ofMinutes(20);
+  private static final Duration DAY2_DURATION = Duration.ofMinutes(10);
   private static final Duration PVP_START_DURATION = Duration.ofMinutes(30);
 
   private static final int START_OF_DAY = 0;
