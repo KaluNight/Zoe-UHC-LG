@@ -48,7 +48,7 @@ import ch.kalunight.uhclg.worker.SpectatorWorker;
 public class MinecraftEventListener implements Listener {
 
   private static final String END_MESSAGE_TITLE = "Fin de partie !";
-  
+
   private static final int TIME_BEFORE_LIGHTNING_DAMAGE = 3;
 
   private static final List<KillerWorker> killedPlayersWhoCanBeSaved = Collections.synchronizedList(new ArrayList<>());
@@ -65,7 +65,7 @@ public class MinecraftEventListener implements Listener {
       event.getPlayer().setInvulnerable(true);
     }else if(GameData.getGameStatus().equals(GameStatus.WAIT_LOBBY_CREATION)) {
       event.getPlayer().setGameMode(GameMode.SPECTATOR);
-      
+
     }else {
       PlayerData playerInGame = GameData.getPlayerInGame(event.getPlayer().getUniqueId());
 
@@ -196,7 +196,7 @@ public class MinecraftEventListener implements Listener {
       }
     }
   }
-  
+
   private boolean playerCanBeSaved(PlayerData playerToBeSaved) {
     for(PlayerData playerCheckRole : GameData.getPlayersInGame()) {
       if((playerCheckRole.getRole().getRoleEnum().equals(Role.SORCIERE) || playerCheckRole.getRole().getRoleEnum().equals(Role.INFECT_PERE_DES_LOUPS)) && playerCheckRole.isAlive()
@@ -209,6 +209,18 @@ public class MinecraftEventListener implements Listener {
 
   @EventHandler
   public void onEntityDamage(final EntityDamageEvent e) {
+    PlayerData playerData = GameData.getPlayerInGame(e.getEntity().getUniqueId());
+
+    if(playerData != null) {
+      for(KillerWorker killerWorkerAlreadyCreated : getKilledPlayersWhoCanBeSaved()) {
+        if(playerData.getAccount().getPlayerUUID().equals(killerWorkerAlreadyCreated.getPlayerKilled().getAccount().getPlayerUUID())) {
+          e.setCancelled(true);
+          e.setDamage(0);
+          return;
+        }
+      }
+    }
+    
     if (e.getCause() == DamageCause.LIGHTNING) {
       if(LocalDateTime.now().minusSeconds(TIME_BEFORE_LIGHTNING_DAMAGE).isBefore(lastTimePlayerKilled)) {
         e.setCancelled(true);
@@ -274,6 +286,14 @@ public class MinecraftEventListener implements Listener {
     if(playerData != null && playerData.isAlive()) {
       if(playerData.getAccount().getPlayer().getHealth() - e.getDamage() < 1) {
 
+        for(KillerWorker killerWorkerAlreadyCreated : getKilledPlayersWhoCanBeSaved()) {
+          if(playerData.getAccount().getPlayerUUID().equals(killerWorkerAlreadyCreated.getPlayerKilled().getAccount().getPlayerUUID())) {
+            e.setCancelled(true);
+            e.setDamage(0);
+            return;
+          }
+        }
+
         if(playerCanBeSaved(playerData)) {
           KillerWorker killerWorker = new KillerWorker(playerData, DeathUtil.getAviableSavior(new ArrayList<>()));
           ZoePluginMaster.getMinecraftServer().getScheduler().runTaskLater(ZoePluginMaster.getPlugin(), killerWorker, DeathUtil.DEATH_TIME_IN_TICKS);
@@ -317,7 +337,8 @@ public class MinecraftEventListener implements Listener {
 
         potentialLoupAmnesique.getAccount().getPlayer()
         .sendMessage("Vous êtes un LOUP GAROU AMNESIQUE ! PREVENEZ VOS ALLIÉS LOUPS !");
-        potentialLoupAmnesique.getAccount().getPlayer().playSound(potentialLoupAmnesique.getAccount().getPlayer().getLocation(), Sound.ENTITY_WOLF_HOWL, 100, 100);
+        potentialLoupAmnesique.getAccount().getPlayer().playSound(
+            potentialLoupAmnesique.getAccount().getPlayer().getLocation(), Sound.ENTITY_WOLF_HOWL, 100, 100);
       }
     }
   }

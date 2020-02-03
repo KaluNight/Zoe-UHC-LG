@@ -62,8 +62,8 @@ public class KillerWorker implements Runnable {
       }
       
       playerKilled.getAccount().getPlayer().addPotionEffect(PotionUtil.SPAWN_RESISTANCE);
-      playerKilled.getAccount().getPlayer().setInvulnerable(false);
       playerKilled.getAccount().getPlayer().teleport(location);
+      playerKilled.getAccount().getPlayer().setInvulnerable(false);
     }else {
       saviorAlreadyAsked.add(potentialSavior);
       
